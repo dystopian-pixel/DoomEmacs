@@ -1,0 +1,420 @@
+#+TITLE: Doom Emacs Configuration
+#+AUTHOR: Andy
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+
+* Overview
+
+This repository is a Doom Emacs configuration with a mixed =Org + Elisp=
+layout:
+
+- =init.el= enables Doom modules.
+- =packages.el= declares extra Emacs packages.
+- =config.el= loads the runtime configuration.
+- =modules/org/= contains the literate Org source files.
+- =modules/config/= contains the tangled =.el= files that Doom actually loads.
+- =themes/= contains custom themes.
+- =scripts/theme-screenshot.fish= is an optional helper for theme gallery screenshots.
+
+This repo is designed to live at:
+
+#+begin_src text
+~/.doom.d
+#+end_src
+
+That matters because several paths in the config and helper scripts are hard-coded to
+that location.
+
+* What this config expects
+
+** Core tools
+
+These are the baseline tools you should have installed before using this repo:
+
+- GNU Emacs
+- git
+- ripgrep
+- fd
+- bash
+- fish
+- cmake
+- make
+- a C/C++ compiler (=gcc= or =clang=)
+- libvterm
+- python3
+- nodejs + npm
+- pyright
+- clangd
+
+** Feature-specific extras
+
+These are only needed for the parts of the repo that use them:
+
+- =zathura= + a PDF plugin, for the custom PDF launcher commands
+- =chromium= or another Chromium-based browser, for the theme gallery kiosk mode
+- =grim=, for the optional Wayland screenshot script used by the theme gallery
+- =pandoc=, for =pandoc-mode= workflows
+- =tmux=, for Doom's tmux module
+- =docker=, for Doom's docker module and any Docker-related workflows
+
+* Step-by-step install from scratch
+
+** 1) Install system packages
+
+Choose the section for your operating system.
+
+*** Arch Linux
+
+#+begin_src sh
+sudo pacman -Syu --needed \
+  emacs git ripgrep fd bash fish cmake make gcc libvterm \
+  python nodejs npm clang zathura zathura-pdf-mupdf chromium
+
+# Optional extras used by some parts of this repo
+sudo pacman -S --needed pandoc tmux docker grim
+
+# Python LSP server used by this config
+sudo npm install -g pyright
+#+end_src
+
+*** Fedora
+
+#+begin_src sh
+sudo dnf install -y \
+  emacs git ripgrep fd-find bash fish cmake make gcc libvterm-devel \
+  python3 python3-pip nodejs npm clang-tools-extra zathura zathura-pdf-poppler chromium
+
+# Optional extras used by some parts of this repo
+sudo dnf install -y pandoc tmux docker grim
+
+# Python LSP server used by this config
+sudo npm install -g pyright
+#+end_src
+
+*** Debian / Ubuntu and other Debian-based systems
+
+#+begin_src sh
+sudo apt update
+sudo apt install -y \
+  emacs git ripgrep fd-find bash fish cmake make gcc libvterm-dev \
+  python3 python3-pip nodejs npm zathura zathura-pdf-poppler chromium pandoc tmux docker.io
+
+# Python LSP server used by this config
+sudo npm install -g pyright
+#+end_src
+
+Debian-based systems commonly install the =fd-find= package as the =fdfind=
+command. Doom prefers =fd=. If =fd= is missing, create a user-local symlink:
+
+#+begin_src sh
+mkdir -p ~/.local/bin
+ln -sf "$(command -v fdfind)" ~/.local/bin/fd
+#+end_src
+
+Make sure =~/.local/bin= is on your =PATH=.
+
+*** NixOS
+
+A simple declarative starting point is:
+
+#+begin_src nix
+{ config, pkgs, ... }:
+{
+  environment.systemPackages = with pkgs; [
+    emacs
+    git
+    ripgrep
+    fd
+    bash
+    fish
+    cmake
+    gnumake
+    gcc
+    libvterm
+    python3
+    nodejs
+    pyright
+    clang-tools
+    zathura
+    zathuraPkgs.zathura_pdf_poppler
+    chromium
+    pandoc
+    tmux
+    docker
+    grim
+  ];
+
+  programs.emacs = {
+    enable = true;
+    extraPackages = epkgs: [ epkgs.vterm ];
+  };
+}
+#+end_src
+
+Then rebuild:
+
+#+begin_src sh
+sudo nixos-rebuild switch
+#+end_src
+
+*** macOS (latest)
+
+Install Xcode Command Line Tools first:
+
+#+begin_src sh
+xcode-select --install
+#+end_src
+
+Then install the main packages with Homebrew:
+
+#+begin_src sh
+brew install emacs git ripgrep fd fish cmake libvterm python node pyright llvm pandoc tmux
+brew install --cask google-chrome
+#+end_src
+
+This repo's PDF commands expect =zathura=. The simplest macOS route is usually
+MacPorts:
+
+#+begin_src sh
+sudo port install zathura zathura-plugin-pdf-mupdf
+#+end_src
+
+If you do not want to install Zathura on macOS, you should change the custom PDF
+commands in this repo to use Preview, Skim, or another macOS PDF viewer.
+
+*** Windows (latest)
+
+The recommended route for this repo is =WSL2 + Ubuntu=.
+
+1. Open PowerShell as Administrator.
+2. Run:
+
+#+begin_src powershell
+wsl --install
+#+end_src
+
+3. Reboot if Windows asks you to.
+4. Open the Ubuntu terminal created by WSL.
+5. Inside Ubuntu, follow the =Debian / Ubuntu= section above.
+
+Native Windows is not the best match for this repo because it assumes several
+Linux-oriented tools and workflows, including =vterm=, =fish=, =zathura=,
+=chromium= kiosk usage, and an optional Wayland screenshot helper.
+
+** 2) Install the Doom Emacs framework
+
+Clone Doom itself to =~/.config/emacs=:
+
+#+begin_src sh
+git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
+#+end_src
+
+Add Doom's =bin= directory to your shell =PATH=.
+
+For Bash / Zsh:
+
+#+begin_src sh
+echo 'export PATH="$HOME/.config/emacs/bin:$PATH"' >> ~/.bashrc
+#+end_src
+
+For Fish:
+
+#+begin_src fish
+fish_add_path $HOME/.config/emacs/bin
+#+end_src
+
+Then run Doom's installer once:
+
+#+begin_src sh
+~/.config/emacs/bin/doom install
+#+end_src
+
+** 3) Install this configuration repo
+
+If =~/.doom.d= already exists, back it up first:
+
+#+begin_src sh
+mv ~/.doom.d ~/.doom.d.bak
+#+end_src
+
+Now clone this repository into the correct location:
+
+#+begin_src sh
+git clone <YOUR-REPO-URL> ~/.doom.d
+#+end_src
+
+** 4) Sync Doom with this config
+
+Run:
+
+#+begin_src sh
+doom sync
+#+end_src
+
+Then run:
+
+#+begin_src sh
+doom doctor
+#+end_src
+
+If =doom doctor= reports a missing dependency, install it before continuing.
+
+** 5) Launch Emacs
+
+Start Emacs normally.
+
+On the first PDF you open, =pdf-tools= may need to build its helper program.
+That is expected on Linux and macOS.
+
+** 6) If you edit the Org source files
+
+This repo keeps the runtime files in =modules/config/= and the Org source files in
+=modules/org/=.
+
+If you edit a file in =modules/org/=, make sure its tangled =.el= file is updated
+before you rely on the change.
+
+Typical workflow:
+
+#+begin_src text
+Edit modules/org/<name>.org
+Save the file
+Let org-auto-tangle regenerate modules/config/<name>.el
+Run doom sync if package/module changes were involved
+#+end_src
+
+If needed, you can also tangle manually with:
+
+#+begin_src text
+M-x org-babel-tangle
+#+end_src
+
+* First-run checks
+
+After installation, verify the following:
+
+- =M-x vterm= opens correctly
+- =M-x projectile-find-file= works
+- Python buffers start LSP successfully
+- C/C++ buffers can find =clangd=
+- PDF commands work if you installed =zathura=
+- Theme gallery commands work if you installed =chromium=
+
+* Updating
+
+** Update Doom itself
+
+#+begin_src sh
+cd ~/.config/emacs
+git pull
+ doom sync
+#+end_src
+
+** Update this config repo
+
+#+begin_src sh
+cd ~/.doom.d
+git pull
+doom sync
+#+end_src
+
+* Troubleshooting
+
+** Fish shell warning in Doom Doctor
+
+This config already forces Doom internals to use a POSIX shell when Emacs is
+launched from Fish or Nushell, while still preferring Fish for interactive shell
+use inside Emacs.
+
+** vterm does not build
+
+Check that all of these are installed:
+
+- =libvterm=
+- =cmake=
+- =make=
+- a C compiler
+
+On NixOS, also make sure =epkgs.vterm= is included in your Emacs package setup.
+
+** Python LSP does not start
+
+Check that:
+
+- =python3= is installed
+- =pyright= is installed and on =PATH=
+- =node= and =npm= are installed if you installed =pyright= through npm
+
+** Zathura commands fail
+
+Install both:
+
+- =zathura=
+- a PDF backend plugin (=zathura-pdf-mupdf= or =zathura-pdf-poppler= depending on distro)
+
+** Theme screenshot script fails
+
+The optional script at =scripts/theme-screenshot.fish= assumes:
+
+- Fish is installed
+- =emacsclient= is available
+- =grim= is installed
+- you are on Wayland
+- the monitor name in the script matches your actual monitor
+
+You may need to edit the monitor name before using it.
+
+* Repo-specific notes
+
+** Important path assumption
+
+This repo assumes the config directory is exactly:
+
+#+begin_src text
+~/.doom.d
+#+end_src
+
+If you use a custom =DOOMDIR=, update any hard-coded paths accordingly.
+
+** Literate source of truth
+
+Treat =modules/org/= as the source of truth when you are editing the config.
+The =modules/config/= files are the runtime output that Doom loads.
+
+* Publishing checklist
+
+Before publishing this repo, make sure:
+
+- your remote URL in the clone example is updated
+- any machine-specific paths are removed or documented
+- any monitor-specific values in scripts are adjusted or explained
+- all tangled =modules/config/*.el= files are up to date
+- =doom sync= and =doom doctor= both pass on a clean machine
+
+
+* Current audit notes from this repo
+
+These are worth checking before you publish the repo.
+
+** Python LSP package mismatch
+
+The config loads =lsp-pyright= in =modules/config/language-support.el=, but the
+current repo does not declare =lsp-pyright= in =packages.el=, and =init.el=
+does not enable Doom's Python =+lsp= / =+pyright= flags.
+
+Recommended fix:
+
+- either add =(package! lsp-pyright)= to =packages.el=
+- or enable the Doom Python flags in =init.el= and align the Python config with that choice
+
+** Dashboard PDF command mismatch
+
+The dashboard quickstart currently references =as/pdf-open-with-zathura=, while
+the repo's PDF helper functions use the =my/...= naming pattern such as:
+
+- =my/open-pdf-in-zathura=
+- =my/launch-zathura-prompt=
+- =my/open-pdf-in-zathura-and-close=
+
+Before publishing, either change the dashboard entry to one of the existing
+functions or add a compatibility alias.
