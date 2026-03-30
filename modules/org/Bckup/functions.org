@@ -1,0 +1,84 @@
+#+TITLE: Functions
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: General helpers, tangling, pdf tools, sidebar tools, buffer management, dictionary, folding helpers
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args:emacs-lisp :comments none :padline no :results none
+#+auto_tangle: t
+#+filetags: :utils:helpers:tangle:pdf:sidebar:buffers:
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
+
+
+
+* Overview
+
+This file lives in =modules/org/functions.org= and tangles a single loader to
+=modules/config/functions.el=. Your feature files live in =modules/org/funcs/*.org=
+and *each of those* tangles to =modules/config/funcs/<name>.el=.
+
+
+* Safety notes
+
+- Every =#+begin_src emacs-lisp= must have a matching =#+end_src=.
+- Do *not* put =#+INCLUDE= lines inside src blocks.
+- If you see =invalid-read-syntax #+= at startup, a src block is unclosed in one of the included files.
+  
+
+* Loader (tangled)
+#+begin_src emacs-lisp :tangle ../config/functions.el
+;;; functions.el --- Doom module: config/functions  -*- lexical-binding: t; -*-
+
+;; Loads every .el from modules/config/funcs at startup. This keeps functions.org
+;; simple and prevents #+INCLUDE content from leaking into the tangled .el.
+
+(defvar my/functions.el-root
+  (file-name-directory (or load-file-name buffer-file-name))
+  "Directory of this file (modules/config).")
+
+(defun my/functions-load-each ()
+  "Load all compiled/tangled helpers from ../config/funcs/*.el in a stable order."
+  (let* ((funcs-dir (expand-file-name "funcs" my/functions.el-root))
+         (files (when (file-directory-p funcs-dir)
+                  (directory-files funcs-dir t "\\.el\\'"))))
+    (dolist (f (sort files #'string<))
+      (condition-case e
+          (load f nil t)
+        (error (message "⚠ functions.el: failed to load %s: %s" f e))))))
+
+(my/functions-load-each)
+
+(message "functions.el loaded")
+(provide 'functions)
+;;; functions.el ends here
+#+end_src
+
+* Includes (editing convenience only; not tangled here)
+These =#+INCLUDE= lines make it easy to jump into sub-files while editing. They
+do *not* tangle from this file. Each child org should declare its own
+=:tangle ../config/funcs/<name>.el= at the file level.
+
+** Sidebar tools
+#+INCLUDE: "funcs/sidebar-tools.org" :lines "1-"
+
+** Buffer management
+#+INCLUDE: "funcs/buffer-management.org" :lines "1-"
+
+** Theming
+#+INCLUDE: "funcs/theming.org" :lines "1-"
+
+** PDF tools enhancements
+#+INCLUDE: "funcs/pdf-tools-enhancements.org" :lines "1-"
+
+* Template for child files (for reference; not tangled)
+#+begin_example org
+#+TITLE: <Name>
+#+PROPERTY: header-args:emacs-lisp :comments none :padline no :results none :tangle ../config/funcs/<name>.el
+
+* Code
+#+begin_src emacs-lisp
+;;; <name>.el  -*- lexical-binding: t; -*-
+
+;; … your existing code for this topic …
+
+(provide '<name>)
+#+end_src
+#+end_example

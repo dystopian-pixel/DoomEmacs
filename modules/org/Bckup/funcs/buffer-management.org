@@ -1,0 +1,165 @@
+#+TITLE: Buffer Management
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Functions for buffer management
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args:emacs-lisp :tangle ../../config/funcs/buffer-management.el :comments none :padline no
+#+auto_tangle: t
+#+filetags: :utils:helpers:buffer-management:
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
+
+This section is about juggling open work without creating chaos. It helps you switch, clean up, and refocus when your desktop gets crowded. The priority is clarity: see what’s open and move between items with ease. It keeps momentum high as you traverse tasks.
+
+
+* Table of Contents :TOC:
+- [[#buffer-management][Buffer Management]]
+- [[#comparisons][Comparisons]]
+  - [[#ediff-faces][eDiff Faces]]
+  - [[#buffers][Buffers]]
+- [[#enhanced-code-folding][Enhanced Code Folding]]
+- [[#module-footer][Module Footer]]
+
+* Buffer Management
+
+This section is about juggling open work without creating chaos. It helps you switch, clean up, and refocus when your desktop gets crowded. The priority is clarity: see what’s open and move between items with ease. It keeps momentum high as you traverse tasks.
+
+
+
+#+begin_src emacs-lisp
+(defun my/kill-all-buffers-and-close-sidebars ()
+  "Kill all buffers and close Treemacs and Minimap if they are open."
+  (interactive)
+  (when (y-or-n-p "Really kill ALL buffers and close sidebars? ")
+    (+evil:kill-all-buffers)
+    (when (featurep 'treemacs)
+      (dolist (win (window-list))
+        (when (string-match-p "\\*Treemacs" (buffer-name (window-buffer win)))
+          (delete-window win)))
+      (dolist (buf (buffer-list))
+        (when (string-match-p "\\*Treemacs" (buffer-name buf))
+          (kill-buffer buf))))
+    (when (bound-and-true-p minimap-mode)
+      (minimap-mode -1))
+    (message "All buffers killed and sidebars closed.")))
+
+(defun my/kill-all-other-buffers ()
+  "Kill all buffers except the current one and Treemacs buffers."
+  (interactive)
+  (when (y-or-n-p "Kill all OTHER buffers (keep Treemacs)? ")
+    (mapc (lambda (b)
+            (unless (or (eq b (current-buffer))
+                        (string-match-p "\\*Treemacs" (buffer-name b)))
+              (kill-buffer b)))
+          (buffer-list))
+    (message "Other buffers killed, Treemacs preserved.")))
+
+(defun my/kill-unmodified-buffers ()
+  "Kill all unmodified buffers."
+  (interactive)
+  (when (y-or-n-p "Kill all unmodified buffers?")
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (unless (buffer-modified-p)
+          (kill-buffer buf))))
+    (message "Unmodified buffers killed.")))
+#+end_src
+
+
+
+* Comparisons
+
+These tools help you understand how things changed. They make differences visible and easy to reason about, whether you’re reviewing edits or validating assumptions. The emphasis is confidence: you can see what’s new, what’s gone, and what needs attention. Decisions become simpler and faster.
+
+** eDiff Faces
+
+This subsection shapes the look of change indicators. It aims for contrasts that communicate clearly without shouting. The visual language is calm, readable, and consistent across situations. You recognize additions, removals, and adjustments at a glance.
+
+#+begin_src emacs-lisp
+(defvar my/ediff-faces-installed nil
+  "Non-nil once theme-aware Ediff faces are set up.")
+
+(defun my/ediff--apply-faces ()
+  "Apply theme-aware faces for Ediff by inheriting from `diff-*' faces."
+  (custom-set-faces!
+    '(ediff-current-diff-A  :inherit diff-removed         :extend t)
+    '(ediff-current-diff-B  :inherit diff-added           :extend t)
+    '(ediff-current-diff-C  :inherit diff-changed         :extend t)
+    '(ediff-fine-diff-A     :inherit diff-refine-removed  :weight bold :extend t)
+    '(ediff-fine-diff-B     :inherit diff-refine-added    :weight bold :extend t)
+    '(ediff-fine-diff-C     :inherit diff-refine-changed  :weight bold :extend t)
+    '(ediff-even-diff-A     :inherit shadow :extend t)
+    '(ediff-odd-diff-A      :inherit shadow :extend t)
+    '(ediff-even-diff-B     :inherit shadow :extend t)
+    '(ediff-odd-diff-B      :inherit shadow :extend t)
+    '(ediff-even-diff-C     :inherit shadow :extend t)
+    '(ediff-odd-diff-C      :inherit shadow :extend t)))
+#+end_src
+
+
+** Buffers
+
+Here you choose what to compare and how to view it. The process is designed to be straightforward and forgiving. You line up the right pieces and let the visuals do the heavy lifting. The result is a tidy, focused comparison experience.
+
+#+begin_src emacs-lisp
+(defun my/ediff-open-buffers (&optional use-visible)
+  (interactive "P")
+  (require 'ediff)
+  (let* ((wins (window-list (selected-frame) 'no-minibuffer))
+         (defaults (if (or use-visible (= (length wins) 2))
+                       (list (window-buffer (nth 0 wins))
+                             (window-buffer (nth 1 wins)))
+                     (list (current-buffer)
+                           (other-buffer (current-buffer) t))))
+         (bufA (read-buffer "Ediff buffer A: "
+                            (buffer-name (nth 0 defaults)) t))
+         (bufB (read-buffer "Ediff buffer B: "
+                            (buffer-name (nth 1 defaults)) t)))
+    (when (equal bufA bufB)
+      (user-error "Select two different buffers"))
+    (ediff-buffers bufA bufB)))
+#+end_src
+
+#+begin_src emacs-lisp
+(defun my/ediff--ensure-faces ()
+
+  (unless (bound-and-true-p my/ediff-faces-installed)
+    ;; Reapply whenever the theme changes (Doom-specific hook).
+    (add-hook 'doom-load-theme-hook #'my/ediff--apply-faces)
+    (setq my/ediff-faces-installed t))
+  (my/ediff--apply-faces))
+#+end_src
+
+
+
+* Enhanced Code Folding
+
+Here the focus is reducing visual noise so the big picture stays visible. Sections can be tucked away when you don’t need their details. It supports scanning, outlining, and returning to depth only when necessary. Your workspace feels lighter and more intentional.
+
+#+begin_src emacs-lisp
+;; Customize the fold ellipsis display
+(setq hs-set-up-overlay
+      (lambda (ov)
+        (when (eq 'code (overlay-get ov 'hs))
+          (overlay-put ov 'display " ⯈⯈⯈ "))))
+
+;; Start files with all folds closed (for programming modes)
+(remove-hook 'prog-mode-hook #'hs-hide-all)
+
+;; Optional: Use outline-style folding for Python
+(add-hook 'python-mode-hook
+  (lambda ()
+    (setq-local outline-regexp " *\\(def \\|class \\)")))
+
+;; Open folds when searching
+(setq hs-isearch-open t)
+
+#+end_src
+
+
+* Module Footer
+
+This is the tidy wrap-up for the file. It signals completeness and keeps final housekeeping in one predictable place. The intent is clarity for future readers and for tooling that expects a clean ending. The file closes the loop with a neat bow.
+
+#+begin_src emacs-lisp
+(message "functions.el loaded")
+(provide 'functions)
+#+end_src

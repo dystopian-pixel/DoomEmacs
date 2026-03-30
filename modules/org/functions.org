@@ -1,0 +1,54 @@
+#+TITLE: Functions Loader
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: General helpers, tangling, pdf tools, sidebar tools, buffer management, dictionary, folding helpers
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args:emacs-lisp :comments none :padline no :results none
+#+auto_tangle: t
+#+filetags: :utils:helpers:tangle:pdf:sidebar:buffers:loader:funcs:
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
+
+
+* Table of Contents :TOC:
+- [[#loader-for-funcs-modules][Loader for funcs/* modules]]
+  - [[#implementation][Implementation]]
+
+* Loader for funcs/* modules
+These are the actions that treat a codebase or notes collection as a single unit. They help you jump to meaningful places, run routine tasks, and keep momentum as you switch workstreams. The emphasis is on quick orientation and seamless transitions. It’s the command center for your current endeavor.
+
+** Implementation
+#+begin_src emacs-lisp :tangle ../../config/functions.el :mkdirp yes :comments link :results none
+;;; functions.el --- Load all funcs/*.el modules -*- lexical-binding: t; -*-
+
+(defun my/functions-load-each ()
+  "Load the set of function modules from a nearby ../config/funcs/ directory.
+This is resilient to being moved around under ~/.config/doom/modules/*."
+  (let* ((here (or load-file-name (buffer-file-name)))
+         (base (file-name-directory here))
+         ;; Try these candidates in order; load whatever exists.
+         (candidates
+          (list
+           ;; If functions.el was tangled to ~/.config/doom/config/functions.el (preferred)
+           (expand-file-name "funcs" (expand-file-name "config" (expand-file-name "~/.config/doom/")))
+           ;; If someone tangled into modules-local config (fallback)
+           (expand-file-name "funcs" (expand-file-name "../config" base))
+           ;; If functions.el itself is in ~/.config/doom/config/, build funcs relative to it
+           (expand-file-name "funcs" (file-name-directory (or load-file-name default-directory))))))
+    (catch 'done
+      (dolist (dir candidates)
+        (when (file-directory-p dir)
+          (dolist (m '("sidebar-tools.el"
+                       "buffer-management.el"
+                       "theming.el"
+                       "pdf-tools-enhancements.el"
+                       "general-helpers.el"
+                       "file-ops.el"
+                       "build-tools.el"))
+            (let ((path (expand-file-name m dir)))
+              (when (file-exists-p path)
+                (load path nil 'nomessage))))
+          (throw 'done t)))))
+  (provide 'functions))
+
+;; Load immediately at startup when this file is required.
+(my/functions-load-each)
+#+end_src

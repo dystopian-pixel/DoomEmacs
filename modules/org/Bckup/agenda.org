@@ -1,0 +1,417 @@
+#+TITLE: Super Agenda (Doom Emacs)
+#+AUTHOR: You
+#+DESCRIPTION: A full-featured, Hydra-free and keybinding-free Org Agenda configuration with org-super-agenda groups, curated custom views, friendly formatting, and robust helper functions.
+#+auto_tangle: t
+#+PROPERTY: header-args:emacs-lisp :tangle ../config/agenda.el :comments link
+
+
+* Table of Contents :TOC:
+- [[#overview][Overview]]
+- [[#load-order--optional-packages][Load order & optional packages]]
+- [[#files--directories][Files & directories]]
+- [[#friendly-formatting-helpers][Friendly formatting helpers]]
+- [[#visual--readability-tweaks][Visual & readability tweaks]]
+- [[#habit-integration-optional][Habit integration (optional)]]
+- [[#robust-helper-functions-skip--project-logic][Robust helper functions (skip & project logic)]]
+- [[#org-super-agenda-groups-if-available][org-super-agenda groups (if available)]]
+- [[#enable-org-super-agenda-only-if-present][Enable org-super-agenda (only if present)]]
+- [[#custom-commands-curated-views][Custom commands (curated views)]]
+  - [[#overview-weekly][Overview (weekly)]]
+  - [[#super-agenda-weekly-grouped][Super Agenda (weekly, grouped)]]
+  - [[#focus-today][Focus: Today]]
+  - [[#upcoming-windows][Upcoming windows]]
+  - [[#deadlines--scheduled][Deadlines & Scheduled]]
+  - [[#inbox-unscheduled-no-deadlines][Inbox (unscheduled, no deadlines)]]
+  - [[#next-actions][Next actions]]
+  - [[#projects--stuck-projects][Projects & Stuck projects]]
+  - [[#waiting--delegated--someday][Waiting / Delegated / Someday]]
+  - [[#weekly-review][Weekly Review]]
+- [[#sorting-preferences][Sorting preferences]]
+- [[#module-footer][Module Footer]]
+
+* Overview
+A clean, batteries-included Org Agenda setup designed for Doom Emacs:
+- Works even if ~org-super-agenda~ isn’t installed; enhances itself if it is.
+- Balanced, readable formatting and buffer headers.
+- A suite of robust helper functions (skip functions, project detection, etc.).
+- Curated, reusable custom commands for weekly overviews, today focus, upcoming windows, deadlines, scheduled, waiting/delegated/someday, next actions, projects, stuck projects, inbox, and a weekly review.
+- No hydras, no keymaps—those live in your separate files.
+
+* Load order & optional packages
+Gently wire optional features without hard dependencies.
+
+#+begin_src emacs-lisp
+;;; agenda.el --- Super Org Agenda for Doom -*- lexical-binding: t; -*-
+
+(eval-and-compile (require 'cl-lib))
+
+;; org-super-agenda (optional but recommended)
+;; Do not error if missing; we enable it conditionally.
+(with-eval-after-load 'org-agenda
+  (when (require 'org-super-agenda nil t)
+    ;; No mode toggle here yet—enable in a later section to ensure groups are set first.
+    (defvar my/org-super-agenda-available t)))
+#+end_src
+
+* Files & directories
+Where the agenda looks for data. Adjust to your layout; this is conservative and common.
+
+#+begin_src emacs-lisp
+(setq org-directory (or (getenv "ORGDIR") (expand-file-name "~/Documents/AGENDAS/"))
+      org-agenda-files
+      (cl-remove-if-not #'file-exists-p
+        (list (expand-file-name "inbox.org"     org-directory)
+              (expand-file-name "tasks.org"     org-directory)
+              (expand-file-name "projects.org"  org-directory)
+              (expand-file-name "calendar.org"  org-directory)
+              (expand-file-name "someday.org"   org-directory))))
+#+end_src
+
+* Friendly formatting helpers
+Human-friendly banners and date formatting for quick scanning.
+
+#+begin_src emacs-lisp
+(defun my/agenda--week-title ()
+  "Return a friendly title like: Tue · Oct 07–Oct 13."
+  (let* ((today (current-time))
+         (dow   (format-time-string "%a" today))
+         (start (org-read-date nil t "+0"))
+         (end   (org-read-date nil t "+6")))
+    (format "%s · %s–%s"
+            dow
+            (format-time-string "%b %d" start)
+            (format-time-string "%b %d" end))))
+
+(defun my/agenda--month-banner ()
+  "Return a month banner (e.g., “October 2025”)."
+  (format-time-string "%B %Y" (current-time)))
+
+(defun my/org-agenda-format-date (date)
+  "Custom date formatter for org-agenda."
+  (let* ((date-str (calendar-date-string date))
+         (ts (org-time-string-to-time date-str)))
+    (format "%s · %s"
+            (format-time-string "%a" ts)
+            (format-time-string "%b %d" ts))))
+#+end_src
+
+* Visual & readability tweaks
+Keep the agenda compact, readable, and informative.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-prefix-format
+        '((agenda  . "  %-16:c %-12t ")
+          (timeline . "  %s")
+          (todo     . " %i  %b ")
+          (tags     . " %i  %b ")
+          (search   . " %i  %b "))
+        org-agenda-block-separator ?─
+        org-agenda-compact-blocks t
+        org-agenda-start-on-weekday 1
+        org-agenda-span 'week
+        org-agenda-inhibit-startup t
+        org-agenda-show-future-repeats t
+        org-agenda-skip-deadline-prewarning-if-scheduled t
+        org-agenda-format-date #'my/org-agenda-format-date
+        org-agenda-current-time-string "⭠ now"
+        org-agenda-time-grid
+        '((daily today require-timed)
+          (800 1000 1200 1400 1600 1800)
+          "......" "----------------")))
+#+end_src
+
+* Habit integration (optional)
+Enable ~org-habit~ if available and make it visible in the agenda.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (when (require 'org-habit nil t)
+    (add-to-list 'org-modules 'org-habit t)
+    (setq org-habit-show-habits t
+          org-habit-show-all-today t
+          org-habit-graph-column 50
+          org-habit-preceding-days 14
+          org-habit-following-days 7)))
+#+end_src
+
+* Robust helper functions (skip & project logic)
+These helpers let custom commands do real filtering without being too clever.
+
+#+begin_src emacs-lisp
+(defun my/org-get-todo-state ()
+  "Return the TODO keyword at point, or nil."
+  (org-back-to-heading t)
+  (org-get-todo-state))
+
+(defun my/org-has-active-child-task-p ()
+  "Non-nil if current subtree has a child with a tasky TODO state."
+  (save-excursion
+    (let ((end (save-excursion (org-end-of-subtree t))))
+      (forward-line 1)
+      (re-search-forward
+       "^\\*+\\s-+\\(TODO\\|NEXT\\|DOING\\|WAIT\\|HOLD\\)\\b" end t))))
+
+(defun my/org-is-project-p ()
+  "A project is a heading that either has the PROJECT tag or child tasks."
+  (save-excursion
+
+
+    (org-back-to-heading t)
+    (or (member "PROJECT" (org-get-tags))
+        (my/org-has-active-child-task-p))))
+
+(defun my/org-project-has-next-p ()
+  "Non-nil if this project subtree contains a NEXT/DOING task."
+  (save-excursion
+    (let ((end (save-excursion (org-end-of-subtree t))))
+      (forward-line 1)
+      (re-search-forward "^\\*+\\s-+\\(NEXT\\|DOING\\)\\b" end t))))
+
+(defun my/org-agenda-skip-if-scheduled-or-deadline ()
+  "Skip current subtree if it is scheduled or has a deadline."
+  (let ((end (save-excursion (org-end-of-subtree t))))
+    (when (or (org-get-scheduled-time (point))
+              (org-get-deadline-time (point)))
+      end)))
+
+(defun my/org-agenda-skip-non-projects ()
+  "Skip if not a project."
+  (unless (my/org-is-project-p)
+    (save-excursion (org-end-of-subtree t))))
+
+(defun my/org-agenda-skip-projects ()
+  "Skip if a project."
+  (when (my/org-is-project-p)
+    (save-excursion (org-end-of-subtree t))))
+
+(defun my/org-agenda-skip-if-not-stuck-project ()
+  "Include only projects with no NEXT/DOING child task."
+  (let ((end (save-excursion (org-end-of-subtree t))))
+    (if (and (my/org-is-project-p)
+             (not (my/org-project-has-next-p)))
+        nil
+      end)))
+#+end_src
+
+* org-super-agenda groups (if available)
+Define signal-rich groups; these are referenced by the Super Agenda view.
+
+#+begin_src emacs-lisp
+(defvar my/org-super-agenda-groups
+  '((:name "🕙 Today"             :time-grid t    :order 1)
+    (:name "⏳ Overdue"           :deadline past  :order 2)
+    (:name "⏰ Due Soon"          :deadline future:order 3)
+    (:name "🚨 High Priority"     :priority "A"   :order 5)
+    (:name "⚡ Medium"            :priority "B"   :order 7)
+    (:name "☁️ Low Priority"      :priority "C"   :order 8))
+  "Default org-super-agenda groups to use in Super Agenda views.")
+#+end_src
+
+* Enable org-super-agenda (only if present)
+Switches the mode on and supplies the groups defined above.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (when (bound-and-true-p my/org-super-agenda-available)
+    (org-super-agenda-mode 1)
+    (setq org-super-agenda-groups my/org-super-agenda-groups)))
+#+end_src
+
+* Custom commands (curated views)
+A compact suite of views covering daily/weekly focus, projects, commitments, and review.
+
+** Overview (weekly)
+A weekly dashboard with a friendly header.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-custom-commands
+        (cl-remove-duplicates
+         (append org-agenda-custom-commands
+                 '(("o" "Overview (Weekly)"
+                    ((agenda ""
+                             ((org-agenda-span 'week)
+                              (org-agenda-start-on-weekday 1)
+                              (org-agenda-overriding-header
+                               (concat (propertize "Weekly Overview" 'face 'org-agenda-structure)
+                                       "\n" (my/agenda--week-title)))))))))
+         :test #'equal)))
+
+#+end_src
+
+** Super Agenda (weekly, grouped)
+Same as Overview, but grouped if ~org-super-agenda~ is available.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-custom-commands
+        (cl-remove-duplicates
+         (append org-agenda-custom-commands
+                 '(("s" "Super Agenda (Weekly, grouped)"
+                    ((agenda ""
+                             ((org-agenda-span 'week)
+                              (org-agenda-start-on-weekday 1)
+                              (org-agenda-overriding-header
+                               (concat
+                                (propertize (my/agenda--month-banner) 'face 'org-agenda-structure)
+                                "\n\n"
+                                (propertize "Super Agenda" 'face 'org-agenda-structure)
+                                "\n" (my/agenda--week-title)))
+                              (org-agenda-format-date #'my/org-agenda-format-date)
+                              (org-super-agenda-groups my/org-super-agenda-groups)))))))
+
+         :test #'equal)))
+#+end_src
+
+** Focus: Today
+A fast “today” agenda.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-custom-commands
+        (cl-remove-duplicates
+         (append org-agenda-custom-commands
+                 '(("t" "Today (1 day)"
+                    ((agenda "" ((org-agenda-span 1)))))))
+         :test #'equal)))
+#+end_src
+
+** Upcoming windows
+Short and medium-range foresight.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (dolist (spec '(("3" "Next 3 days"  3)
+                  ("2" "Next 14 days" 14)))
+    (setq org-agenda-custom-commands
+          (cl-remove-duplicates
+           (append org-agenda-custom-commands
+                   (list
+                    (list (nth 0 spec) (nth 1 spec)
+                          (list (list 'agenda ""
+                                      (list (list 'org-agenda-span (nth 2 spec))))))))
+           :test #'equal))))
+#+end_src
+
+** Deadlines & Scheduled
+Dedicated views for commitments you’ve set.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-custom-commands
+        (cl-remove-duplicates
+         (append org-agenda-custom-commands
+                 '(("d" "Deadlines"  ((search "+DEADLINE>=\"<today>\"")))
+                   ("D" "Scheduled"  ((search "+SCHEDULED>=\"<today>\"")))))
+         :test #'equal)))
+#+end_src
+
+** Inbox (unscheduled, no deadlines)
+Tasks that need triage—no schedule, no deadline.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (defun my/org-agenda-skip-if-has-date ()
+    "Skip subtree if it has SCHEDULED or DEADLINE."
+    (let ((end (save-excursion (org-end-of-subtree t))))
+      (when (or (org-get-scheduled-time (point))
+                (org-get-deadline-time (point)))
+        end)))
+
+  (setq org-agenda-custom-commands
+        (cl-remove-duplicates
+         (append org-agenda-custom-commands
+                 '(("i" "Inbox (no dates)"
+                    ((todo "TODO|NEXT|DOING"
+                           ((org-agenda-overriding-header "Inbox (unscheduled, no deadlines)")
+                            (org-agenda-skip-function #'my/org-agenda-skip-if-has-date)))))))
+         :test #'equal)))
+#+end_src
+
+** Next actions
+Actions that should move now.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (let ((cmd '("n" "Next Actions"
+               ((todo "NEXT|DOING"
+                      ((org-agenda-overriding-header "Next Actions")))))))
+    (setq org-agenda-custom-commands
+          (cons cmd
+                (cl-remove-if (lambda (c) (equal (car c) (car cmd)))
+                              org-agenda-custom-commands)))))
+#+end_src
+
+** Projects & Stuck projects
+Project inventory and a spotlight on projects without NEXT/DOING.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (let ((cmd '("k" "Stuck Projects"
+               ((tags-todo "+PROJECT/-DONE"
+                           ((org-agenda-overriding-header "Stuck Projects (no NEXT/DOING)")
+                            (org-agenda-skip-function #'my/org-agenda-skip-if-not-stuck-project)))))))
+    (setq org-agenda-custom-commands
+          (cons cmd
+                (cl-remove-if (lambda (c) (equal (car c) (car cmd)))
+                              org-agenda-custom-commands)))))
+#+end_src
+
+** Waiting / Delegated / Someday
+Workflow states you want to review periodically.
+
+#+begin_src emacs-lisp
+#+end_src
+
+** Weekly Review
+A multi-block dashboard for reflection and planning.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-custom-commands
+        (cl-remove-duplicates
+         (append org-agenda-custom-commands
+                 '(("R" "Weekly Review"
+                    ((agenda ""
+                             ((org-agenda-span 7)
+                              (org-agenda-start-on-weekday 1)
+                              (org-agenda-overriding-header
+                               (concat (propertize "Weekly Plan" 'face 'org-agenda-structure)
+                                       "\n" (my/agenda--week-title)))))
+                     (todo "NEXT|DOING"
+                           ((org-agenda-overriding-header "Next Actions")))
+                     (tags-todo "+PROJECT/-DONE"
+                                ((org-agenda-overriding-header "Projects")
+                                 (org-agenda-skip-function #'my/org-agenda-skip-if-no-project)))
+                     (tags "+DEADLINE<=\"<+7d>\""
+                           ((org-agenda-overriding-header "Upcoming Deadlines")))
+                     (search "+SCHEDULED>=\"<today>\""
+                             ((org-agenda-overriding-header "Scheduled")))
+                     (tags "+TODO=\"WAIT\""
+                           ((org-agenda-overriding-header "Waiting")))
+                     (tags "+TODO=\"DELEGATED\""
+                           ((org-agenda-overriding-header "Delegated")))
+                     (tags "+TODO=\"SOMEDAY\""
+                           ((org-agenda-overriding-header "Someday/Maybe")))))))
+         :test #'equal)))
+
+#+end_src
+
+* Sorting preferences
+Keep time-sensitive items first; then priority.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-sorting-strategy
+        '((agenda time-up priority-down category-keep)
+          (todo   priority-down deadline-up)
+          (tags   priority-down deadline-up)
+          (search category-keep))))
+#+end_src
+
+* Module Footer
+#+begin_src emacs-lisp
+(message "agenda.el loaded")
+(provide 'agenda)
+#+end_src

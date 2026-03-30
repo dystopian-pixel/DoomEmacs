@@ -1,0 +1,40 @@
+#+TITLE: Language Development
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Configuration for programming language development, including LSP support, syntax checking, and formatters.
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args :tangle ../config/language-development.el
+#+auto_tangle: t
+#+FILETAGS: :languages:programming:development:lsp:
+#+KEYWORDS: language configuration, programming languages, LSP, syntax highlighting, linters
+
+* Table of Contents :TOC:
+- [[#language-development-helpers][Language Development Helpers]]
+  - [[#c-compilation][C++ Compilation]]
+- [[#module-footer][Module Footer]]
+
+* Language Development Helpers
+
+This section is a hub for everyday programming workflow comforts. It gathers small, reliable aids that speed up common tasks and keep momentum steady. The focus is on smooth feedback and clear steps so work feels predictable rather than fussy. The aim is to let you spend more time shaping ideas and less time managing tools.
+
+** C++ Compilation
+
+This subsection centers on turning your C++ work into a runnable result with minimal ceremony. It emphasizes quick loops so you can make a change, check the outcome, and keep moving. The goal is steady rhythm over complexity—fast runs, clear outcomes, and fewer interruptions. It helps your experiments feel light, safe, and repeatable.
+
+#+begin_src emacs-lisp
+;;; language-development.el --- C++ helpers -*- lexical-binding: t; -*-
+
+(defun my/compile-cpp-project ()
+  "Compile all C++ files."
+  (interactive)
+  (compile "g++ -std=c++17 -O2 $(find . -name '*.cpp') -o app"))
+#+end_src
+
+
+* Module Footer
+
+This is the tidy wrap-up for the file. It keeps final notes and small housekeeping in one predictable place. The intent is to signal completeness and leave a clean end state for tools and future readers. It closes the loop so the whole module feels finished and easy to revisit.
+
+#+begin_src emacs-lisp
+(provide 'language-development)
+;;; language-development.el ends here
+#+end_src

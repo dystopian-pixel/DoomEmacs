@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doom Emacs Theme Gallery</title>
+  <style>
+
+body { background: #282c34; color: #bbc2cf; margin: 0; font-family: system-ui,sans-serif; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 32px; padding: 2em; }
+.theme-thumb { background-size: cover; background-position: center; width: 180px; height: 110px; margin: 0 auto 0.4em auto; border-radius: 10px; box-shadow: 0 2px 8px #0005; border: 2px solid #21242b; cursor: pointer; transition: border 0.2s, box-shadow 0.2s; }
+.theme-thumb:hover { border-color: #51afef; box-shadow: 0 4px 20px #51afef80; }
+.theme-name { text-align: center; font-size: 1em; font-family: monospace; }
+@media (max-width: 700px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); } .theme-thumb { width: 110px; height: 72px; } }
+
+</style>
+</head>
+<body>
+  <h1 style="text-align:center;font-size:1.7em;letter-spacing:0.08em">Doom Emacs Theme Gallery</h1>
+  <div class="gallery">
+</div>
+<script>
+function switchTheme(themeName) {
+  fetch('/my-theme-gallery/' + encodeURIComponent(themeName)).then(r=>r.text());
+}
+document.querySelectorAll('.theme-thumb').forEach(function(div) {
+  div.addEventListener('click', function() {
+    switchTheme(this.dataset.theme);
+  });
+});
+</script>
+</body></html>

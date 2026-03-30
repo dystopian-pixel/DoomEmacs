@@ -1,0 +1,16 @@
+0 REM **********************************************
+1 REM  ${1:Project Name}
+2 REM  Author: ${2:`(user-full-name)`}
+3 REM  Date: `(format-time-string "%Y-%m-%d")`
+4 REM  Description: ${3:Short description}
+5 REM **********************************************
+
+10 CLS
+20 PRINT "Hello, Spectrum Next!"
+30 PRINT "This program was created on "; DATE$
+40 REM Main program loop
+50 FOR i = 1 TO 5
+60   PRINT "Count: "; i
+70 NEXT i
+80 PRINT "Done!"
+90 END

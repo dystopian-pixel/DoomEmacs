@@ -1,0 +1,43 @@
+#+TITLE: File Templates
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Setup and customization of file templates and snippets for generating boilerplate code automatically.
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args :tangle ../config/file-templates.el
+#+auto_tangle: t
+#+FILETAGS: :templates:skeletons:snippets:automation:
+#+KEYWORDS: file templates, yasnippet, auto-insert, boilerplate, code skeletons
+
+
+* Table of Contents :TOC:
+- [[#file-templates][File Templates]]
+
+* File Templates
+
+This section defines how new files start their lives—what scaffolding they get, what patterns they follow, and how much boilerplate you never have to type again. The emphasis is on consistency and speed, so every fresh file feels ready to work in right away. It aims to reduce setup time, remove fiddly chores, and nudge projects toward a uniform shape. You open a blank buffer, and it already understands the kind of document you’re making.
+
+#+begin_src emacs-lisp:w!
+
+;;; file-templates.el --- Templates config -*- lexical-binding: t; -*-
+
+(setq +file-templates-dir (expand-file-name "snippets" doom-user-dir))
+
+(after! file-templates
+  (set-file-templates!
+   '(("\\.py$"  :mode python-mode)
+     ("\\.cpp$" :mode c++-mode :trigger "__cpp")
+     ("\\.bas$" :mode basic-generic-mode))))
+
+(require 'yasnippet)
+
+(add-hook 'find-file-hook
+          (lambda ()
+            (when (and (eq major-mode 'basic-generic-mode)
+                       (bound-and-true-p yas-minor-mode)
+                       (buffer-file-name)
+                       (= (point-min) (point-max)))
+              (yas-expand-snippet
+               (yas-lookup-snippet "__" 'basic-generic-mode)))))
+
+(provide 'file-templates)
+;;; file-templates.el ends here
+#+end_src

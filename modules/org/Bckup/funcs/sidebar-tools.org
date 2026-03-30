@@ -1,0 +1,191 @@
+#+TITLE: Sidebar Tools
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Functions for sidebar tools
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args:emacs-lisp :tangle ../../config/funcs/sidebar-tools.el :comments none :padline no
+#+auto_tangle: t
+#+filetags: :utils:helpers:sidebar-tools:
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
+
+
+* Table of Contents :TOC:
+- [[#sidebar-tools][Sidebar Tools]]
+- [[#minimap-configuration--helpers][Minimap configuration & helpers]]
+- [[#treemacs-and-minimap][Treemacs and Minimap]]
+- [[#imenu-list][iMenu List]]
+- [[#unified-sidebars-toggle-treemacs--minimap][Unified sidebars toggle (Treemacs + Minimap)]]
+- [[#module-footer][Module Footer]]
+
+* Sidebar Tools
+
+These tools give you a peripheral view of your work. Side panels keep context in view without stealing focus. With Treemacs + Imenu on the left and a Minimap on the right, you always know where you are and where to jump next.
+
+* Minimap configuration & helpers
+#+begin_src emacs-lisp
+;;; --- Minimap: fixed width + readable text ---------------------------------
+
+(with-eval-after-load 'minimap
+  ;; Use absolute columns (not fractions); right side placement.
+  (setq minimap-width-fraction nil
+        minimap-minimum-width 18
+        minimap-window-location 'right)
+
+  (defun my/minimap--buffer ()
+    "Return the current minimap buffer if any."
+    (car (seq-filter (lambda (b) (string-prefix-p " *Minimap" (buffer-name b)))
+                     (buffer-list))))
+
+  (defun my/minimap-setup ()
+    "Style and lock the minimap window width."
+    (run-at-time
+     0.03 nil
+     (lambda ()
+       (when-let ((buf (my/minimap--buffer)))
+         (with-current-buffer buf
+           ;; readable, not microscopic; keep the render simple
+           (text-scale-mode 1)
+           (text-scale-set -1)
+           (setq-local line-spacing 0
+                       truncate-lines t
+                       cursor-type nil
+                       mode-line-format nil
+                       header-line-format nil
+                       display-line-numbers nil)
+           (when (boundp 'left-margin-width)  (setq-local left-margin-width 0))
+           (when (boundp 'right-margin-width) (setq-local right-margin-width 0)))
+         (when-let ((win (get-buffer-window buf t)))
+           (set-window-margins win 0 0)
+           (set-window-fringes win 0 0)
+           ;; enforce width
+           (let* ((cols minimap-minimum-width)
+                  (delta (- cols (window-width win))))
+             (unless (zerop delta)
+               (adjust-window-trailing-edge win delta t)))
+           (set-window-parameter win 'window-size-fixed 'width)
+           (set-window-dedicated-p win t)
+           (set-window-parameter win 'no-other-window t)
+           (set-window-parameter win 'no-delete-other-windows t))))))
+
+  (add-hook 'minimap-mode-hook #'my/minimap-setup))
+#+end_src
+
+* Treemacs and Minimap
+#+begin_src emacs-lisp
+;;; --- Treemacs helpers ------------------------------------------------------
+
+(require 'cl-lib)
+
+(defun my/treemacs-window ()
+  "Return the Treemacs window if visible, else nil."
+  (when (and (featurep 'treemacs)
+             (fboundp 'treemacs-get-local-window))
+    (ignore-errors (treemacs-get-local-window))))
+#+end_src
+
+* iMenu List
+#+begin_src emacs-lisp
+;;; --- Imenu-list: left side, stack with Treemacs, smart width --------------
+
+(with-eval-after-load 'imenu-list
+  ;; Always use the left side (we’ll manage the rest).
+  (setq imenu-list-position 'left
+        imenu-list-size 30)
+
+  (defun my/left-column--ensure-width (&optional cols)
+    "Ensure the left sidebar column is at least COLS columns wide.
+If COLS is nil, use max(Treemacs width, `imenu-list-size`)."
+    (let* ((twin (my/treemacs-window))
+           (iw   (get-buffer-window "*Ilist*" t))
+           (cols (or cols
+                     (max (if (window-live-p twin)
+                              (with-selected-window twin (window-width))
+                            0)
+                          imenu-list-size)))
+           (col  (or twin iw)))
+      (when (window-live-p col)
+        (let ((delta (- cols (window-width col))))
+          (unless (zerop delta)
+            (adjust-window-trailing-edge col delta t))))
+      (when (window-live-p twin)
+        (set-window-parameter twin 'window-size-fixed 'width))
+      (when (window-live-p iw)
+        (set-window-parameter iw   'window-size-fixed 'width))))
+
+  (defun my/display-imenu-list (buffer _alist)
+    "Display *Ilist* in left side-window, stacking under Treemacs."
+    (let* ((have-tree (window-live-p (my/treemacs-window())))
+           (slot      (if have-tree 1 0))  ;; Treemacs = slot 0, Imenu = slot 1
+           (win (display-buffer-in-side-window
+                 buffer `((side . left)
+                          (slot . ,slot)
+                          (window-parameters . ((no-delete-other-windows . t)))))))
+      ;; lock width to `imenu-list-size`
+      (set-window-parameter win 'window-size-fixed 'width)
+      (set-window-dedicated-p win t)
+      (let ((delta (- imenu-list-size (window-width win))))
+        (unless (zerop delta)
+          (adjust-window-trailing-edge win delta t)))
+      ;; ensure the column width respects Treemacs/Imenu
+      (my/left-column--ensure-width)
+      win))
+
+  ;; Route *Ilist* buffers to our custom placer
+  (add-to-list 'display-buffer-alist '("\\`\\*Ilist\\*\\'" . my/display-imenu-list)))
+#+end_src
+
+* Unified sidebars toggle (Treemacs + Minimap)
+#+begin_src emacs-lisp
+;;; --- Toggle & lifecycle ----------------------------------------------------
+
+(defun my/sidebars-visible-p ()
+  "Return non-nil if any of our sidebars are visible."
+  (or (window-live-p (my/treemacs-window))
+      (get-buffer-window "*Ilist*" t)
+      (my/minimap--buffer)))
+
+(defun my/open-sidebars ()
+  "Open Treemacs + Imenu (stacked left) and Minimap (right)."
+  (interactive)
+  ;; Treemacs first (top-left)
+  (when (require 'treemacs nil t)
+    (unless (window-live-p (my/treemacs-window))
+      (treemacs)))
+  ;; Imenu under Treemacs
+  (ignore-errors (imenu-list-smart-toggle))
+  ;; Minimap right
+  (ignore-errors (minimap-mode 1))
+  ;; Re-lock widths after they render
+  (run-at-time 0.10 nil #'my/left-column--ensure-width)
+  (run-at-time 0.10 nil #'my/minimap-setup))
+
+(defun my/close-sidebars ()
+  "Close Treemacs, Imenu, and Minimap without touching your main windows."
+  (interactive)
+  (when-let ((tw (my/treemacs-window)))
+    (when (window-live-p tw) (delete-window tw)))
+  (when-let ((iw (get-buffer-window "*Ilist*" t)))
+    (delete-window iw))
+  (when (bound-and-true-p minimap-mode)
+    (minimap-mode -1)))
+
+(defun my/toggle-sidebars ()
+  "Toggle Treemacs + Imenu (stacked left) and Minimap (right)."
+  (interactive)
+  (if (my/sidebars-visible-p)
+      (progn (my/close-sidebars) (message "Sidebars off"))
+    (my/open-sidebars) (message "Sidebars on")))
+
+;; Auto-open once a real buffer is active (prevents 'setting up...' limbo)
+(defun my/deferred-sidebar-setup ()
+  "Run once when the first real buffer appears."
+  (when (derived-mode-p 'prog-mode 'text-mode 'org-mode)
+    (remove-hook 'buffer-list-update-hook #'my/deferred-sidebar-setup)
+    (run-at-time 0.20 nil #'my/open-sidebars)))
+(add-hook 'buffer-list-update-hook #'my/deferred-sidebar-setup)
+#+end_src
+
+* Module Footer
+#+begin_src emacs-lisp
+(message "sidebar-tools.el loaded")
+(provide 'sidebar-tools)
+#+end_src

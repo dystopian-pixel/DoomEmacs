@@ -1,0 +1,9 @@
+Fix theme persistence, package checks, Org workflow, and sidebars
+
+This update fixes several issues in my Doom Emacs configuration:
+
+- Fixed the theme persistence error.
+- Fixed the external packages issue reported by doom doctor.
+- Added a check for simple-httpd so it does not load if it is already loaded.
+- Added Org Agenda and Org Capture support to record tasks, notes, ideas, and journal entries.
+- Fixed the sidebar behavior so Treemacs, iMenu List, and minimap display correctly.

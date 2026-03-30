@@ -1,0 +1,8 @@
+Tangle these Org files:
+- modules/org/ui.org
+- modules/org/theme-gallery.org
+
+Main fix:
+- Save the actual THEME argument from load-theme/enable-theme
+- Use modules/config/.last-theme.el consistently
+- theme-gallery.org now tangles to modules/config/theme-gallery.el

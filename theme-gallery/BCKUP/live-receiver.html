@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Doom Emacs — Live Receiver</title>
+<style>
+  :root{
+    --bg:#0f1117; --bg-alt:#11141d; --panel:#0b0e16; --border:#2a2f3a;
+    --text:#e5e7eb; --muted:#9aa4b2;
+    --accent:#51afef; --accent-2:#a78bfa;
+    --kw:#89ddff; --fn:#82aaff; --var:#c3e88d; --const:#f78c6c; --str:#c3e88d;
+    --comment:#697387; --type:#f8bd96; --builtin:#7aa2f7; --number:#ff9e64;
+    --info:#4fc1ff; --warn:#facc15; --error:#f87171; --hint:#34d399;
+    --diff-add:#10351f; --diff-del:#351018; --diff-chg:#162d43;
+    --region:#1f2433; --hl:#1a2030; --cursor:#ffd700;
+    --modeline:#0f1320; --modeline-text:#cbd5e1; --tab:#13192a; --tab-active:#1a2134;
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --dur: 260ms; --ease: cubic-bezier(.22,1,.36,1);
+  }
+  * { box-sizing: border-box }
+  html,body{height:100%; overflow:hidden}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;transition: background var(--dur) var(--ease), color var(--dur) var(--ease);}
+  .bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg-alt);position:sticky; top:0; z-index:10; margin-bottom: 10px;}
+  .chip{border:1px solid var(--border);padding:.3rem .6rem;border-radius:999px;background:color-mix(in oklab, var(--bg) 88%, black 12%); color:var(--text); font-weight:600;}
+  .right{ margin-left:auto; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center}
+  .btn, .seg button{border:1px solid var(--border);background:color-mix(in oklab,var(--panel) 85%, black 15%);color:var(--text); padding:.35rem .6rem; border-radius:10px; cursor:pointer;transition: transform .07s ease, background .15s ease, border-color .15s ease;}
+  .btn:hover, .seg button:hover{ transform: translateY(-1px); background:color-mix(in oklab,var(--panel) 75%, black 25%); }
+  .seg{ display:inline-flex; border-radius:10px; overflow:hidden; border:1px solid var(--border); padding:4px; gap:6px }
+  .seg button{ border:0; padding:.35rem .6rem }
+  .seg button:last-child{ border-right:0 }
+  .seg .active{ border-color: color-mix(in oklab, var(--accent) 60%, var(--border)); outline: 2px solid color-mix(in oklab, var(--accent) 35%, transparent) }
+  input[type="range"]{ accent-color: var(--accent) }
+  label{ color: var(--muted); font-size:12px }
+  .wrap{display:grid;grid-template-rows:auto 1fr; height:calc(100% - 54px)}
+  .canvas{display:grid; grid-template-columns: 1fr; gap:12px; padding:12px; height:100%;}
+  .pane{border:1px solid var(--border); border-radius:12px; background:var(--panel);box-shadow: inset 0 1px 0 rgba(255,255,255,.03);overflow:hidden; display:flex; flex-direction:column; min-height:0;transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);}
+  .modeline{display:flex; align-items:center; gap:8px; padding:6px 10px;background: var(--modeline); color: var(--modeline-text); border-bottom:1px solid var(--border);font-family: var(--code-font); font-size:12px;}
+  .tabbar{ display:flex; gap:4px; padding:6px; border-bottom:1px solid var(--border); background: var(--bg-alt) }
+  .tab{ padding:.25rem .5rem; border-radius:8px; background: var(--tab); border:1px solid var(--border) }
+  .tab.active{ background: var(--tab-active); border-color: color-mix(in oklab, var(--accent) 60%, var(--border)) }
+  .editor{display:grid; grid-template-columns:auto 1fr; gap:0; flex:1; min-height:0;font-family: var(--code-font); font-size: var(--code-size, 13px); line-height:1.55;}
+  .gutter{background: color-mix(in oklab, var(--panel) 85%, black 15%); color: var(--muted);border-right:1px solid var(--border); padding:8px 10px; text-align:right; user-select:none;}
+  .code{padding:8px 12px; overflow:auto; position:relative;}
+  .code .line{ white-space:pre; }
+  .kw{ color: var(--kw) } .fn{ color: var(--fn) } .var{ color: var(--var) } .const{ color: var(--const) } .str{ color: var(--str) } .num{ color: var(--number) } .type{ color: var(--type) } .builtin{ color: var(--builtin) } .com{ color: var(--comment) }
+  .sel{ background: var(--region); border-radius:4px } .hl{ background: var(--hl); border-radius:4px } .cursor{ background: var(--cursor); width:2px; display:inline-block; height:1em; vertical-align:bottom; animation: blink 1.1s steps(1) infinite }
+  @keyframes blink{ 50%{ background: transparent } }
+  .diag{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); border-radius:8px; padding:2px 6px; font-size:12px }
+  .d-info{ color: var(--info) } .d-warn{ color: var(--warn) } .d-error{ color: var(--error) } .d-hint{ color: var(--hint) }
+  .diff{ display:grid; grid-template-columns:1fr 1fr; gap:8px; height:220px } .diff pre{ margin:0; padding:10px; overflow:auto; height:100% } .add{ background: var(--diff-add) } .del{ background: var(--diff-del) } .chg{ background: var(--diff-chg) }
+  .split{ display:grid; gap:12px; grid-template-columns: 1fr 1fr } .hidden{ display:none !important }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div class="chip">Live Preview</div>
+    <div class="chip">Theme: <span id="tname">—</span></div>
+    <div class="chip" id="chip-source">Source: waiting…</div>
+
+    <div class="right">
+      <div class="seg" id="scene">
+        <button data-scene="code" class="active">Code</button>
+        <button data-scene="org">Org</button>
+        <button data-scene="magit">Magit</button>
+        <button data-scene="diff">Diff</button>
+        <button data-scene="ui">UI Kit</button>
+      </div>
+
+      <label for="size">Font</label>
+      <input id="size" type="range" min="11" max="18" value="13"/>
+
+      <label><input id="ln" type="checkbox" checked/> Line #</label>
+      <label><input id="split" type="checkbox"/> Split</label>
+      <label><input id="diags" type="checkbox" checked/> Diagnostics</label>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="canvas" id="canvas">
+      <div class="pane scene-code">
+        <div class="tabbar">
+          <div class="tab active">init.el</div>
+          <div class="tab">config.el</div>
+          <div class="tab">packages.el</div>
+        </div>
+        <div class="modeline">~/doom.d/init.el — UTF-8 (Emacs Lisp)</div>
+        <div class="editor" id="ed-code">
+          <pre class="gutter" id="gut-code"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre>
+          <div class="code">
+            <div class="line"><span class="com">;; Minimal pretend buffer styled by theme</span></div>
+            <div class="line">(<span class="kw">use-package</span> <span class="type">doom-themes</span>)</div>
+            <div class="line">(<span class="kw">defun</span> <span class="fn">doom/apply-theme</span> (<span class="var">name</span>)</div>
+            <div class="line">  (<span class="kw">interactive</span>)</div>
+            <div class="line">  (<span class="builtin">message</span> <span class="str">"Theme → "</span> <span class="var">name</span>))</div>
+            <div class="line hl">(<span class="kw">setq</span> <span class="var">doom-theme</span> '<span class="const">doom-one</span>)</div>
+            <div class="line">(<span class="fn">provide</span> <span class="str">"init"</span>)<span class="cursor"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane scene-org hidden">
+        <div class="modeline">~/notes.org — Org</div>
+        <div class="editor">
+          <pre class="gutter" id="gut-org"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8</pre>
+          <div class="code">
+            <div class="line"><span class="fn">* Roadmap</span></div>
+            <div class="line">- <span class="fn">[X]</span> Gallery: image/compare/fullscreen</div>
+            <div class="line">- <span class="fn">[ ]</span> Live: <span class="kw">palette</span> + <span class="kw">scenes</span> + <span class="kw">diagnostics</span></div>
+            <div class="line">- <span class="fn">[ ]</span> Integrate with Emacs via HTTP hook</div>
+            <div class="line"><span class="fn">** Notes</span></div>
+            <div class="line">Use <span class="kw">CSS variables</span> for live skinning; swap values per theme.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane scene-magit hidden">
+        <div class="modeline">magit: status — doom-emacs</div>
+        <div class="editor">
+          <pre class="gutter" id="gut-magit"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8</pre>
+          <div class="code">
+            <div class="line"><span class="fn">## master</span> <span class="com">(2 ahead, 0 behind)</span></div>
+            <div class="line"><span class="fn"> M </span> lisp/init.el</div>
+            <div class="line"><span class="fn">A  </span> themes/doom-one.json</div>
+            <div class="line"><span class="fn"> D </span> old/live.html</div>
+            <div class="line"><span class="diag d-info"> Info</span> <span class="diag d-warn"> Warn</span> <span class="diag d-error"> Error</span> <span class="diag d-hint"> Hint</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane scene-diff hidden">
+        <div class="modeline">diff: init.el ←→ init.el</div>
+        <div class="diff">
+          <pre class="del">- (setq doom-theme 'doom-old)</pre>
+          <pre class="add">+ (setq doom-theme 'doom-one)</pre>
+          <pre class="chg">~ (setq doom-theme 'doom-dracula)</pre>
+          <pre class="chg">~ (setq doom-theme 'doom-nord)</pre>
+        </div>
+      </div>
+
+      <div class="pane scene-ui hidden">
+        <div class="modeline">UI kit</div>
+        <div style="padding:12px; display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:10px">
+          <div class="tab active">Active Tab</div>
+          <div class="tab">Tab</div>
+          <div class="diag d-info">Info</div>
+          <div class="diag d-warn">Warn</div>
+          <div class="diag d-error">Error</div>
+          <div class="diag d-hint">Hint</div>
+          <div style="grid-column:1 / -1; border:1px dashed var(--border); padding:8px; border-radius:10px">
+            Selection <span class="sel">Lorem ipsum</span> · Highlight <span class="hl">dolor sit</span> · Cursor <span class="cursor"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas hidden" id="canvas2"></div>
+  </div>
+
+<script>
+(() => {
+  const TRUST_ANY_ORIGIN = false;
+  const TRUSTED_ORIGIN = location.origin;
+
+  const sceneSeg = document.getElementById('scene');
+  const size = document.getElementById('size');
+  const ln = document.getElementById('ln');
+  const split = document.getElementById('split');
+  const diags = document.getElementById('diags');
+
+  const tnameEl = document.getElementById('tname');
+  const chipSrc = document.getElementById('chip-source');
+  const canvas = document.getElementById('canvas');
+  const canvas2 = document.getElementById('canvas2');
+
+  const slug = s => String(s||'').trim().toLowerCase().replace(/\s+/g,'-');
+
+  async function loadPalette(themeName){
+    const s = slug(themeName);
+    try{
+      const a = await fetch(`themes/${encodeURIComponent(s)}.json`, {cache:'no-cache'});
+      if (a.ok) return await a.json();
+    }catch{}
+    try{
+      const b = await fetch('themes.json', {cache:'no-cache'});
+      if (b.ok){
+        const all = await b.json();
+        if (all && all[s]) return all[s];
+      }
+    }catch{}
+    return null;
+  }
+
+  function applyPalette(pal, themeName){
+    const root = document.documentElement;
+    const set = (k,v)=> v!=null && root.style.setProperty(k, v);
+
+    if (!pal){
+      const h = hashHue(themeName);
+      set('--accent', `hsl(${h}deg 70% 55%)`);
+      set('--accent-2', `hsl(${(h+60)%360}deg 70% 60%)`);
+      return;
+    }
+    set('--bg', pal.bg); set('--bg-alt', pal.bgAlt); set('--panel', pal.panel); set('--border', pal.border);
+    set('--text', pal.text); set('--muted', pal.muted);
+    set('--accent', pal.accent); set('--accent-2', pal.accent2);
+
+    set('--kw', pal.kw); set('--fn', pal.fn); set('--var', pal.var); set('--const', pal.const);
+    set('--str', pal.str); set('--comment', pal.comment); set('--type', pal.type);
+    set('--builtin', pal.builtin); set('--number', pal.number);
+
+    set('--info', pal.info); set('--warn', pal.warn); set('--error', pal.error); set('--hint', pal.hint);
+
+    set('--diff-add', pal.diffAdd); set('--diff-del', pal.diffDel); set('--diff-chg', pal.diffChg);
+
+    set('--region', pal.region); set('--hl', pal.hl); set('--cursor', pal.cursor);
+
+    set('--modeline', pal.modeline); set('--modeline-text', pal.modelineText);
+    set('--tab', pal.tab); set('--tab-active', pal.tabActive);
+  }
+
+  function applyTheme(name){
+    tnameEl.textContent = name || '—';
+    flashRegion();
+  }
+  function applyFromOutside(name){
+    if (!name) return;
+    if (typeof window.applyTheme === 'function') return window.applyTheme(String(name));
+    if (typeof window.setTheme === 'function')   return window.setTheme(String(name));
+    return applyTheme(String(name));
+  }
+
+  sceneSeg.addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-scene]');
+    if (!b) return;
+    sceneSeg.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const s = b.dataset.scene;
+    showScene(s);
+  });
+  function showScene(name){
+    document.querySelectorAll('[class^="scene-"], [class*=" scene-"]').forEach(p=>{
+      p.classList.toggle('hidden', !p.classList.contains('scene-'+name));
+    });
+    mirrorToSplit();
+  }
+
+  size.addEventListener('input', ()=>{
+    document.documentElement.style.setProperty('--code-size', size.value+'px');
+  });
+
+  ln.addEventListener('change', ()=>{
+    document.querySelectorAll('.gutter').forEach(g=> g.classList.toggle('hidden', !ln.checked));
+  });
+
+  split.addEventListener('change', ()=>{
+    canvas2.classList.toggle('hidden', !split.checked);
+    mirrorToSplit();
+  });
+
+  diags.addEventListener('change', ()=>{
+    document.querySelectorAll('.diag').forEach(d=> d.classList.toggle('hidden', !diags.checked));
+  });
+
+  function mirrorToSplit(){
+    if (canvas2.classList.contains('hidden')) return;
+    canvas2.innerHTML = '';
+    const visible = Array.from(document.querySelectorAll('.canvas .pane')).find(p=>!p.classList.contains('hidden'));
+    if (visible){
+      const clone = visible.cloneNode(true);
+      canvas2.appendChild(clone);
+      clone.querySelectorAll('.gutter').forEach(g=> g.classList.toggle('hidden', !ln.checked));
+      clone.querySelectorAll('.diag').forEach(d=> d.classList.toggle('hidden', !diags.checked));
+    }
+  }
+
+  try{
+    const u = new URL(location.href);
+    const initial = u.searchParams.get('theme')
+                 || (u.hash.startsWith('#theme=') ? decodeURIComponent(u.hash.slice(7)) : '')
+                 || localStorage.getItem('doom_gallery_selected_theme') || '';
+    if (initial) {
+      onThemeFrom('URL/localStorage', initial);
+    }
+  }catch{}
+
+  window.addEventListener('message', (e) => {
+    if (!e || !e.data) return;
+    if (!TRUST_ANY_ORIGIN && e.origin !== TRUSTED_ORIGIN) return;
+
+    const { type, theme } = e.data || {};
+    if (type === 'PING'){
+      chipSrc.textContent = 'Source: handshake';
+      try{ e.source?.postMessage({ type:'READY' }, e.origin); }catch{}
+      return;
+    }
+    if ((type === 'SELECT_THEME' || type === 'SET_THEME') && typeof theme === 'string'){
+      onThemeFrom('postMessage', theme);
+    }
+  });
+
+  window.addEventListener('storage', (ev) => {
+    if (ev.key === 'doom_gallery_selected_theme' && ev.newValue) {
+      onThemeFrom('storage event', ev.newValue);
+    }
+  });
+
+  async function onThemeFrom(source, name){
+    chipSrc.textContent = 'Source: ' + source;
+    tnameEl.textContent = name || '—';
+    const palette = await loadPalette(name);
+    applyPalette(palette, name);
+    applyFromOutside(name);
+  }
+
+  function flashRegion(){
+    const el = document.createElement('div');
+    Object.assign(el.style, {
+      position:'fixed', inset:'0', pointerEvents:'none',
+      background:'radial-gradient(120% 120% at 50% 10%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%)',
+      opacity:'0', transition:'opacity 500ms var(--ease)', zIndex:1
+    });
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>{ el.style.opacity='.9'; });
+    setTimeout(()=>{ el.style.opacity='0'; el.addEventListener('transitionend', ()=>el.remove(), {once:true}); }, 30);
+  }
+
+  function hashHue(s){ s=String(s||''); let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return h%360; }
+
+  showScene('code');
+})();
+</script>
+</body>
+</html>

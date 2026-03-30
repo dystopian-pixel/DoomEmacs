@@ -1,0 +1,101 @@
+;;; doom-zx-spectrum-next-theme.el --- ZX Spectrum Next 256-color Doom Theme -*- no-byte-compile: t; -*-
+(require 'doom-themes)
+
+(def-doom-theme zx-spectrum-next-dark
+  "Doom theme using the ZX Spectrum Next 256-color palette."
+  (
+   ;; ----- Base colors -----
+   (bg         '("#000000" nil nil))      ; black
+   (bg-alt     '("#232323" nil nil))      ; very dark gray
+   (base0      '("#181818" nil nil))      ; near black
+   (base1      '("#222222" nil nil))      ; dark
+   (base2      '("#282828" nil nil))      ; dark gray
+   (base3      '("#383838" nil nil))
+   (base4      '("#484848" nil nil))
+   (base5      '("#606060" nil nil))
+   (base6      '("#808080" nil nil))      ; gray
+   (base7      '("#B0B0B0" nil nil))      ; light gray
+   (base8      '("#FFFFFF" nil nil))      ; white
+
+   (fg         '("#E0E0E0" nil nil))      ; soft white
+   (fg-alt     '("#B0B0B0" nil nil))      ; light gray
+
+   ;; ----- Core ZX Next colors -----
+   (grey       '("#808080" nil nil))
+   (red        '("#FF0000" nil nil))
+   (dark-red   '("#840000" nil nil))
+   (green      '("#00FF00" nil nil))
+   (dark-green '("#008400" nil nil))
+   (yellow     '("#FFFF00" nil nil))
+   (dark-yellow '("#848400" nil nil))
+   (blue       '("#0000FF" nil nil))
+   (dark-blue  '("#000084" nil nil))
+   (magenta    '("#FF00FF" nil nil))
+   (dark-magenta '("#840084" nil nil))
+   (cyan       '("#00FFFF" nil nil))
+   (dark-cyan  '("#008484" nil nil))
+   (orange     '("#FF8400" nil nil))
+   (violet     '("#8400FF" nil nil))
+   (teal       '("#00A984" nil nil))    ;; not ZX classic, but used for variety
+
+   ;; ----- Semantic mapping (must come after all palette colors) -----
+   (selection  base2)
+   (builtin    blue)
+   (comments   grey)
+   (doc-comments dark-yellow)
+   (constants  orange)
+   (functions  cyan)
+   (keywords   magenta)
+   (methods    blue)
+   (operators  magenta)
+   (type       yellow)
+   (strings    green)
+   (variables  fg)
+   (numbers    yellow)
+   (region     dark-blue)
+   (highlight  violet)
+   (vertical-bar base2)
+   (error      red)
+   (warning    orange)
+   (success    green)
+   (vc-modified orange)
+   (vc-added   green)
+   (vc-deleted red)
+
+   ;; UI
+   (cursor     violet)
+   (modeline-bg      base2)
+   (modeline-bg-alt  base1)
+   (modeline-fg      fg)
+   (modeline-fg-alt  grey)
+   )
+
+  ;; ---------- Faces ----------
+  (
+   (default :background bg :foreground fg)
+   (region :background region)
+   (cursor :background cursor)
+   (fringe :background bg)
+   (highlight :background highlight :foreground fg)
+   (vertical-border :foreground base2)
+   (minibuffer-prompt :foreground blue)
+   (mode-line :background modeline-bg :foreground modeline-fg :box nil)
+   (mode-line-inactive :background modeline-bg-alt :foreground modeline-fg-alt :box nil)
+   (hl-line :background base1)
+   (font-lock-builtin-face :foreground builtin)
+   (font-lock-comment-face :foreground comments :slant 'italic)
+   (font-lock-doc-face :foreground doc-comments)
+   (font-lock-constant-face :foreground constants)
+   (font-lock-function-name-face :foreground functions)
+   (font-lock-keyword-face :foreground keywords)
+   (font-lock-string-face :foreground strings)
+   (font-lock-type-face :foreground type)
+   (font-lock-variable-name-face :foreground variables)
+   (font-lock-number-face :foreground numbers)
+   (font-lock-warning-face :foreground warning :weight 'bold)
+   (error :foreground error :weight 'bold)
+   (success :foreground success)
+   (warning :foreground warning)
+  )
+)
+;;; doom-zx-spectrum-next-theme.el ends here

@@ -1,0 +1,32 @@
+#+TITLE: Doom Emacs Configuration
+#+STARTUP: showeverything
+
+* UI
+#+INCLUDE: "modules/ui.org" :only-contents t
+
+* Development Tools
+#+INCLUDE: "modules/development-tools.org" :only-contents t
+
+* Language Support
+#+INCLUDE: "modules/language-support.org" :only-contents t
+
+* Language Development
+#+INCLUDE: "modules/language-development.org" :only-contents t
+
+* File Templates
+#+INCLUDE: "modules/file-templates.org" :only-contents t
+
+* Utilities
+#+INCLUDE: "modules/utilities.org" :only-contents t
+
+* Hydras
+#+INCLUDE "module/hydras.org" :only-contents t
+
+* Agenda
+#+INCLUDE "module/agenda.org" :only-content t
+
+* Keybindings
+#+INCLUDE: "modules/keybindings.org" :only-contents t
+
+* Hydras
+#+INCLUDE: "modules/hydras.org" :only-contents t

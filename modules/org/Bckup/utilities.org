@@ -1,0 +1,313 @@
+#+TITLE: Utilities
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: General utilities, helper functions, and miscellaneous productivity enhancements for Doom Emacs.
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args :tangle utilities.el
+#+auto_tangle: t
+#+FILETAGS: :utils:helpers:productivity:
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
+
+* Table of Contents :TOC:
+- [[#general-helpers][General Helpers]]
+  - [[#font-lock][Font Lock]]
+  - [[#tangle-on-save][Tangle on Save]]
+- [[#pdf-tools-enhancements][PDF Tools Enhancements]]
+  - [[#setup-and-settings][Setup and Settings]]
+  - [[#pdf-navigation][PDF Navigation]]
+  - [[#zathura-integration][Zathura Integration]]
+- [[#sidebar-tools][Sidebar Tools]]
+  - [[#treemacs-and-minimap][Treemacs and Minimap]]
+  - [[#treemacs-manual-directory-load][Treemacs Manual Directory Load]]
+- [[#buffer-management][Buffer Management]]
+- [[#org-auto-tangle][Org-Auto-Tangle]]
+- [[#dictionary][Dictionary]]
+- [[#enhanced-code-folding][Enhanced Code Folding]]
+- [[#theme-selector][Theme Selector]]
+- [[#module-footer][Module Footer]]
+
+* General Helpers
+
+** Font Lock
+
+Focused configuration: Defines a custom command or function.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/ensure-font-lock ()
+  "Ensure font-lock is applied to the whole buffer."
+  (font-lock-ensure))
+(add-hook 'find-file-hook #'my/ensure-font-lock)
+#+end_src
+
+** Tangle on Save
+
+Focused configuration: Defines a custom command or function.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/tangle-on-save ()
+  "Tangle Org files before saving."
+  (when (and buffer-file-name
+             (string-match-p "\\.org$" buffer-file-name)
+             (string-prefix-p (expand-file-name "~/.config/doom/modules/")
+                              (expand-file-name buffer-file-name)))
+    (org-babel-tangle)
+    (message "🔁 Tangled %s" buffer-file-name)))
+(add-hook 'before-save-hook #'my/tangle-on-save)
+#+end_src
+
+* PDF Tools Enhancements
+
+** Setup and Settings
+
+Focused configuration: Sets various configuration variables.
+
+#+begin_src emacs-lisp :tangle yes
+(after! pdf-tools
+  (pdf-tools-install))
+(after! pdf-tools
+  (setq pdf-outline-bury-on-select t))
+#+end_src
+
+** PDF Navigation
+
+Focused configuration: Defines a custom command or function.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/pdf-outline-jump-to-page ()
+  "Prompt for a page number and jump to that page in the associated PDF buffer."
+  (interactive)
+  (pdf-outline-select-pdf-window)
+  (let ((page (read-number "Go to page: ")))
+    (pdf-view-goto-page page)))
+
+(after! pdf-tools
+  (evil-define-key 'normal pdf-outline-buffer-mode-map
+    (kbd "g") #'my/pdf-outline-jump-to-page
+    (kbd "M-RET") #'pdf-outline-mouse-follow-link
+    (kbd "TAB") #'pdf-outline-mouse-follow-link))
+
+(add-hook 'pdf-view-mode-hook 'pdf-history-minor-mode)
+(add-hook 'pdf-view-mode-hook #'pdf-view-fit-page-to-window)
+(add-hook 'pdf-view-mode-hook
+          (lambda ()
+            (run-at-time
+             "0.2 sec" nil
+             (lambda ()
+               (require 'pdf-outline)
+               (let ((display-buffer-overriding-action
+                      '((display-buffer-in-side-window)
+                        (side . left)
+                        (slot . 0)
+                        (window-width . 40))))
+                 (call-interactively #'pdf-outline))))))
+#+end_src
+
+** Zathura Integration
+
+Focused configuration: Defines a custom command or function.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/open-pdf-in-zathura ()
+  "Open the current PDF in Zathura."
+  (interactive)
+  (let ((file (buffer-file-name)))
+    (start-process "zathura" nil "zathura" file)))
+
+(defun my/launch-zathura-prompt ()
+  "Prompt for a PDF file and open it in Zathura."
+  (interactive)
+  (let ((file (read-file-name "Open PDF in Zathura: " nil nil t nil
+                              (lambda (f) (string-match-p "\\.pdf\\'" f)))))
+    (start-process "zathura" nil "zathura" (expand-file-name file))))
+
+(defun my/open-pdf-in-zathura-and-close ()
+  "Open the current PDF in Zathura and close the buffer in Emacs."
+  (interactive)
+  (if (not (buffer-file-name))
+      (message "This buffer is not visiting a file.")
+    (start-process "zathura" nil "zathura" (buffer-file-name))
+    (kill-buffer (current-buffer))))
+
+(defun my/consult-pdf-zathura ()
+  "Prompt for directory, then fuzzy search PDFs and open in Zathura."
+  (interactive)
+  (require 'consult)
+  (let* ((dir (read-directory-name "Select directory: " default-directory))
+         (file (consult--read
+                (directory-files-recursively dir "\\.pdf$")
+                :prompt "Open PDF in Zathura: ")))
+    (start-process "zathura" nil "zathura" (expand-file-name file))))
+#+end_src
+
+* Sidebar Tools
+
+** Treemacs and Minimap
+
+Focused configuration: Defines a custom command or function.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/find-file-with-sidebars ()
+  "Open a file, then show Minimap and Treemacs focused on the file."
+  (interactive)
+  (require 'treemacs)
+  (let ((file (read-file-name "Find file: ")))
+    (find-file file)
+    (when (fboundp 'minimap-mode)
+      (minimap-mode 1))
+    (unless (treemacs-get-local-window)
+      (treemacs))
+    (treemacs-find-file)
+    (other-window 1)))
+
+(defun my/open-all-files-in-directory (dir)
+  "Open all files in DIR, show minimap, and open Treemacs."
+  (interactive "DDirectory: ")
+  (let* ((files (seq-filter #'file-regular-p
+                            (directory-files dir t "^[^.].*"))))
+    (unless files
+      (user-error "No files to open in directory: %s" dir))
+    (dolist (file files)
+      (find-file file))
+    (minimap-mode 1)
+    (require 'treemacs)
+    (treemacs)
+    (other-window 1)
+    (message "Opened %d files, enabled minimap, and opened Treemacs." (length files))))
+#+end_src
+
+** Treemacs Manual Directory Load
+
+Focused configuration: Sets various configuration variables.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/treemacs-open-at-dir (dir &optional no-persist)
+  "Open Treemacs at DIR without project logic. Set NO-PERSIST to disable state restore temporarily."
+  (interactive "DDirectory: 
+P")
+  (require 'treemacs)
+  (when no-persist
+    (setq treemacs--projects nil
+          treemacs--workspaces nil
+          treemacs--ready-to-follow nil
+          treemacs-last-error-persisted nil))
+  (let ((default-directory dir)
+        (treemacs-no-persist no-persist))
+    ;; Kill existing Treemacs buffers
+    (dolist (buf (buffer-list))
+      (when (string-match-p "\*Treemacs.*\*" (buffer-name buf))
+        (kill-buffer buf)))
+    ;; Open Treemacs manually
+    (treemacs)
+    (when no-persist
+      (treemacs--reset))
+    (treemacs-do-add-project-to-workspace dir (file-name-nondirectory (directory-file-name dir)))
+    (treemacs-select-window)))
+#+end_src
+
+* Buffer Management
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/kill-all-buffers-and-close-sidebars ()
+  "Kill all buffers and close Treemacs and Minimap if they are open."
+  (interactive)
+  (when (y-or-n-p "Really kill ALL buffers and close sidebars? ")
+    (+evil:kill-all-buffers)
+    (when (featurep 'treemacs)
+      (dolist (win (window-list))
+        (when (string-match-p "\\*Treemacs" (buffer-name (window-buffer win)))
+          (delete-window win)))
+      (dolist (buf (buffer-list))
+        (when (string-match-p "\\*Treemacs" (buffer-name buf))
+          (kill-buffer buf))))
+    (when (bound-and-true-p minimap-mode)
+      (minimap-mode -1))
+    (message "All buffers killed and sidebars closed.")))
+
+(defun my/kill-all-other-buffers ()
+  "Kill all buffers except the current one and Treemacs buffers."
+  (interactive)
+  (when (y-or-n-p "Kill all OTHER buffers (keep Treemacs)? ")
+    (mapc (lambda (b)
+            (unless (or (eq b (current-buffer))
+                        (string-match-p "\\*Treemacs" (buffer-name b)))
+              (kill-buffer b)))
+          (buffer-list))
+    (message "Other buffers killed, Treemacs preserved.")))
+
+(defun my/kill-unmodified-buffers ()
+  "Kill all unmodified buffers."
+  (interactive)
+  (when (y-or-n-p "Kill all unmodified buffers?")
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (unless (buffer-modified-p)
+          (kill-buffer buf))))
+    (message "Unmodified buffers killed.")))
+#+end_src
+
+
+* Org-Auto-Tangle
+
+#+begin_src emacs-lisp
+(defun my/org-auto-tangle-message()
+  (message " org-auto-tangle: tangled %s" (buffer-file-name)))
+
+(advice-add 'org-auto-tangle--tangle-file :after #'my/org-auto-tangle-message)
+;; test
+(use-package! org-auto-tangle
+  :hook (org-mode.org-auto-tangle-mode)
+  :config
+  (setq org-auto-tangle-default t))
+#+end_src
+
+* Dictionary
+#+BEGIN_SRC emacs-lisp
+(setq ispell-alternate-dictionary "/usr/share/dict/words")
+#+END_SRC
+
+
+* Enhanced Code Folding
+#+begin_src emacs-lisp :tangle yes
+;; Customize the fold ellipsis display
+(setq hs-set-up-overlay
+      (lambda (ov)
+        (when (eq 'code (overlay-get ov 'hs))
+          (overlay-put ov 'display " ⯈⯈⯈ "))))
+
+;; Start files with all folds closed (for programming modes)
+(remove-hook 'prog-mode-hook #'hs-hide-all)
+
+;; Optional: Use outline-style folding for Python
+(add-hook 'python-mode-hook
+  (lambda ()
+    (setq-local outline-regexp " *\\(def \\|class \\)")))
+
+;; Open folds when searching
+(setq hs-isearch-open t)
+#+end_src
+
+
+* Theme Selector
+Hydra for interactively cycling through available Doom themes, previewing them, and saving the selection.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/theme-at-index ()
+  "Return the theme at current index."
+  (interactive)
+  (message "%s" (nth my/current-theme-index my/doom-themes-list))
+  (nth my/current-theme-index my/doom-themes-list))
+
+(defun my/rotate-theme (direction)
+  "Rotate themes and apply new one by DIRECTION steps."
+  (interactive "p")
+  (setq my/current-theme-index
+        (mod (+ my/current-theme-index direction) (length my/doom-themes-list)))
+  (my/apply-theme (my/theme-at-index)))
+#+end_src
+
+
+* Module Footer
+#+begin_src emacs-lisp :tangle yes
+(message "utilities.el loaded")
+(provide 'utilities)
+
+#+end_src

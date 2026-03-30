@@ -1,0 +1,330 @@
+#+TITLE: Hydra Configuration
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Central configuration of all custom hydras for Doom Emacs keybindings, navigation, and commands.
+#+DATE: <2025-07-13 Sun>
+#+PROPERTY: header-args :tangle hydras.el
+#+auto_tangle: t
+#+FILETAGS: :hydra:keybindings:shortcuts:transient:
+#+KEYWORDS: hydra, keybindings, transient menus, shortcuts, navigation, Doom Emacs
+
+* Table of Contents :TOC:
+- [[#buffer-management-hydra][Buffer Management Hydra]]
+- [[#window-management-hydra][Window Management Hydra]]
+- [[#project-navigation-hydra][Project Navigation Hydra]]
+- [[#org-mode-hydra][Org Mode Hydra]]
+- [[#code-formatting-and-linting-hydra][Code Formatting and Linting Hydra]]
+- [[#tree-sitter--syntax-hydra][Tree-sitter & Syntax Hydra]]
+- [[#centaur-tabs][Centaur Tabs]]
+- [[#git--magit-hydra][Git / Magit Hydra]]
+- [[#terminal--shell-hydra][Terminal & Shell Hydra]]
+- [[#code-folding-hydra][Code Folding Hydra]]
+- [[#theme-selector-hydra][Theme Selector Hydra]]
+- [[#module-footer][Module Footer]]
+
+* Buffer Management Hydra
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defhydra hydra-buffer (:hint nil :color blue)
+  "
+^Buffer Management^
+-----------------------------------------
+_a_ : Kill all buffers + close sidebars
+_o_ : Kill all other buffers
+_u_ : Kill unmodified buffers
+_s_ : Save buffer
+_r_ : Revert buffer
+_q_ : Quit
+"
+  ("a" my/kill-all-buffers-and-close-sidebars)
+  ("o" my/kill-all-other-buffers)
+  ("u" my/kill-unmodified-buffers)
+  ("s" save-buffer)
+  ("r" revert-buffer)
+  ("q" nil "quit"))
+#+END_SRC
+
+* Window Management Hydra
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defhydra hydra-window (:hint nil :color blue)
+  "
+^Movement^           ^Resize^                  ^Split^              ^Other^
+^^^^^^^^-----------------------------------------------------------------
+_h_ ←        _H_ shrink horizontally    _v_ vertical split     _u_ undo window config
+_j_ ↓        _J_ shrink vertically      _s_ horizontal split   _r_ redo window config
+_k_ ↑        _K_ enlarge vertically     _d_ delete window      _o_ other window
+_l_ →        _L_ enlarge horizontally   _D_ delete other wins  _b_ balance windows
+"
+  ("h" windmove-left)
+  ("j" windmove-down)
+  ("k" windmove-up)
+  ("l" windmove-right)
+  ("H" shrink-window-horizontally)
+  ("L" enlarge-window-horizontally)
+  ("J" shrink-window)
+  ("K" enlarge-window)
+  ("v" split-window-right)
+  ("s" split-window-below)
+  ("d" delete-window)
+  ("D" delete-other-windows)
+  ("u" winner-undo)
+  ("r" winner-redo)
+  ("o" other-window)
+  ("b" balance-windows)
+  ("q" nil "quit"))
+#+END_SRC
+
+* Project Navigation Hydra
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defhydra hydra-project (:color blue :hint nil)
+  "
+^Project^
+-------------------------------
+_f_ Find file
+_s_ Search project
+_r_ Recent files
+_b_ Switch buffer
+_p_ Switch project
+_q_ Quit
+"
+  ("f" projectile-find-file)
+  ("s" projectile-ripgrep)
+  ("r" consult-recent-file)
+  ("b" consult-buffer)
+  ("p" projectile-switch-project)
+  ("q" nil "quit"))
+#+END_SRC
+
+* Org Mode Hydra
+#+begin_src emacs-lisp :tangle yes
+(setq hydra-lv t)
+
+(defhydra hydra-org-agenda (:color blue :hint nil)
+  "
+┌─────────────────────────────── Org Agenda ─────────────────────────────────────────────────────────────┐
+│ View   _d_: day   _w_: week   _m_: month     │ Navigate _n_: next  _p_: prev  _._: today  _g_: goto    │
+│ Filter _/_: tag   _f_: follow _L_: log       │ Move     _>_: later _<_: earlier                        │
+│ TODO   _t_: todo  _s_: sched  _D_: deadline  │ Priority _+_: ↑  _-_: ↓  _0_: none _1_: A _2_: B _3_: C │
+│ Effort _E_: set   _C-e_: clear               │ Tags     _:_ set   _C-:_ clear                          │
+│ Misc   _#_: cols  _G_: refresh  _x_: grid    │ File     _r_: refile _A_: archive                       │
+│ Exit   _q_: quit                             │                                                         │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+"
+  ;; View
+  ("d" org-agenda-day-view) ("w" org-agenda-week-view) ("m" org-agenda-month-view)
+  ;; Navigate / Move
+  ("n" org-agenda-next-line) ("p" org-agenda-previous-line)
+  ("." org-agenda-goto-today) ("g" org-agenda-goto-date)
+  (">" org-agenda-later) ("<" org-agenda-earlier)
+  ;; Filter / modes
+  ("/" org-agenda-filter-by-tag) ("f" org-agenda-follow-mode) ("L" org-agenda-log-mode)
+  ;; TODO & scheduling
+  ("t" org-agenda-todo) ("s" org-agenda-schedule) ("D" org-agenda-deadline)
+  ;; Priority
+  ("+" org-agenda-priority-up) ("-" org-agenda-priority-down)
+  ("0" (lambda () (interactive) (org-agenda-priority 32)))  ; none
+  ("1" (lambda () (interactive) (org-agenda-priority 65)))  ; A
+  ("2" (lambda () (interactive) (org-agenda-priority 66)))  ; B
+  ("3" (lambda () (interactive) (org-agenda-priority 67)))  ; C
+  ;; Effort
+  ("E" org-agenda-set-effort)
+  ("C-e" (lambda () (interactive) (org-agenda-set-effort 0)))
+  ;; Tags
+  (":" org-agenda-set-tags)
+  ("C-:" (lambda () (interactive) (org-agenda-set-tags nil)))
+  ;; Refile / Archive
+  ("r" org-agenda-refile) ("A" org-agenda-archive)
+  ;; Misc
+  ("#" org-agenda-columns) ("G" org-agenda-redo) ("x" org-agenda-toggle-time-grid)
+  ;; Exit
+  ("q" nil :color blue))
+#+end_src
+
+
+* Code Formatting and Linting Hydra
+#+BEGIN_SRC emacs-lisp :Tangle yes
+(defhydra hydra-code (:color blue :hint nil)
+  "
+^Code^
+-----------------------------------
+_f_ Format buffer
+_l_ Lint buffer
+_d_ Describe symbol
+_r_ Rename symbol
+_q_ Quit
+"
+  ("f" +format/buffer)
+  ("l" flycheck-list-errors)
+  ("d" lsp-describe-thing-at-point)
+  ("r" lsp-rename)
+  ("q" nil "quit"))
+#+END_SRC
+
+
+* Tree-sitter & Syntax Hydra
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defhydra hydra-syntax (:color blue :hint nil)
+  "
+^Tree-sitter^
+-----------------------------------
+_t_ Toggle tree-sitter
+_h_ Highlight node
+_i_ Inspect syntax tree
+_q_ Quit
+"
+  ("t" tree-sitter-mode)
+  ("h" tree-sitter-highlight-node)
+  ("i" tree-sitter-inspect-mode)
+  ("q" nil "quit"))
+#+END_SRC
+
+
+* Centaur Tabs
+#+begin_src emacs-lisp :tangle yes
+;; Requires :ui tabs (centaur-tabs) and :ui hydra
+;; If you don't use the hydra module, install the `hydra` package yourself.
+
+(use-package! hydra
+  :after centaur-tabs
+  :config
+  ;; helpers
+  (defun +tabs--goto (n)
+    "Jump to visible tab N (1..9)."
+    (interactive "p")
+    (centaur-tabs-select-visible-nth-tab n))
+
+  (defhydra hydra-centaur-tabs (:color blue :hint nil)
+    "
+ Tabs  [_h_]← prev  [_l_] next →    Move  [_H_]←  [_L_]→       Groups  _[_ prev  _]_ next
+ Misc  [_m_] local-mode  [_t_] toggle mode  [_x_] kill buf      Goto: _1_.._9_      [_q_] quit
+"
+    ;; basic nav (Doom wrappers also accept a count)
+    ("h" +tabs:previous-or-goto)     ; prev (or goto count)
+    ("l" +tabs:next-or-goto)         ; next (or goto count)
+
+    ;; move current tab (centaur-tabs provides these)
+    ("H" (call-interactively 'centaur-tabs-move-current-tab-to-left))
+    ("L" (call-interactively 'centaur-tabs-move-current-tab-to-right))
+
+    ;; group travel (only if available in your centaur-tabs version)
+    ("[" (when (fboundp 'centaur-tabs-backward-group)
+           (call-interactively 'centaur-tabs-backward-group)))
+    ("]" (when (fboundp 'centaur-tabs-forward-group)
+           (call-interactively 'centaur-tabs-forward-group)))
+
+    ;; toggles & misc
+    ("m" centaur-tabs-local-mode)    ; hide tabs in this buffer
+    ("t" centaur-tabs-mode)          ; toggle global mode
+    ("x" kill-this-buffer)
+
+    ;; numeric goto (visible)
+    ("1" (lambda () (interactive) (+tabs--goto 1)))
+    ("2" (lambda () (interactive) (+tabs--goto 2)))
+    ("3" (lambda () (interactive) (+tabs--goto 3)))
+    ("4" (lambda () (interactive) (+tabs--goto 4)))
+    ("5" (lambda () (interactive) (+tabs--goto 5)))
+    ("6" (lambda () (interactive) (+tabs--goto 6)))
+    ("7" (lambda () (interactive) (+tabs--goto 7)))
+    ("8" (lambda () (interactive) (+tabs--goto 8)))
+    ("9" (lambda () (interactive) (+tabs--goto 9)))
+
+    ;; quit
+    ("q" nil :exit t)) 
+#+end_src
+
+
+* Git / Magit Hydra
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defhydra hydra-git (:color blue :hint nil)
+  "
+^Git^
+--------------------------------
+_s_ Status
+_b_ Blame
+_l_ Log
+_p_ Pull
+_P_ Push
+_q_ Quit
+"
+  ("s" magit-status)
+  ("b" magit-blame)
+  ("l" magit-log-all)
+  ("p" magit-pull)
+  ("P" magit-push)
+  ("q" nil "quit"))
+#+END_SRC
+
+* Terminal & Shell Hydra
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defhydra hydra-shell (:color blue :hint nil)
+  "
+gg^Shell & Docker^
+--------------------------------------
+_v_ VTerm
+_d_ Docker bash
+_k_ Docker Kali
+_q_ Quit
+"
+  ("v" +vterm/here)
+  ("d" my-docker-bash)
+  ("k" my-docker-kali)
+  ("q" nil "quit"))
+#+END_SRC
+
+
+* Code Folding Hydra
+#+begin_src emacs-lisp :tangle yes
+(defhydra hydra-folding (:hint nil)
+  "
+^Folds^
+^^^^^^^^---------------------------
+_t_: toggle     _o_: open      _c_: close
+_R_: open all   _M_: close all
+"
+  ("t" hs-toggle-hiding)
+  ("o" hs-show-block)
+  ("c" hs-hide-block)
+  ("R" hs-show-all)
+  ("M" hs-hide-all)
+  ("q" nil "quit"))
+#+end_src
+
+
+* Theme Selector Hydra
+#+begin_src emacs-lisp :tangle yes
+(defvar my/current-theme-index 0)
+
+(defun my/theme-at-index ()
+  (nth my/current-theme-index my/doom-themes-list))
+
+(defun my/rotate-theme (direction)
+  "Rotate themes and apply new one."
+  (setq my/current-theme-index
+        (mod (+ my/current-theme-index direction) (length my/doom-themes-list)))
+  (my/apply-theme (my/theme-at-index)))
+
+(defhydra hydra-themes (:hint nil)
+  "
+^Theme Gallery^
+-------------------------------
+_n_ Next  _p_ Previous
+_o_ Open Gallery _u_ Update Gallery
+_RET_ Save
+_q_ Quit
+"
+  ("n" (my/rotate-theme +1))
+  ("p" (my/rotate-theme -1))
+  ("o" (my/theme-gallery-split-html) :exit t)
+  ("u" (my/generate-gallery-screenshot-script) :exit t)
+  ("RET" (my/save-theme doom-theme) :exit t)
+  ("q" nil "Quit"))
+#+end_src
+
+
+#+end_src
+
+* Module Footer
+
+#+begin_src emacs-lisp :tangle yes
+(message "hydras.el loaded")
+(provide 'hydras)
+#+end_src
+

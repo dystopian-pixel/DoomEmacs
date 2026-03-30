@@ -1,0 +1,94 @@
+#+TITLE: PDF Tools Enhancements
+#+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Functions for pdf tools enhancements
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args:emacs-lisp :tangle ../../config/funcs/pdf-tools-enhancements.el :comments none :padline no
+#+auto_tangle: t
+#+filetags: :utils:helpers:pdf-tools-enhancements:
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
+
+This section tunes the reading experience for long documents. It aims for smooth viewing, sensible defaults, and quick access to common actions. The focus is staying in flow while you study or review. It turns the editor into a comfortable document viewer.
+
+
+
+* Table of Contents :TOC:
+- [[#setup-and-settings][Setup and Settings]]
+- [[#pdf-navigation][PDF Navigation]]
+- [[#zathura-integration][Zathura Integration]]
+- [[#module-footer][Module Footer]]
+
+* Setup and Settings
+
+This subsection establishes the baseline behavior for working with documents. It chooses options that are comfortable for most sessions and easy on the eyes. The priority is a predictable experience from the first page. You open a file and it simply behaves well.
+
+#+begin_src emacs-lisp
+(use-package! pdf-tools
+  :config
+  ;;(pdf-tools-install)
+  (setq pdf-view-display-size 'fit-page
+        pdf-view-use-scaling nil))
+#+end_src
+
+
+* PDF Navigation
+
+Here you get fluid movement through pages and sections. It favours familiar motions and fast orientation so you never feel lost. The design is about keeping your place, skimming quickly, and returning to important spots. Reading feels more like browsing a well-made book.
+
+#+begin_src emacs-lisp
+(map! :map pdf-view-mode-map
+      :n "j" #'pdf-view-next-line-or-next-page
+      :n "k" #'pdf-view-previous-line-or-previous-page
+      :n "h" #'image-backward-hscroll
+      :n "l" #'image-forward-hscroll
+      :n "g g" #'pdf-view-first-page
+      :n "G"   #'pdf-view-last-page)
+#+end_src
+
+
+* Zathura Integration
+
+This section provides a bridge to an external viewer when that’s the better fit. It’s about flexibility: use the right tool for the moment and return without friction. The focus is simple hand-offs and quick previews. You gain the best of both worlds with minimal ceremony.
+
+#+begin_src emacs-lisp
+(defun my/open-pdf-in-zathura ()
+  "Open the current PDF in Zathura."
+  (interactive)
+  (let ((file (buffer-file-name)))
+    (start-process "zathura" nil "zathura" file)))
+
+(defun my/launch-zathura-prompt ()
+  "Prompt for a PDF file and open it in Zathura."
+  (interactive)
+  (let ((file (read-file-name "Open PDF in Zathura: " nil nil t nil
+                              (lambda (f) (string-match-p "\\.pdf\\'" f)))))
+    (start-process "zathura" nil "zathura" (expand-file-name file))))
+
+(defun my/open-pdf-in-zathura-and-close ()
+  "Open the current PDF in Zathura and close the buffer in Emacs."
+  (interactive)
+  (if (not (buffer-file-name))
+      (message "This buffer is not visiting a file.")
+    (start-process "zathura" nil "zathura" (buffer-file-name))
+    (kill-buffer (current-buffer))))
+
+(defun my/consult-pdf-zathura ()
+  "Prompt for directory, then fuzzy search PDFs and open in Zathura."
+  (interactive)
+  (require 'consult)
+  (let* ((dir (read-directory-name "Select directory: " default-directory))
+         (file (consult--read
+                (directory-files-recursively dir "\\.pdf$")
+                :prompt "Open PDF in Zathura: ")))
+    (start-process "zathura" nil "zathura" (expand-file-name file))))
+
+#+end_src
+
+
+* Module Footer
+
+This is the tidy wrap-up for the file. It signals completeness and keeps final housekeeping in one predictable place. The intent is clarity for future readers and for tooling that expects a clean ending. The file closes the loop with a neat bow.
+
+#+begin_src emacs-lisp
+(message "pdf-tools-enhancements.el loaded")
+(provide 'pdf-tools-enhancements)
+#+end_src
