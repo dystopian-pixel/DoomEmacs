@@ -13,7 +13,6 @@ This section gathers small conveniences that make everyday work smoother. It foc
 
 * Table of Contents :TOC:
 - [[#font-lock][Font Lock]]
-- [[#tangle-on-save][Tangle on Save]]
 - [[#org-auto-tangle][Org-Auto-Tangle]]
 - [[#dictionary][Dictionary]]
 - [[#module-footer][Module Footer]]
@@ -31,22 +30,6 @@ This subsection ensures your text is consistently legible and easy to scan. It e
   "Ensure font-lock is applied to the whole buffer."
   (font-lock-ensure))
 (add-hook 'find-file-hook #'my/ensure-font-lock)
-#+end_src
-
-
-
-* Tangle on Save
-
-Here the file takes care of housekeeping when you save your work. It keeps derived outputs in sync so you don’t have to remember to run extra steps. The emphasis is reliability and repeatability. You focus on writing; the system quietly handles the rest.
-
-#+begin_src emacs-lisp
-(defun my/tangle-on-save ()
-  "Tangle Org files before saving."
-  (when (and buffer-file-name
-             (string-match-p "\\.org$" buffer-file-name)
-             (string-prefix-p (expand-file-name "~/.doom.d/") buffer-file-name))
-    (org-babel-tangle)))
-(add-hook 'before-save-hook #'my/tangle-on-save)
 #+end_src
 
 * Org-Auto-Tangle
@@ -82,6 +65,6 @@ This provides quick language lookups while you write. It’s there to clarify me
 This is the tidy wrap-up for the file. It signals completeness and keeps final housekeeping in one predictable place. The intent is clarity for future readers and for tooling that expects a clean ending. The file closes the loop with a neat bow.
 
 #+begin_src emacs-lisp
-(message "general-helpers.el loaded")
+(message "☑️ general-helpers.el loaded")
 (provide 'general-helpers)
 #+end_src

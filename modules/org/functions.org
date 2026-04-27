@@ -11,6 +11,7 @@
 * Table of Contents :TOC:
 - [[#loader-for-funcs-modules][Loader for funcs/* modules]]
   - [[#implementation][Implementation]]
+- [[#module-footer][Module Footer]]
 
 * Loader for funcs/* modules
 These are the actions that treat a codebase or notes collection as a single unit. They help you jump to meaningful places, run routine tasks, and keep momentum as you switch workstreams. The emphasis is on quick orientation and seamless transitions. It’s the command center for your current endeavor.
@@ -51,4 +52,15 @@ This is resilient to being moved around under ~/.config/doom/modules/*."
 
 ;; Load immediately at startup when this file is required.
 (my/functions-load-each)
+#+end_src
+
+
+* Module Footer
+
+This closing section mirrors the same role: a clean, unambiguous end to the document. It keeps final touches together so the boundaries of the file are obvious. The aim is clarity for both people and tools that expect a consistent finish. It makes the module easier to revisit, refactor, and extend later.
+
+#+begin_src emacs-lisp
+(message "📁 functions.el loaded")
+(provide 'functions)
+;;; file-templates.el ends here
 #+end_src

@@ -1,6 +1,11 @@
 #+TITLE: File Ops
+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Functions for managing sidebars
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args:emacs-lisp :tangle ../../config/funcs/file-ops.el :comments link :padline no
+#+auto_tangle: t
 #+FILETAGS: :files:nav:sidebars:
-#+PROPERTY: header-args:emacs-lisp :tangle ../../config/funcs/file-ops.el :mkdirp yes :comments link :results none
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
 
 
 * Table of Contents :TOC:
@@ -8,7 +13,7 @@
   - [[#module-prologue][Module prologue]]
   - [[#find-file-with-sidebars][Find file with sidebars]]
   - [[#open-all-files-in-a-directory][Open all files in a directory]]
-  - [[#module-epilogue][Module epilogue]]
+- [[#module-footer][Module Footer]]
 
 * File operations (navigation + sidebars)
 These are the actions that treat a codebase or notes collection as a single unit. They help you jump to meaningful places, run routine tasks, and keep momentum as you switch workstreams. The emphasis is on quick orientation and seamless transitions. It’s the command center for your current endeavor.
@@ -78,8 +83,12 @@ together in Centaur Tabs."
 
 #+end_src
 
-** Module epilogue
+* Module Footer
+
+This is the tidy ending to the module. It keeps finishing touches, notes, or final glue in one predictable spot. The goal is simple: close the loop cleanly and leave the file in an easy-to-understand state. Future you (and collaborators) should be able to skim the end and immediately know it’s complete.
+
 #+begin_src emacs-lisp
+(message "☑️ file-ops.el loaded")
 (provide 'file-ops)
 ;;; file-ops.el ends here
 #+end_src

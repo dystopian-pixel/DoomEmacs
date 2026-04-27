@@ -425,8 +425,11 @@ left side."
 #+end_src
 
 * Module Footer
+
+This is the tidy ending to the module. It keeps finishing touches, notes, or final glue in one predictable spot. The goal is simple: close the loop cleanly and leave the file in an easy-to-understand state. Future you (and collaborators) should be able to skim the end and immediately know it’s complete.
+
 #+begin_src emacs-lisp
-(message "sidebar-tools.el loaded")
+(message "☑️ sidebar-tools.el loaded")
 (provide 'sidebar-tools)
 ;;; sidebar-tools.el ends here
 #+end_src

@@ -91,5 +91,5 @@
 
 ;; Open folds when searching
 (setq hs-isearch-open t)
-(message "functions.el loaded")
-(provide 'functions)
+(message "☑️ functions.el loaded")
+(provide 'buffer-management)

@@ -50,8 +50,8 @@
       (:prefix ("f" . "file")
        :desc "Find file with sidebars" "f" #'my/find-file-with-sidebars
        :desc "Find file (plain)" "T" #'find-file
-       :desc "Open PDF in Zathura" "z" #'my/launch-zathura-prompt
-       :desc "Open in Zathura and close buffer" "Z" #'my/open-pdf-in-zathura-and-close
+       :desc "Open PDF in Zathura" "z" #'my/open-pdf-picker-in-emacs
+       :desc "Open in Zathura and close buffer" "Z" #'my/open-pdf-picker-in-zathura
        :desc "Open all files in directory" "A" #'my/open-all-files-in-directory
        :desc "Window/Buffer group switch" "t g" #'consult-buffer)
 )
@@ -80,16 +80,18 @@
        :desc "Balance windows" "=" #'balance-windows)
 )
 
-(map!
- :n "M-<right>"     #'centaur-tabs-forward
- :n "M-<left>"      #'centaur-tabs-backward
- :n "C-<right>"     #'centaur-tabs-move-current-tab-to-right
- :n "C-<left>"      #'centaur-tabs-move-current-tab-to-left
- :n "M-S-<right>"   #'centaur-tabs-forward-group
- :n "M-S-<left>"    #'centaur-tabs-backward-group
- :n "M-<up>"        #'centaur-tabs-select-beg-tab
- :n "M-<down>"      #'centaur-tabs-select-end-tab
- :n "M-g"           #'centaur-tabs-switch-group)
+(after! centaur-tabs
+  (general-define-key
+   :states '(normal insert visual emacs motion)
+   "M-<right>"     #'centaur-tabs-forward
+   "M-<left>"      #'centaur-tabs-backward
+   "C-<right>"     #'centaur-tabs-move-current-tab-to-right
+   "C-<left>"      #'centaur-tabs-move-current-tab-to-left
+   "M-S-<right>"   #'centaur-tabs-forward-group
+   "M-S-<left>"    #'centaur-tabs-backward-group
+   "M-<up>"        #'centaur-tabs-select-beg-tab
+   "M-<down>"      #'centaur-tabs-select-end-tab
+   "M-g"           #'centaur-tabs-switch-group))
 
 
 ;; Jump to the Nth visible Centaur tab: SPC t 1..9
@@ -122,7 +124,7 @@
        :desc "Buffer management" "b" #'hydra-buffer/body
        :desc "Window management" "w" #'hydra-window/body
        :desc "Project" "p" #'hydra-project/body
-       :desc "Org" "o" #'hydra-org/body
+       ;:desc "Org" "o" #'hydra-org/body
        :desc "Org-Agenda" "O" #'hydra-org-agenda/body
        :desc "Code" "c" #'hydra-code/body
        :desc "Syntax" "s" #'hydra-syntax/body
@@ -134,26 +136,28 @@
        :desc "Tabs" "t" #'hydra-centaur-tabs/body)
 )
 
-(map! :map pdf-view-mode-map
-      :leader
-      :prefix ("o" . "open")
-      :desc "PDF outline" "g" #'pdf-outline)
+(after! pdf-view
+  (map! :map pdf-view-mode-map
+        :n "j"  #'pdf-view-next-line-or-next-page
+        :n "k"  #'pdf-view-previous-line-or-previous-page
+        :n "h"  #'image-backward-hscroll
+        :n "l"  #'image-forward-hscroll
+        :n "gg" #'pdf-view-first-page
+        :n "G"  #'pdf-view-last-page
+        :n "gp" #'pdf-view-goto-page)
 
-(map! :map pdf-view-mode-map
-      :n "g g" #'pdf-view-goto-page)
+  (map! :map pdf-view-mode-map
+        :leader
+        (:prefix ("o" . "open")
+         :desc "PDF outline"                 "g" #'pdf-outline))
 
-(general-define-key
- :states 'normal
- :prefix "SPC t p"
- "d" #'pdf-view-midnight-minor-mode
- "m" #'pdf-view-themed-minor-mode
- "w" #'pdf-view-fit-width-to-window
- "p" #'pdf-view-fit-page-to-window)
-
-(map! :map pdf-view-mode-map
-      :leader
-      :prefix ("o" . "open")
-      :desc "Open in Zathura" "z" #'my/open-pdf-in-zathura)
+  (map! :map pdf-view-mode-map
+        :localleader
+        (:prefix ("t" . "toggle")
+         :desc "Midnight mode" "d" #'pdf-view-midnight-minor-mode
+         :desc "Themed mode"   "m" #'pdf-view-themed-minor-mode
+         :desc "Fit width"     "w" #'pdf-view-fit-width-to-window
+         :desc "Fit page"      "p" #'pdf-view-fit-page-to-window)))
 
 (general-define-key
  :states 'normal
@@ -169,8 +173,8 @@
        :desc "Deadlines"        "d" (lambda! () (interactive) (org-agenda nil "d"))
        :desc "Waiting"          "w" (lambda! () (interactive) (org-agenda nil "w"))
        :desc "Projects"         "p" (lambda! () (interactive) (org-agenda nil "p"))
-       :desc "Weekly review"    "r" (lambda! () (interactive) (org-agenda nil "r"))))
+       :desc "Weekly review"    "R" (lambda! () (interactive) (org-agenda nil "r"))))
 
-(message "keybindings.el loaded")
+(message "✅ keybindings.el loaded")
 (provide 'keybindings)
 ;;; keybindings.el ends here

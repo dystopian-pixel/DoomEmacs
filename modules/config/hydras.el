@@ -61,9 +61,6 @@ _q_ Quit
   ("p" projectile-switch-project)
   ("q" nil "quit"))
 
-(use-package! hydra :demand t)
-(require 'org)
-(require 'org-agenda)
 (setq hydra-lv t)
 
 (defhydra hydra-org-agenda (:color blue :hint nil)
@@ -72,7 +69,7 @@ _q_ Quit
 │ View   _d_: day   _w_: week   _m_: month     │ Navigate _n_: next  _p_: prev  _._: today  _g_: goto    │
 │ Filter _/_: tag   _f_: follow _L_: log       │ Move     _>_: later _<_: earlier                        │
 │ TODO   _t_: todo  _s_: sched  _D_: deadline  │ Priority _+_: ↑  _-_: ↓  _0_: none _1_: A _2_: B _3_: C │
-│ Effort _E_: set   _C-e_: clear               │ Tags     _:_ set   _C-M-;_: clear                          │
+│ Effort _E_: set   _C-e_: clear               │ Tags     _:_ set   _C-:_ clear                          │
 │ Misc   _#_: cols  _G_: refresh  _x_: grid    │ File     _r_: refile _A_: archive                       │
 │ Exit   _q_: quit                             │                                                         │
 └────────────────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -98,13 +95,29 @@ _q_ Quit
   ("C-e" (lambda () (interactive) (org-agenda-set-effort 0)))
   ;; Tags
   (":" org-agenda-set-tags)
-  ("C-M-;" (lambda () (interactive) (org-agenda-set-tags nil)))
+  ("C-:" (lambda () (interactive) (org-agenda-set-tags nil)))
   ;; Refile / Archive
   ("r" org-agenda-refile) ("A" org-agenda-archive)
   ;; Misc
   ("#" org-agenda-columns) ("G" org-agenda-redo) ("x" org-agenda-toggle-time-grid)
   ;; Exit
   ("q" nil :color blue))
+
+(defhydra hydra-code (:color blue :hint nil)
+  "
+^Code^
+-----------------------------------
+_f_ Format buffer
+_l_ Lint buffer
+_d_ Describe symbol
+_r_ Rename symbol
+_q_ Quit
+"
+  ("f" +format/buffer)
+  ("l" flycheck-list-errors)
+  ("d" lsp-describe-thing-at-point)
+  ("r" lsp-rename)
+  ("q" nil "quit"))
 
 (defhydra hydra-syntax (:color blue :hint nil)
   "
@@ -132,7 +145,7 @@ _q_ Quit
     (interactive "p")
     (centaur-tabs-select-visible-nth-tab n))
 
-  (defhydra +hydra-centaur-tabs (:color blue :hint nil)
+  (defhydra hydra-centaur-tabs (:color blue :hint nil)
     "
  Tabs  [_h_]← prev  [_l_] next →    Move  [_H_]←  [_L_]→       Groups  _[_ prev  _]_ next
  Misc  [_m_] local-mode  [_t_] toggle mode  [_x_] kill buf      Goto: _1_.._9_      [_q_] quit
@@ -168,10 +181,7 @@ _q_ Quit
     ("9" (lambda () (interactive) (+tabs--goto 9)))
 
     ;; quit
-    ("q" nil :exit t))
-
-  ;; leader binding: SPC t t
-  (map! :leader :desc "Centaur Tabs hydra" "t t" #'+hydra/centaur-tabs/body))
+    ("q" nil :exit t)))
 
 (defhydra hydra-git (:color blue :hint nil)
   "
@@ -246,43 +256,5 @@ _q_ Quit
   ("RET" (my/save-theme doom-theme) :exit t)
   ("q" nil "Quit"))
 
-(defhydra +hydra/centaur-tabs (:color blue :hint nil)
-    "
- Tabs  [_h_]← prev  [_l_] next →    Move  [_H_]←  [_L_]→       Groups  _[_ prev  _]_ next
- Misc  [_m_] local-mode  [_t_] toggle mode  [_x_] kill buf      Goto: _1_.._9_      [_q_] quit
-"
-    ;; basic nav (Doom wrappers also accept a count)
-    ("h" +tabs:previous-or-goto)     ; prev (or goto count)
-    ("l" +tabs:next-or-goto)         ; next (or goto count)
-
-    ;; move current tab (centaur-tabs provides these)
-    ("H" (call-interactively 'centaur-tabs-move-current-tab-to-left))
-    ("L" (call-interactively 'centaur-tabs-move-current-tab-to-right))
-
-    ;; group travel (only if available in your centaur-tabs version)
-    ("[" (when (fboundp 'centaur-tabs-backward-group)
-           (call-interactively 'centaur-tabs-backward-group)))
-    ("]" (when (fboundp 'centaur-tabs-forward-group)
-           (call-interactively 'centaur-tabs-forward-group)))
-
-    ;; toggles & misc
-    ("m" centaur-tabs-local-mode)    ; hide tabs in this buffer
-    ("t" centaur-tabs-mode)          ; toggle global mode
-    ("x" kill-this-buffer)
-
-    ;; numeric goto (visible)
-    ("1" (lambda () (interactive) (+tabs--goto 1)))
-    ("2" (lambda () (interactive) (+tabs--goto 2)))
-    ("3" (lambda () (interactive) (+tabs--goto 3)))
-    ("4" (lambda () (interactive) (+tabs--goto 4)))
-    ("5" (lambda () (interactive) (+tabs--goto 5)))
-    ("6" (lambda () (interactive) (+tabs--goto 6)))
-    ("7" (lambda () (interactive) (+tabs--goto 7)))
-    ("8" (lambda () (interactive) (+tabs--goto 8)))
-    ("9" (lambda () (interactive) (+tabs--goto 9)))
-
-    ;; quit
-    ("q" nil :exit t))
-
-(message "hydras.el loaded")
+(message "✅ hydras.el loaded")
 (provide 'hydras)

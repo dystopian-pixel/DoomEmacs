@@ -2,7 +2,7 @@
 #+AUTHOR: Andy Stevenson
 #+DESCRIPTION: Central configuration of all custom hydras for Doom Emacs keybindings, navigation, and commands.
 #+DATE: <2025-07-13 Sun>
-#+PROPERTY: header-args :tangle hydras.el
+#+PROPERTY: header-args :tangle ../config/hydras.el
 #+auto_tangle: t
 #+FILETAGS: :hydra:keybindings:shortcuts:transient:
 #+KEYWORDS: hydra, keybindings, transient menus, shortcuts, navigation, Doom Emacs
@@ -22,7 +22,7 @@
 - [[#module-footer][Module Footer]]
 
 * Buffer Management Hydra
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp
 (defhydra hydra-buffer (:hint nil :color blue)
   "
 ^Buffer Management^
@@ -43,7 +43,7 @@ _q_ : Quit
 #+END_SRC
 
 * Window Management Hydra
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp
 (defhydra hydra-window (:hint nil :color blue)
   "
 ^Movement^           ^Resize^                  ^Split^              ^Other^
@@ -73,7 +73,7 @@ _l_ →        _L_ enlarge horizontally   _D_ delete other wins  _b_ balance win
 #+END_SRC
 
 * Project Navigation Hydra
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp
 (defhydra hydra-project (:color blue :hint nil)
   "
 ^Project^
@@ -94,7 +94,7 @@ _q_ Quit
 #+END_SRC
 
 * Org Mode Hydra
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (setq hydra-lv t)
 
 (defhydra hydra-org-agenda (:color blue :hint nil)
@@ -140,7 +140,7 @@ _q_ Quit
 
 
 * Code Formatting and Linting Hydra
-#+BEGIN_SRC emacs-lisp :Tangle yes
+#+BEGIN_SRC emacs-lisp
 (defhydra hydra-code (:color blue :hint nil)
   "
 ^Code^
@@ -160,7 +160,7 @@ _q_ Quit
 
 
 * Tree-sitter & Syntax Hydra
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp
 (defhydra hydra-syntax (:color blue :hint nil)
   "
 ^Tree-sitter^
@@ -178,7 +178,7 @@ _q_ Quit
 
 
 * Centaur Tabs
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 ;; Requires :ui tabs (centaur-tabs) and :ui hydra
 ;; If you don't use the hydra module, install the `hydra` package yourself.
 
@@ -227,12 +227,12 @@ _q_ Quit
     ("9" (lambda () (interactive) (+tabs--goto 9)))
 
     ;; quit
-    ("q" nil :exit t)) 
+    ("q" nil :exit t))) 
 #+end_src
 
 
 * Git / Magit Hydra
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp
 (defhydra hydra-git (:color blue :hint nil)
   "
 ^Git^
@@ -253,7 +253,7 @@ _q_ Quit
 #+END_SRC
 
 * Terminal & Shell Hydra
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp
 (defhydra hydra-shell (:color blue :hint nil)
   "
 gg^Shell & Docker^
@@ -271,7 +271,7 @@ _q_ Quit
 
 
 * Code Folding Hydra
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defhydra hydra-folding (:hint nil)
   "
 ^Folds^
@@ -289,7 +289,7 @@ _R_: open all   _M_: close all
 
 
 * Theme Selector Hydra
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defvar my/current-theme-index 0)
 
 (defun my/theme-at-index ()
@@ -319,12 +319,12 @@ _q_ Quit
 #+end_src
 
 
-#+end_src
-
 * Module Footer
 
-#+begin_src emacs-lisp :tangle yes
-(message "hydras.el loaded")
+This is the tidy ending to the module. It keeps finishing touches, notes, or final glue in one predictable spot. The goal is simple: close the loop cleanly and leave the file in an easy-to-understand state. Future you (and collaborators) should be able to skim the end and immediately know it’s complete.
+
+#+begin_src emacs-lisp
+(message "✅ hydras.el loaded")
 (provide 'hydras)
 #+end_src
 

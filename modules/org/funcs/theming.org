@@ -14,7 +14,7 @@
   - [[#module-prologue][Module prologue]]
   - [[#theme-gallery][Theme gallery]]
   - [[#toggle-transparency][Toggle transparency]]
-  - [[#module-epilogue][Module epilogue]]
+- [[#module-footer][Module Footer]]
 
 * Theming
 These are the actions that treat a codebase or notes collection as a single unit. They help you jump to meaningful places, run routine tasks, and keep momentum as you switch workstreams. The emphasis is on quick orientation and seamless transitions. It’s the command center for your current endeavor.
@@ -73,9 +73,14 @@ Flip between fully opaque and a preferred translucent setting. Works with both t
     (message "Transparency: %s" next)))
 #+end_src
 
-** Module epilogue
+* Module Footer
+
+This closing section mirrors the same role: a clean, unambiguous end to the document. It keeps final touches together so the boundaries of the file are obvious. The aim is clarity for both people and tools that expect a consistent finish. It makes the module easier to revisit, refactor, and extend later.
+
+
 #+begin_src emacs-lisp
+(message "☑️ theming.el loaded")
 (provide 'theming)
-;;; theming.el ends here
+;;; theming.el ends here 
 #+end_src
 

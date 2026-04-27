@@ -93,7 +93,8 @@
           (user-error "No `run' target and no executable found in build/ or bin/")))))))
 ;; Make: run:1 ends here
 
-;; [[file:../../org/funcs/build-tools.org::*Module epilogue][Module epilogue:1]]
+;; [[file:../../org/funcs/build-tools.org::*Module Footer][Module Footer:1]]
+(message "☑️ build-tools.el loaded")
 (provide 'build-tools)
 ;;; build-tools.el ends here
-;; Module epilogue:1 ends here
+;; Module Footer:1 ends here

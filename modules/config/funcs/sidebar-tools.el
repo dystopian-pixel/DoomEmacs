@@ -158,7 +158,6 @@
         (set-window-parameter win 'no-other-window t)
         (set-window-parameter win 'no-delete-other-windows t)
         (set-window-dedicated-p win t)))))
-
 ;;; --- Minimap ---------------------------------------------------------------
 
 (with-eval-after-load 'minimap
@@ -217,7 +216,6 @@
   "Compatibility alias for `my/toggle-minimap'."
   (interactive)
   (my/toggle-minimap))
-
 ;;; --- Treemacs --------------------------------------------------------------
 
 (with-eval-after-load 'treemacs
@@ -253,7 +251,6 @@
      (my/left-column--ensure-width)
      (when (my/imenu-list-window)
        (my/imenu-list-refresh-layout)))))
-
 ;;; --- iMenu List ------------------------------------------------------------
 
 (with-eval-after-load 'imenu-list
@@ -292,11 +289,11 @@ left side."
          (lambda (entry)
            (and (consp entry)
                 (stringp (car entry))
-                (string-match-p "\\` ?\\*Ilist\\*\\'" (car entry))))
+                (string-match-p "\` ?\*Ilist\*\'" (car entry))))
          display-buffer-alist))
 
   (add-to-list 'display-buffer-alist
-               '("\\` ?\\*Ilist\\*\\'" my/display-imenu-list))
+               '("\` ?\*Ilist\*\'" my/display-imenu-list))
 
   (defun my/imenu-list-update-from-main-buffer-a (orig-fn &rest args)
     "Run ORIG-FN from the main editing buffer, never from sidebars."
@@ -328,7 +325,6 @@ left side."
    (lambda ()
      (when (my/imenu-list-window)
        (my/imenu-list-refresh-layout)))))
-
 ;;; --- Unified toggles -------------------------------------------------------
 
 (defun my/sidebars-visible-p ()
@@ -387,7 +383,6 @@ left side."
 
 (add-hook 'buffer-list-update-hook #'my/sidebar-sync-visibility-h)
 (add-hook 'window-selection-change-functions #'my/sidebar-sync-visibility-h)
-
-(message "sidebar-tools.el loaded")
+(message "☑️ sidebar-tools.el loaded")
 (provide 'sidebar-tools)
 ;;; sidebar-tools.el ends here

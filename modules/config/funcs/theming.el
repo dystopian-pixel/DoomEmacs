@@ -36,5 +36,6 @@
                 (t my/frame-transparency))))
     (my--theming--set-alpha frame next)
     (message "Transparency: %s" next)))
+(message "☑️ theming.el loaded")
 (provide 'theming)
 ;;; theming.el ends here

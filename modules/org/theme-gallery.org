@@ -29,7 +29,7 @@
 This module dynamically generates a Doom Emacs theme gallery with inline thumbnails and live theme-matched CSS. Use it to preview, browse, and select your Emacs themes from a modern gallery in an external browser (Chromium kiosk/app mode, no tabs), or within Emacs (legacy, less pretty). Theme switching is instant.
 
 * Theme Gallery Configuration
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (setq httpd-root (expand-file-name "theme-gallery/" doom-user-dir))
    ;; Set simple-httpd root folder to inside Doom Emacs folder
 
@@ -50,7 +50,7 @@ This module dynamically generates a Doom Emacs theme gallery with inline thumbna
 * Functions
 
 ** Save and Load Theme
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (unless (boundp 'my/last-theme-file)
   (defvar my/last-theme-file
     (expand-file-name "modules/config/.last-theme.el" doom-user-dir)
@@ -84,7 +84,7 @@ This module dynamically generates a Doom Emacs theme gallery with inline thumbna
 #+end_src
 
 ** Apply Theme
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/apply-theme (theme)
   "Disable active themes and load THEME."
   (interactive)
@@ -95,7 +95,7 @@ This module dynamically generates a Doom Emacs theme gallery with inline thumbna
 #+end_src
 
 ** Screenshot Capture (Placeholder)
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/capture-theme-screenshot (theme)
   "Capture screenshot of THEME buffer (placeholder implementation)."
   (let ((img-file (expand-file-name (format "%s.png" theme) my/theme-gallery-dir)))
@@ -107,7 +107,7 @@ This module dynamically generates a Doom Emacs theme gallery with inline thumbna
 * Commands
 
 ** Show Theme Gallery (Legacy, In-Emacs)
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/show-theme-gallery ()
   "Show a clickable grid of all available themes with screenshots in Emacs. (Legacy version)"
   (interactive)
@@ -149,7 +149,7 @@ This module dynamically generates a Doom Emacs theme gallery with inline thumbna
 #+end_src
 
 * Generate HTML for HTML Gallery (For Browser/Kiosk)
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/theme-gallery-css-from-theme ()
   "Dynamically extract basic colors from the current theme for CSS."
   (let* ((bg   (face-background 'default nil t))
@@ -166,7 +166,7 @@ body { background: %s; color: %s; margin: 0; font-family: system-ui,sans-serif; 
 " bg fg box acc acc)))
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/theme-gallery--html-head ()
   (concat
    "<!DOCTYPE html>
@@ -185,7 +185,7 @@ body { background: %s; color: %s; margin: 0; font-family: system-ui,sans-serif; 
 "))
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/theme-gallery--html-end ()
   "</div>
 <script>
@@ -201,7 +201,7 @@ document.querySelectorAll('.theme-thumb').forEach(function(div) {
 </body></html>")
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/generate-theme-gallery-html ()
   "Generate a clickable, responsive HTML theme gallery with live theme-matched CSS."
   (interactive)
@@ -227,7 +227,7 @@ document.querySelectorAll('.theme-thumb').forEach(function(div) {
 
 
 * Launch HTML Theme Gallery in Kiosk Mode
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/open-theme-gallery-kiosk ()
   "Open the theme gallery in Chromium app mode (no tabs/address bar, full window)."
   (interactive)
@@ -243,19 +243,22 @@ document.querySelectorAll('.theme-thumb').forEach(function(div) {
 
 
 * Update Theme Gallery
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/generate-gallery-screenshot-script ()
-  "Run the theme_screenshot.fish script asynchronously."
+  "Run the theme screenshot script asynchronously."
   (interactive)
-  (start-process-shell-command
-   "theme-screenshot"
-   "*theme-screenshot-output*"
-   "~/.doom.d/scripts/theme-screenshot.fish"))
+  (let ((script (expand-file-name "scripts/theme-screenshot.fish" doom-user-dir)))
+    (if (file-exists-p script)
+        (start-process-shell-command
+         "theme-screenshot"
+         "*theme-screenshot-output*"
+         (shell-quote-argument script))
+      (message "Theme screenshot script not found: %s" script))))
 #+end_src
 
 
 * Auto-Regenerate HTML Gallery on Theme Switch
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (add-hook 'doom-load-theme-hook #'my/generate-theme-gallery-html)
 #+end_src
 
@@ -263,9 +266,7 @@ document.querySelectorAll('.theme-thumb').forEach(function(div) {
 
 * Clickable HTML Gallery for Theme Switching
 
-This section provides a function to generate a clickable HTML theme gallery.
-Each screenshot is clickable; clicking a screenshot will immediately change the
-Doom Emacs theme via a local HTTP request to your running Emacs server.
+This section provides a function to generate a clickable HTML theme gallery. Each screenshot is clickable; clicking a screenshot will immediately change the Doom Emacs theme via a local HTTP request to your running Emacs server.
 
 **How to use:**
 - Evaluate or tangle this block.
@@ -274,8 +275,7 @@ Doom Emacs theme via a local HTTP request to your running Emacs server.
 - Clicking any theme screenshot will switch themes in Emacs instantly.
 
 **Note:**
-Requires your local Emacs HTTP server to be running and listening at
-`/my-theme-gallery/THEME-NAME` (as you have configured).
+Requires your local Emacs HTTP server to be running and listening at `/my-theme-gallery/THEME-NAME` (as you have configured).
 
 
 #+begin_src emacs-lisp :tangle yes
@@ -324,7 +324,7 @@ This section generates a split-panel, animated theme gallery:
 - Left: 2/3, all screenshots in a grid (bigger, with animated hover, tile effect)
 - Right: 1/3, large preview of hovered theme, with theme name and info
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/theme-gallery-split-html ()
   "Generate a modern split gallery with live preview, tile effects, and info."
   (interactive)
@@ -482,7 +482,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 * Module Footer
-#+begin_src emacs-lisp :tangle yes
+
+This is the tidy ending to the module. It keeps finishing touches, notes, or final glue in one predictable spot. The goal is simple: close the loop cleanly and leave the file in an easy-to-understand state. Future you (and collaborators) should be able to skim the end and immediately know it’s complete.
+
+#+begin_src emacs-lisp
 (provide 'theme-gallery)
 (message "✅ theme-gallery.el loaded")
 #+end_src
+

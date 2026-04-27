@@ -1,6 +1,11 @@
 #+TITLE: Build Tools
+AUTHOR: Andy Stevenson
+#+DESCRIPTION: Functions for 
+#+DATE: <2025-07-12 Sat>
+#+PROPERTY: header-args:emacs-lisp :tangle ../../config/funcs/build-tools.el :comments none :padline no
+#+auto_tangle: t
 #+FILETAGS: :build:compile:cmake:make:
-#+PROPERTY: header-args:emacs-lisp :tangle ../../config/funcs/build-tools.el :mkdirp yes :comments link :results none
+#+KEYWORDS: utilities, helper functions, productivity tools, miscellaneous improvements
 
 
 * Table of Contents :TOC:
@@ -9,7 +14,7 @@
   - [[#cmake-build-and-run][CMake: build and run]]
   - [[#make-build][Make: build]]
   - [[#make-run][Make: run]]
-  - [[#module-epilogue][Module epilogue]]
+- [[#module-footer][Module Footer]]
 
 * Build tools (CMake & Make)
 These are the actions that treat a codebase or notes collection as a single unit. They help you jump to meaningful places, run routine tasks, and keep momentum as you switch workstreams. The emphasis is on quick orientation and seamless transitions. It’s the command center for your current endeavor.
@@ -119,8 +124,12 @@ Prefer a =run= target if it exists; otherwise, try to run a recent executable fr
           (user-error "No `run' target and no executable found in build/ or bin/")))))))
 #+end_src
 
-** Module epilogue
+* Module Footer
+
+This is the tidy ending to the module. It keeps finishing touches, notes, or final glue in one predictable spot. The goal is simple: close the loop cleanly and leave the file in an easy-to-understand state. Future you (and collaborators) should be able to skim the end and immediately know it’s complete.
+
 #+begin_src emacs-lisp
+(message "☑️ build-tools.el loaded")
 (provide 'build-tools)
 ;;; build-tools.el ends here
 #+end_src

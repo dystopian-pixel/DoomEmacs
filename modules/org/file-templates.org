@@ -7,38 +7,59 @@
 #+FILETAGS: :templates:skeletons:snippets:automation:
 #+KEYWORDS: file templates, yasnippet, auto-insert, boilerplate, code skeletons
 
-
 * Table of Contents :TOC:
 - [[#file-templates][File Templates]]
+- [[#module-footer][Module Footer]]
 
 * File Templates
 
 This section defines how new files start their lives—what scaffolding they get, what patterns they follow, and how much boilerplate you never have to type again. The emphasis is on consistency and speed, so every fresh file feels ready to work in right away. It aims to reduce setup time, remove fiddly chores, and nudge projects toward a uniform shape. You open a blank buffer, and it already understands the kind of document you’re making.
 
 #+begin_src emacs-lisp
-
 ;;; file-templates.el --- Templates config -*- lexical-binding: t; -*-
 
 (setq +file-templates-dir (expand-file-name "snippets" doom-user-dir))
 
-(after! file-templates
-  (set-file-templates!
-   '(("\\.py$"  :mode python-mode)
-     ("\\.cpp$" :mode c++-mode :trigger "__cpp")
-     ("\\.bas$" :mode basic-generic-mode)
-     ("\\.c$"   :mode c-mode :trigger "__c"))))
-
 (require 'yasnippet)
 
-(add-hook 'find-file-hook
-          (lambda ()
-            (when (and (eq major-mode 'basic-generic-mode)
-                       (bound-and-true-p yas-minor-mode)
-                       (buffer-file-name)
-                       (= (point-min) (point-max)))
-              (yas-expand-snippet
-               (yas-lookup-snippet "__" 'basic-generic-mode)))))
+(defun my/expand-new-file-snippet-if-empty ()
+  "Expand a snippet automatically for a brand new empty file by extension."
+  (when (and (bound-and-true-p yas-minor-mode)
+             (buffer-file-name)
+             (= (point-min) (point-max)))
+    (pcase (downcase (or (file-name-extension (buffer-file-name)) ""))
+      ("py"
+       (when-let ((snippet (yas-lookup-snippet "__" 'python-mode)))
+         (yas-expand-snippet snippet)))
+      ("bas"
+       (when-let ((snippet (yas-lookup-snippet "__" 'basic-generic-mode)))
+         (yas-expand-snippet snippet)))
+      ("c"
+       (when-let ((snippet (yas-lookup-snippet "__c" 'c-mode)))
+         (yas-expand-snippet snippet)))
+      ((or "cc" "cpp" "cxx")
+       (when-let ((snippet (yas-lookup-snippet "__cpp" 'c++-mode)))
+         (yas-expand-snippet snippet))))))
 
+(add-hook 'find-file-hook #'my/expand-new-file-snippet-if-empty)
+
+(defun my/refontify-c-family-after-template-h ()
+  "Refresh mode and font-lock after inserting a C/C++ file template."
+  (when (and buffer-file-name
+             (member (downcase (or (file-name-extension buffer-file-name) ""))
+                     '("c" "cc" "cpp" "cxx" "h" "hh" "hpp" "hxx")))
+    (font-lock-flush)
+    (font-lock-ensure)))
+
+(add-hook 'yas-after-exit-snippet-hook #'my/refontify-c-family-after-template-h)
+#+end_src
+
+* Module Footer
+
+This closing section mirrors the same role: a clean, unambiguous end to the document. It keeps final touches together so the boundaries of the file are obvious. The aim is clarity for both people and tools that expect a consistent finish. It makes the module easier to revisit, refactor, and extend later.
+
+#+begin_src emacs-lisp
+(message "✅ file-templates.el loaded")
 (provide 'file-templates)
 ;;; file-templates.el ends here
 #+end_src

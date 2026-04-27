@@ -284,10 +284,15 @@
 
 ;; [[file:../org/agenda.org::*Projects & Stuck projects][Projects & Stuck projects:1]]
 (with-eval-after-load 'org-agenda
-  (let ((cmd '("k" "Stuck Projects"
-               ((tags-todo "+PROJECT/-DONE"
-                           ((org-agenda-overriding-header "Stuck Projects (no NEXT/DOING)")
-                            (org-agenda-skip-function #'my/org-agenda-skip-if-not-stuck-project)))))))
+  (dolist (cmd
+           '(("p" "Projects"
+              ((tags-todo "+PROJECT/-DONE"
+                          ((org-agenda-overriding-header "Projects")
+                           (org-agenda-skip-function #'my/org-agenda-skip-non-projects)))))
+             ("k" "Stuck Projects"
+              ((tags-todo "+PROJECT/-DONE"
+                          ((org-agenda-overriding-header "Stuck Projects (no NEXT/DOING)")
+                           (org-agenda-skip-function #'my/org-agenda-skip-if-not-stuck-project)))))))
     (setq org-agenda-custom-commands
           (cons cmd
                 (cl-remove-if (lambda (c) (equal (car c) (car cmd)))
@@ -295,7 +300,14 @@
 ;; Projects & Stuck projects:1 ends here
 
 ;; [[file:../org/agenda.org::*Waiting / Delegated / Someday][Waiting / Delegated / Someday:1]]
-
+(with-eval-after-load 'org-agenda
+  (let ((cmd '("w" "Waiting"
+               ((tags-todo "+TODO=\"WAIT\""
+                           ((org-agenda-overriding-header "Waiting")))))))
+    (setq org-agenda-custom-commands
+          (cons cmd
+                (cl-remove-if (lambda (c) (equal (car c) (car cmd)))
+                              org-agenda-custom-commands)))))
 ;; Waiting / Delegated / Someday:1 ends here
 
 ;; [[file:../org/agenda.org::*Weekly Review][Weekly Review:1]]
@@ -303,7 +315,7 @@
   (setq org-agenda-custom-commands
         (cl-remove-duplicates
          (append org-agenda-custom-commands
-                 '(("R" "Weekly Review"
+                 '(("r" "Weekly Review"
                     ((agenda ""
                              ((org-agenda-span 7)
                               (org-agenda-start-on-weekday 1)
@@ -314,7 +326,7 @@
                            ((org-agenda-overriding-header "Next Actions")))
                      (tags-todo "+PROJECT/-DONE"
                                 ((org-agenda-overriding-header "Projects")
-                                 (org-agenda-skip-function #'my/org-agenda-skip-if-no-project)))
+                                 (org-agenda-skip-function #'my/org-agenda-skip-non-projects)))
                      (tags "+DEADLINE<=\"<+7d>\""
                            ((org-agenda-overriding-header "Upcoming Deadlines")))
                      (search "+SCHEDULED>=\"<today>\""
@@ -338,6 +350,6 @@
 ;; Sorting preferences:1 ends here
 
 ;; [[file:../org/agenda.org::*Module Footer][Module Footer:1]]
-(message "agenda.el loaded")
+(message "✅ agenda.el loaded")
 (provide 'agenda)
 ;; Module Footer:1 ends here

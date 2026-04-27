@@ -1,6 +1,9 @@
 #!/usr/bin/env fish
 
-set THEME_DIR ~/.doom.d/theme-gallery
+set SCRIPT_DIR (path dirname (status filename))
+set DOOM_DIR (path dirname $SCRIPT_DIR)
+set THEME_DIR "$DOOM_DIR/theme-gallery"
+
 mkdir -p $THEME_DIR
 
 # Set your monitor name (check with: grim -l)

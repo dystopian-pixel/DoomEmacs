@@ -1,6 +1,6 @@
 #+TITLE: Super Agenda (Doom Emacs)
 #+AUTHOR: You
-#+DESCRIPTION: A full-featured, Hydra-free and keybinding-free Org Agenda configuration with org-super-agenda groups, curated custom views, friendly formatting, and robust helper functions.
+#+DESCRIPTION: A full-featured Org Agenda configuration with org-super-agenda groups, curated custom views, friendly formatting, and robust helper functions.
 #+auto_tangle: t
 #+PROPERTY: header-args:emacs-lisp :tangle ../config/agenda.el :comments link
 
@@ -70,10 +70,7 @@ Where the agenda looks for data. Adjust to your layout; this is conservative and
 #+end_src
 
 * Org Capture templates
-Capture templates for fast inboxing. These live alongside your agenda setup so
-the files, defaults, and workflow stay in one place. Tasks go to ~inbox.org~,
-while notes, ideas, and journal entries stay in their own files to keep the
-agenda focused on actionable items.
+Capture templates for fast inboxing. These live alongside your agenda setup so the files, defaults, and workflow stay in one place. Tasks go to ~inbox.org~, while notes, ideas, and journal entries stay in their own files to keep the agenda focused on actionable items.
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'org-capture
@@ -383,10 +380,15 @@ Project inventory and a spotlight on projects without NEXT/DOING.
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'org-agenda
-  (let ((cmd '("k" "Stuck Projects"
-               ((tags-todo "+PROJECT/-DONE"
-                           ((org-agenda-overriding-header "Stuck Projects (no NEXT/DOING)")
-                            (org-agenda-skip-function #'my/org-agenda-skip-if-not-stuck-project)))))))
+  (dolist (cmd
+           '(("p" "Projects"
+              ((tags-todo "+PROJECT/-DONE"
+                          ((org-agenda-overriding-header "Projects")
+                           (org-agenda-skip-function #'my/org-agenda-skip-non-projects)))))
+             ("k" "Stuck Projects"
+              ((tags-todo "+PROJECT/-DONE"
+                          ((org-agenda-overriding-header "Stuck Projects (no NEXT/DOING)")
+                           (org-agenda-skip-function #'my/org-agenda-skip-if-not-stuck-project)))))))
     (setq org-agenda-custom-commands
           (cons cmd
                 (cl-remove-if (lambda (c) (equal (car c) (car cmd)))
@@ -397,6 +399,14 @@ Project inventory and a spotlight on projects without NEXT/DOING.
 Workflow states you want to review periodically.
 
 #+begin_src emacs-lisp
+(with-eval-after-load 'org-agenda
+  (let ((cmd '("w" "Waiting"
+               ((tags-todo "+TODO=\"WAIT\""
+                           ((org-agenda-overriding-header "Waiting")))))))
+    (setq org-agenda-custom-commands
+          (cons cmd
+                (cl-remove-if (lambda (c) (equal (car c) (car cmd)))
+                              org-agenda-custom-commands)))))
 #+end_src
 
 ** Weekly Review
@@ -407,7 +417,7 @@ A multi-block dashboard for reflection and planning.
   (setq org-agenda-custom-commands
         (cl-remove-duplicates
          (append org-agenda-custom-commands
-                 '(("R" "Weekly Review"
+                 '(("r" "Weekly Review"
                     ((agenda ""
                              ((org-agenda-span 7)
                               (org-agenda-start-on-weekday 1)
@@ -418,7 +428,7 @@ A multi-block dashboard for reflection and planning.
                            ((org-agenda-overriding-header "Next Actions")))
                      (tags-todo "+PROJECT/-DONE"
                                 ((org-agenda-overriding-header "Projects")
-                                 (org-agenda-skip-function #'my/org-agenda-skip-if-no-project)))
+                                 (org-agenda-skip-function #'my/org-agenda-skip-non-projects)))
                      (tags "+DEADLINE<=\"<+7d>\""
                            ((org-agenda-overriding-header "Upcoming Deadlines")))
                      (search "+SCHEDULED>=\"<today>\""
@@ -446,7 +456,11 @@ Keep time-sensitive items first; then priority.
 #+end_src
 
 * Module Footer
+
+
+This closing section mirrors the same role: a clean, unambiguous end to the document. It keeps final touches together so the boundaries of the file are obvious. The aim is clarity for both people and tools that expect a consistent finish. It makes the module easier to revisit, refactor, and extend later.
+
 #+begin_src emacs-lisp
-(message "agenda.el loaded")
+(message "✅ agenda.el loaded")
 (provide 'agenda)
 #+end_src

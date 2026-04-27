@@ -18,13 +18,12 @@
   - [[#selection--theme-aware][Selection — Theme-Aware]]
   - [[#modeline---line-only-separation][Modeline - line-only separation]]
   - [[#minibuffer--completion][Minibuffer & completion]]
-- [[#minimap][Minimap]]
-  - [[#minimap-1][Minimap]]
 - [[#centaur-tabs][Centaur Tabs]]
 - [[#centaur-tabs-faces][Centaur Tabs Faces]]
 - [[#transparent-background][Transparent Background]]
 - [[#file-comparison-colours][File Comparison Colours]]
 - [[#theme-selector][Theme Selector]]
+- [[#minimap][Minimap]]
 - [[#module-footer][Module Footer]]
 
 * Doom Emacs Interface
@@ -301,7 +300,30 @@ Tabs provide a familiar, visual way to juggle multiple buffers. They serve as la
           centaur-tabs-adjust-buffer-order t
           centaur-tabs-cycle-scope 'tabs)
 
-    ;; ensure tabs stay enabled after theme reloads
+    (defun my/centaur-tabs-buffer-groups ()
+      "Return the current buffer group for Centaur Tabs."
+      (list
+       (cond
+        ((bound-and-true-p my/centaur-tabs-group)
+         my/centaur-tabs-group)
+        ((derived-mode-p 'org-mode)
+         "Org")
+        ((derived-mode-p 'emacs-lisp-mode 'lisp-interaction-mode)
+         "Elisp")
+        ((derived-mode-p 'dired-mode)
+         "Dired")
+        ((derived-mode-p 'help-mode 'helpful-mode 'special-mode)
+         "System")
+        ((derived-mode-p 'term-mode 'eshell-mode 'vterm-mode 'shell-mode)
+         "Terminal")
+        ((and (fboundp 'projectile-project-p)
+              (projectile-project-p))
+         (format "Project:%s" (projectile-project-name)))
+        (t
+         "Common"))))
+
+    (setq centaur-tabs-buffer-groups-function #'my/centaur-tabs-buffer-groups)
+
     (add-hook 'doom-load-theme-hook #'centaur-tabs-mode)))
 #+end_src
 
@@ -362,6 +384,9 @@ This provides a smooth way to try on different visual moods. Switching is quick 
     (doom/reload-theme)))
 #+end_src
 
+* Minimap
+
+Configuration is handled in =sidebar-tools.org= via `my/minimap-setup` and related helpers.
 
 
 * Module Footer
@@ -369,10 +394,7 @@ This provides a smooth way to try on different visual moods. Switching is quick 
 This is the neat closing to the module. It keeps final notes and small housekeeping in one predictable place. The goal is to signal completeness and leave a tidy end state. Future you should be able to skim the bottom and instantly know the file is wrapped up.
 
 #+begin_src emacs-lisp
-(message "ui.el loaded")
+(message "✅ ui.el loaded")
 (provide 'config-ui)
 #+end_src
 
-* Minimap
-
-Configuration is handled in =sidebar-tools.org= via `my/minimap-setup` and related helpers.

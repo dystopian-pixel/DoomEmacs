@@ -1,1 +1,1 @@
-(setq doom-theme 'doom-tomorrow-night)
+(setq doom-theme 'doom-oceanic-next)

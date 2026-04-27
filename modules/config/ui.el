@@ -43,17 +43,6 @@
   '(font-lock-comment-face :slant italic)
   '(font-lock-comment-delimiter-face :slant italic))
 
-(add-to-list 'custom-theme-load-path (expand-file-name "themes" doom-user-dir))
-
-(setq doom-font (font-spec :family "JetBrains Mono" :size 12)
-      doom-variable-pitch-font (font-spec :family "Inter" :size 16)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 20)
-      display-line-numbers-type t)
-
-(custom-set-faces!
-  '(font-lock-comment-face :slant italic)
-  '(font-lock-comment-delimiter-face :slant italic))
-
 (after! org
   (setq org-fontify-whole-heading-line t
         org-ellipsis " … "
@@ -208,7 +197,30 @@
           centaur-tabs-adjust-buffer-order t
           centaur-tabs-cycle-scope 'tabs)
 
-    ;; ensure tabs stay enabled after theme reloads
+    (defun my/centaur-tabs-buffer-groups ()
+      "Return the current buffer group for Centaur Tabs."
+      (list
+       (cond
+        ((bound-and-true-p my/centaur-tabs-group)
+         my/centaur-tabs-group)
+        ((derived-mode-p 'org-mode)
+         "Org")
+        ((derived-mode-p 'emacs-lisp-mode 'lisp-interaction-mode)
+         "Elisp")
+        ((derived-mode-p 'dired-mode)
+         "Dired")
+        ((derived-mode-p 'help-mode 'helpful-mode 'special-mode)
+         "System")
+        ((derived-mode-p 'term-mode 'eshell-mode 'vterm-mode 'shell-mode)
+         "Terminal")
+        ((and (fboundp 'projectile-project-p)
+              (projectile-project-p))
+         (format "Project:%s" (projectile-project-name)))
+        (t
+         "Common"))))
+
+    (setq centaur-tabs-buffer-groups-function #'my/centaur-tabs-buffer-groups)
+
     (add-hook 'doom-load-theme-hook #'centaur-tabs-mode)))
 
 (with-eval-after-load 'centaur-tabs
@@ -236,5 +248,5 @@
     (setq doom-theme choice)
     (doom/reload-theme)))
 
-(message "ui.el loaded")
+(message "✅ ui.el loaded")
 (provide 'config-ui)

@@ -1,4 +1,4 @@
-:w!#+TITLE: Language Support
+#+TITLE: Language Support
 #+AUTHOR: Andy Stevenson
 #+DESCRIPTION: Extra packages and tools that enhance language workflows and improve coding productivity.
 #+DATE: <2025-07-12 Sat>
@@ -11,6 +11,7 @@
 - [[#language-support-configuration][Language Support Configuration]]
   - [[#python-mode][Python Mode]]
   - [[#lsp-pyright][LSP Pyright]]
+  - [[#prefer-classic-c-and-c-modes-for-now][Prefer classic C and C++ modes for now]]
 - [[#module-footer][Module Footer]]
 
 * Language Support Configuration
@@ -21,7 +22,7 @@ This section defines how the editor understands and adapts to different programm
 
 This subsection shapes a pleasant writing environment for Python. It aims for readable text, gentle guidance, and small conveniences that keep you moving. The focus is on clarity and rhythm so you can concentrate on ideas instead of mechanics. You open a file and the surroundings simply help you think.
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
 ;;; language-support.el --- Python -*- lexical-binding: t; -*-
 
 (use-package! python
@@ -39,12 +40,42 @@ This subsection emphasizes timely, understandable feedback while you work with P
   :hook (python-mode . lsp!))
 #+end_src
 
+** Prefer classic C and C++ modes for now
+
+This keeps C and C++ on the classic major modes until the current Tree-sitter font-lock issue is out of the way. It also makes Doom's built-in file templates and snippets line up with the modes that new C and C++ files actually open in.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'cc-mode
+  ;; Prefer classic modes for C/C++ file extensions.
+  (dolist (entry '(("\\.c\\'"   . c-mode)
+                   ("\\.h\\'"   . c-or-c++-mode)
+                   ("\\.cc\\'"  . c++-mode)
+                   ("\\.cp\\'"  . c++-mode)
+                   ("\\.cpp\\'" . c++-mode)
+                   ("\\.cxx\\'" . c++-mode)
+                   ("\\.hh\\'"  . c++-mode)
+                   ("\\.hpp\\'" . c++-mode)
+                   ("\\.hxx\\'" . c++-mode)))
+    (add-to-list 'auto-mode-alist entry))
+
+  ;; Defuse tree-sitter remapping for the C family in this config.
+  (setq major-mode-remap-alist
+        (assq-delete-all 'c-mode major-mode-remap-alist))
+  (setq major-mode-remap-alist
+        (assq-delete-all 'c++-mode major-mode-remap-alist))
+  (when (boundp 'major-mode-remap-defaults)
+    (setq major-mode-remap-defaults
+          (assq-delete-all 'c-mode major-mode-remap-defaults))
+    (setq major-mode-remap-defaults
+          (assq-delete-all 'c++-mode major-mode-remap-defaults))))
+#+end_src
 
 * Module Footer
 
 This closing section mirrors the same role: a clean, unambiguous end to the document. It keeps final touches together so the boundaries of the file are obvious. The aim is clarity for both people and tools that expect a consistent finish. It makes the module easier to revisit, refactor, and extend later.
 
 #+begin_src emacs-lisp
+(message "✅ language-support.el loaded")
 (provide 'language-support)
 ;;; language-support.el ends here
 #+end_src

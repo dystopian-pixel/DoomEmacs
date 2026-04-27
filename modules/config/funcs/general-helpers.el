@@ -3,13 +3,6 @@
   "Ensure font-lock is applied to the whole buffer."
   (font-lock-ensure))
 (add-hook 'find-file-hook #'my/ensure-font-lock)
-(defun my/tangle-on-save ()
-  "Tangle Org files before saving."
-  (when (and buffer-file-name
-             (string-match-p "\\.org$" buffer-file-name)
-             (string-prefix-p (expand-file-name "~/.doom.d/") buffer-file-name))
-    (org-babel-tangle)))
-(add-hook 'before-save-hook #'my/tangle-on-save)
 (defun my/org-auto-tangle-message()
   (message " org-auto-tangle: tangled %s" (buffer-file-name)))
 
@@ -21,5 +14,5 @@
   (setq org-auto-tangle-default t))
 (use-package! define-word
   :commands (define-word lookup-dictionary))
-(message "general-helpers.el loaded")
+(message "☑️ general-helpers.el loaded")
 (provide 'general-helpers)

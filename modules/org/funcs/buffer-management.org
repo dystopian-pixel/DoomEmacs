@@ -160,6 +160,6 @@ Here the focus is reducing visual noise so the big picture stays visible. Sectio
 This is the tidy wrap-up for the file. It signals completeness and keeps final housekeeping in one predictable place. The intent is clarity for future readers and for tooling that expects a clean ending. The file closes the loop with a neat bow.
 
 #+begin_src emacs-lisp
-(message "functions.el loaded")
-(provide 'functions)
+(message "☑️ functions.el loaded")
+(provide 'buffer-management)
 #+end_src

@@ -55,7 +55,8 @@ together in Centaur Tabs."
          nil t)))))
 ;; Open all files in a directory:1 ends here
 
-;; [[file:../../org/funcs/file-ops.org::*Module epilogue][Module epilogue:1]]
+;; [[file:../../org/funcs/file-ops.org::*Module Footer][Module Footer:1]]
+(message "☑️ file-ops.el loaded")
 (provide 'file-ops)
 ;;; file-ops.el ends here
-;; Module epilogue:1 ends here
+;; Module Footer:1 ends here
