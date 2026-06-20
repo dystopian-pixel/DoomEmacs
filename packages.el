@@ -47,22 +47,28 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
-(package! doom-themes)
-(package! projectile)
-(package! magit)
-(package! forge)
-(package! yasnippet)
-(package! company)
-(package! lsp-mode)
+;; Custom packages used directly by this private Doom config.
+;;
+;; Do not redeclare packages already provided by enabled Doom modules unless this
+;; config intentionally overrides their recipe or pin.
+
 (package! minimap)
 (package! imenu-list)
 (package! basic-mode)
-(package! pdf-tools)
 (package! pandoc-mode)
+
 (package! org-auto-tangle)
 (package! org-super-agenda)
 (package! simple-httpd)
 (package! org-modern)
 (package! org-modern-indent
   :recipe (:host github :repo "jdtsmith/org-modern-indent"))
+
+;; Used by modules/org/language-support.org while init.el still has
+;; `(python +lsp)` rather than `(python +lsp +pyright)`.
 (package! lsp-pyright)
+
+;; Direct dependencies of private config modules.
+(package! define-word)
+(package! hydra)
+
