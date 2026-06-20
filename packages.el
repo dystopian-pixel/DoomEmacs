@@ -64,10 +64,6 @@
 (package! org-modern-indent
   :recipe (:host github :repo "jdtsmith/org-modern-indent"))
 
-;; Used by modules/org/language-support.org while init.el still has
-;; `(python +lsp)` rather than `(python +lsp +pyright)`.
-(package! lsp-pyright)
-
 ;; Direct dependencies of private config modules.
 (package! define-word)
 (package! hydra)

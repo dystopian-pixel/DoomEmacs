@@ -29,7 +29,7 @@
        vertico             ; the search engine of the future
 
        :ui
-       (tabs)          ; pulls in centaur-tabs automatically with Doom’s integration
+       tabs            ; pulls in centaur-tabs automatically with Doom’s integration
        ;;deft              ; notational velocity for Emacs
        doom                ; what makes DOOM look the way it does
        doom-dashboard      ; a nifty splash screen for Emacs
@@ -57,7 +57,7 @@
        :editor
        (evil +everywhere)  ; come to the dark side, we have cookies
        (file-templates)    ; auto-snippets for empty files
-       (fold +hideshow +outline)    ; (nigh) universal code folding
+       fold              ; (nigh) universal code folding
        ;;(format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
@@ -163,7 +163,7 @@
        ;;plantuml          ; diagrams for confusing people more
        ;;graphviz          ; diagrams for confusing yourself even more
        ;;purescript        ; javascript, but functional
-       (python +lsp)              ; beautiful is better than ugly
+       (python +lsp +pyright) ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
