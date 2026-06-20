@@ -23,6 +23,8 @@
 
 * Buffer Management Hydra
 #+BEGIN_SRC emacs-lisp
+(require 'hydra)
+
 (defhydra hydra-buffer (:hint nil :color blue)
   "
 ^Buffer Management^

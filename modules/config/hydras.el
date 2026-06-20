@@ -1,3 +1,5 @@
+(require 'hydra)
+
 (defhydra hydra-buffer (:hint nil :color blue)
   "
 ^Buffer Management^
