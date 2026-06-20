@@ -1,5 +1,9 @@
 ;;; ui.el --- UI settings -*- lexical-binding: t; -*-
 
+(defvar my/doom-themes-list
+  (custom-available-themes)
+  "List of all available themes on this system.")
+
 (defvar my/last-theme-file
   (expand-file-name "last-theme.el"
                     (or (bound-and-true-p doom-etc-dir)
@@ -11,6 +15,26 @@
   "Write THEME to `my/last-theme-file'."
   (with-temp-file my/last-theme-file
     (insert (format "(setq doom-theme '%S)\n" theme))))
+
+(defun my/save-theme (theme)
+  "Persist THEME and update `doom-theme'."
+  (setq doom-theme theme)
+  (my/write-last-theme-file theme))
+
+(defun my/apply-theme (theme)
+  "Disable current themes, load THEME, and persist it."
+  (interactive
+   (list
+    (intern
+     (completing-read
+      "Theme: "
+      (mapcar #'symbol-name my/doom-themes-list)
+      nil t))))
+  (setq doom-theme theme)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme theme t)
+  (my/save-theme theme))
+
 
 (defun my/persist-theme-a (theme &rest _)
   "Persist THEME whenever it is enabled or loaded."
