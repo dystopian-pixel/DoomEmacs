@@ -16,14 +16,96 @@ layout:
 - =themes/= contains custom themes.
 - =scripts/theme-screenshot.fish= is an optional helper for theme gallery screenshots.
 
-This repo is designed to live at:
+This repo is designed to be Doom's private config directory.
+
+On current Doom Emacs installs that usually means:
 
 #+begin_src text
-~/.doom.d
+~/.config/doom
 #+end_src
 
-That matters because several paths in the config and helper scripts are hard-coded to
-that location.
+On this NixOS setup, =~/.config/doom= is managed by Home Manager as an
+out-of-store symlink to:
+
+#+begin_src text
+~/dotfiles/doom
+#+end_src
+
+Older Doom setups may use =~/.doom.d= instead. The important rule is that
+=Doom= must see this repository as its =doom-user-dir=.
+
+* Maintenance workflow
+
+This repository uses an Org-first workflow.
+
+The canonical files are:
+
+- =config.el=
+- =init.el=
+- =packages.el=
+- =config.org=
+- =modules/org/*.org=
+- =modules/org/funcs/*.org=
+- =theme-gallery/theme-gallery.org=
+
+The generated runtime files are:
+
+- =modules/config/*.el=
+- =modules/config/funcs/*.el=
+
+Do not edit generated =modules/config/*.el= files by themselves. Make the change
+in the matching Org source file, then tangle it.
+
+Typical edit cycle:
+
+#+begin_src sh
+cd ~/dotfiles/doom
+
+# edit the canonical Org source first
+$EDITOR modules/org/ui.org
+
+# either let trusted org-auto-tangle update the generated file,
+# or manually tangle from Emacs with:
+# M-x org-babel-tangle
+
+doom sync
+doom doctor
+systemctl --user restart emacs.service
+#+end_src
+
+For NixOS/Home Manager changes, edit the NixOS repository separately and rebuild
+the system. Do not use =home-manager switch= or =nixos-rebuild= for ordinary Doom
+Org/Elisp edits unless the Nix configuration itself changed.
+
+** Runtime state
+
+Runtime state should not be committed to Git.
+
+Theme persistence is stored under Doom's local state area, for example:
+
+#+begin_src text
+~/.config/emacs/.local/etc/last-theme.el
+#+end_src
+
+The old tracked path, =modules/config/.last-theme.el=, is intentionally ignored.
+
+** Optional startup helpers
+
+The local HTTP helper and theme gallery are intentionally disabled at startup:
+
+#+begin_src emacs-lisp
+my/enable-local-emacs-server
+my/enable-theme-gallery
+#+end_src
+
+Leave them nil during normal startup. Enable them only when actively working on
+those experimental features.
+
+** Org auto-tangle safety
+
+=org-auto-tangle= is restricted to trusted Doom config Org sources. It should
+enable for files under =modules/org/= and =theme-gallery/=, but not for arbitrary
+Org files elsewhere on the system.
 
 * What this config expects
 
