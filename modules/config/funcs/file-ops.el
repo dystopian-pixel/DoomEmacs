@@ -3,20 +3,29 @@
 ;; Module prologue:1 ends here
 
 ;; [[file:../../org/funcs/file-ops.org::*Find file with sidebars][Find file with sidebars:1]]
+(defun my/tramp-buffer-p ()
+  "Return non-nil when the current buffer/default-directory is remote or sudo."
+  (file-remote-p (or buffer-file-name default-directory)))
+
 ;;;###autoload
 (defun my/find-file-with-sidebars ()
-  "Open a file, then ensure the usual sidebars are visible."
+  "Open a file, then ensure the usual sidebars are visible for local files only.
+
+TRAMP buffers, especially /sudo: buffers, should not automatically start
+Treemacs, iMenu List, or Minimap.  Those sidebars can trigger extra file and
+process probes through sudo."
   (interactive)
   (call-interactively #'find-file)
-  (ignore-errors
-    (unless (window-live-p (my/treemacs-window))
-      (my/toggle-treemacs)))
-  (ignore-errors
-    (unless (window-live-p (my/imenu-list-window))
-      (my/toggle-imenu-list)))
-  (ignore-errors
-    (unless (bound-and-true-p minimap-mode)
-      (my/toggle-minimap))))
+  (unless (my/tramp-buffer-p)
+    (ignore-errors
+      (unless (window-live-p (my/treemacs-window))
+        (my/toggle-treemacs)))
+    (ignore-errors
+      (unless (window-live-p (my/imenu-list-window))
+        (my/toggle-imenu-list)))
+    (ignore-errors
+      (unless (bound-and-true-p minimap-mode)
+        (my/toggle-minimap)))))
 ;; Find file with sidebars:1 ends here
 
 ;; [[file:../../org/funcs/file-ops.org::*Open all files in a directory][Open all files in a directory:1]]

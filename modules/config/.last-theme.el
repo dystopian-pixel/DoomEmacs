@@ -1,1 +1,1 @@
-(setq doom-theme 'doom-oceanic-next)
+(setq doom-theme 'doom-city-lights)

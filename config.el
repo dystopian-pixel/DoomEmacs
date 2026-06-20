@@ -1,5 +1,17 @@
 ;;; config.el -*- lexical-binding: t; -*-
 
+
+;;; Quiet native-comp background noise on Emacs 30/Nix.
+(setq native-comp-async-report-warnings-errors nil
+      native-comp-warning-on-missing-source nil)
+
+(when (boundp 'native-comp-jit-compilation)
+  (setq native-comp-jit-compilation nil))
+
+(when (boundp 'native-comp-deferred-compilation)
+  (setq native-comp-deferred-compilation nil))
+
+
 ;; Force a POSIX shell for Emacs/Doom internals, but only when launched from Fish/Nushell.
 (let ((user-shell (file-name-nondirectory (or (getenv "SHELL") ""))))
   (when (member user-shell '("fish" "nu" "nushell"))

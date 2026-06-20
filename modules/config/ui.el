@@ -39,6 +39,30 @@
       doom-big-font (font-spec :family "JetBrains Mono" :size 20)
       display-line-numbers-type t)
 
+
+(defun my/doom-color-or (name &optional fallback)
+  "Return Doom theme color NAME, FALLBACK, or `unspecified'."
+  (or (and (fboundp 'doom-color)
+           (ignore-errors (doom-color name)))
+      fallback
+      'unspecified))
+
+(defun my/doom-lighten-or (name amount &optional fallback)
+  "Return Doom color NAME lightened by AMOUNT, FALLBACK, or `unspecified'."
+  (or (and (fboundp 'doom-color)
+           (fboundp 'doom-lighten)
+           (ignore-errors (doom-lighten (doom-color name) amount)))
+      fallback
+      'unspecified))
+
+(defun my/doom-blend-or (fg bg alpha &optional fallback)
+  "Return Doom color FG blended over BG by ALPHA, FALLBACK, or `unspecified'."
+  (or (and (fboundp 'doom-color)
+           (fboundp 'doom-blend)
+           (ignore-errors (doom-blend (doom-color fg) (doom-color bg) alpha)))
+      fallback
+      'unspecified))
+
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(font-lock-comment-delimiter-face :slant italic))
@@ -61,12 +85,12 @@
  '(org-document-title :height 1.8 :bold t :underline nil))
 
   (custom-set-faces!
-   `(outline-1 :foreground ,(doom-color 'red))
-   `(outline-2 :foreground ,(doom-color 'orange))
-   `(outline-3 :foreground ,(doom-color 'yellow))
-   `(outline-4 :foreground ,(doom-color 'green))
-   `(outline-5 :foreground ,(doom-color 'blue))
-   `(outline-6 :foreground ,(doom-color 'magenta))))
+   `(outline-1 :foreground ,(my/doom-color-or 'red "#ff6c6b"))
+   `(outline-2 :foreground ,(my/doom-color-or 'orange "#da8548"))
+   `(outline-3 :foreground ,(my/doom-color-or 'yellow "#ECBE7B"))
+   `(outline-4 :foreground ,(my/doom-color-or 'green "#98be65"))
+   `(outline-5 :foreground ,(my/doom-color-or 'blue "#51afef"))
+   `(outline-6 :foreground ,(my/doom-color-or 'magenta "#c678dd"))))
 
 (use-package! org-modern
   :hook (org-mode . org-modern-mode)
@@ -165,26 +189,32 @@
    `(mode-line
      :box nil :underline nil
      :background unspecified
-     :overline ,(or (and (fboundp 'doom-blend) (fboundp 'doom-color)
-                         (doom-blend (doom-color 'fg) (doom-color 'bg) 0.10))
-                    "#3a3f46")
-     :foreground ,(and (fboundp 'doom-color) (doom-color 'base6)))
+     :overline ,(my/doom-blend-or 'fg 'bg 0.10 "#3a3f46")
+     :foreground ,(my/doom-color-or 'base6))
    `(mode-line-inactive
      :box nil :underline nil
      :background unspecified
-     :overline ,(or (and (fboundp 'doom-blend) (fboundp 'doom-color)
-                         (doom-blend (doom-color 'fg) (doom-color 'bg) 0.06))
-                    "#2f3339")
-     :foreground ,(and (fboundp 'doom-color) (doom-color 'base5)))))
+     :overline ,(my/doom-blend-or 'fg 'bg 0.06 "#2f3339")
+     :foreground ,(my/doom-color-or 'base5))))
 
 (after! doom-themes
   (custom-set-faces!
-   `(minibuffer-prompt :foreground ,(and (fboundp 'doom-color) (doom-color 'blue)) :weight bold)
-   ;; Orderless highlights: use distinct, theme-driven accents
-   `(orderless-match-face-0 :foreground ,(and (fboundp 'doom-color) (doom-color 'yellow)) :weight semi-bold)
-   `(orderless-match-face-1 :foreground ,(and (fboundp 'doom-color) (doom-color 'magenta)) :weight semi-bold)
-   `(orderless-match-face-2 :foreground ,(and (fboundp 'doom-color) (doom-color 'cyan)) :weight semi-bold)
-   `(orderless-match-face-3 :foreground ,(and (fboundp 'doom-color) (doom-color 'green)) :weight semi-bold)))
+   `(minibuffer-prompt
+     :foreground ,(my/doom-color-or 'blue)
+     :weight bold)
+   ;; Orderless highlights: use distinct, theme-driven accents.
+   `(orderless-match-face-0
+     :foreground ,(my/doom-color-or 'yellow)
+     :weight semi-bold)
+   `(orderless-match-face-1
+     :foreground ,(my/doom-color-or 'magenta)
+     :weight semi-bold)
+   `(orderless-match-face-2
+     :foreground ,(my/doom-color-or 'cyan)
+     :weight semi-bold)
+   `(orderless-match-face-3
+     :foreground ,(my/doom-color-or 'green)
+     :weight semi-bold)))
 
 (when (modulep! :ui tabs)
   (after! centaur-tabs
@@ -221,7 +251,36 @@
 
     (setq centaur-tabs-buffer-groups-function #'my/centaur-tabs-buffer-groups)
 
-    (add-hook 'doom-load-theme-hook #'centaur-tabs-mode)))
+    (defun my/centaur-tabs-enabled-p ()
+      "Return non-nil when Centaur Tabs is really enabled."
+      (and (fboundp 'centaur-tabs-mode-on-p)
+           (centaur-tabs-mode-on-p)))
+
+    (defun my/centaur-tabs-enable-h ()
+      "Enable Centaur Tabs without toggling it off accidentally."
+      (unless (my/centaur-tabs-enabled-p)
+        (centaur-tabs-mode +1)))
+
+    (defun my/centaur-tabs-disable-on-dashboard-h ()
+      "Hide Centaur Tabs locally in Doom dashboard buffers."
+      (when (my/centaur-tabs-enabled-p)
+        (centaur-tabs-local-mode +1)))
+
+    ;; Enable Centaur Tabs immediately. Do not rely only on theme hooks.
+    (my/centaur-tabs-enable-h)
+
+    ;; Keep it enabled after theme changes.
+    (add-hook 'doom-load-theme-hook #'my/centaur-tabs-enable-h)
+
+    ;; Hide Centaur Tabs on Doom dashboard buffers only.
+    (add-hook '+doom-dashboard-mode-hook #'my/centaur-tabs-disable-on-dashboard-h)
+    (add-hook '+dashboard-mode-hook #'my/centaur-tabs-disable-on-dashboard-h)
+
+    ;; If the dashboard already exists, apply the local hide rule now.
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (derived-mode-p '+doom-dashboard-mode '+dashboard-mode)
+          (my/centaur-tabs-disable-on-dashboard-h))))))
 
 (with-eval-after-load 'centaur-tabs
   (custom-set-faces!
