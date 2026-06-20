@@ -1,7 +1,10 @@
 ;;; ui.el --- UI settings -*- lexical-binding: t; -*-
 
 (defvar my/last-theme-file
-  (expand-file-name "modules/config/.last-theme.el" doom-user-dir)
+  (expand-file-name "last-theme.el"
+                    (or (bound-and-true-p doom-etc-dir)
+                        (bound-and-true-p doom-cache-dir)
+                        doom-user-dir))
   "File used to persist the last selected theme.")
 
 (defun my/write-last-theme-file (theme)
