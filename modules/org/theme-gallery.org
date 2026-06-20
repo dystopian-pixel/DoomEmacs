@@ -278,7 +278,7 @@ This section provides a function to generate a clickable HTML theme gallery. Eac
 Requires your local Emacs HTTP server to be running and listening at `/my-theme-gallery/THEME-NAME` (as you have configured).
 
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (defun my/theme-gallery-write-clickable-html ()
   "Generate clickable HTML gallery; clicking switches the Emacs theme instantly."
   (interactive)

@@ -133,7 +133,7 @@ This provides an organized way to browse available themes in one place. It encou
 
 This is the tidy wrap-up for the file. It keeps closing notes and small housekeeping in one predictable spot. The intent is to signal completeness and leave a clean end state for tools and future readers. It makes the module easier to revisit and maintain later.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (provide 'local-emacs-server)
 (message "✅ local-emacs-server.el loaded")
 #+end_src

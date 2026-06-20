@@ -17,7 +17,7 @@
 These are the actions that treat a codebase or notes collection as a single unit. They help you jump to meaningful places, run routine tasks, and keep momentum as you switch workstreams. The emphasis is on quick orientation and seamless transitions. It’s the command center for your current endeavor.
 
 ** Implementation
-#+begin_src emacs-lisp :tangle ../../config/functions.el :mkdirp yes :comments link :results none
+#+begin_src emacs-lisp :tangle ../config/functions.el :mkdirp yes :comments link :results none
 ;;; functions.el --- Load all funcs/*.el modules -*- lexical-binding: t; -*-
 
 (defun my/functions-load-each ()

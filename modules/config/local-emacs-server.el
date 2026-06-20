@@ -74,3 +74,6 @@ When QUIET is non-nil, suppress informational startup messages."
           (setq my/theme-gallery-theme theme-symbol)
           (princ (format "Theme switched to: %s" theme-symbol)))
       (princ "Invalid theme"))))
+
+(provide 'local-emacs-server)
+(message "✅ local-emacs-server.el loaded")
