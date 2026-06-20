@@ -177,9 +177,14 @@
 
 ;; [[file:../org/agenda.org::*Enable org-super-agenda (only if present)][Enable org-super-agenda (only if present):1]]
 (with-eval-after-load 'org-agenda
-  (when (bound-and-true-p my/org-super-agenda-available)
-    (org-super-agenda-mode 1)
-    (setq org-super-agenda-groups my/org-super-agenda-groups)))
+  (when (require 'org-super-agenda nil t)
+    (setq org-super-agenda-groups my/org-super-agenda-groups)
+    (unless (bound-and-true-p org-super-agenda-mode)
+      ;; `org-super-agenda-mode' prints an "enabled" message. Keep startup and
+      ;; TRAMP file visits quieter by enabling it without echo-area/log noise.
+      (let ((inhibit-message t)
+            (message-log-max nil))
+        (org-super-agenda-mode 1)))))
 ;; Enable org-super-agenda (only if present):1 ends here
 
 ;; [[file:../org/agenda.org::*Overview (weekly)][Overview (weekly):1]]

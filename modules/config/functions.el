@@ -1,24 +1,36 @@
-;;; functions.el --- Doom module: config/functions  -*- lexical-binding: t; -*-
-
-;; Loads every .el from modules/config/funcs at startup. This keeps functions.org
-;; simple and prevents #+INCLUDE content from leaking into the tangled .el.
-
-(defvar my/functions.el-root
-  (file-name-directory (or load-file-name buffer-file-name))
-  "Directory of this file (modules/config).")
+;; [[file:../org/functions.org::*Implementation][Implementation:1]]
+;;; functions.el --- Load all funcs/*.el modules -*- lexical-binding: t; -*-
 
 (defun my/functions-load-each ()
-  "Load all compiled/tangled helpers from ../config/funcs/*.el in a stable order."
-  (let* ((funcs-dir (expand-file-name "funcs" my/functions.el-root))
-         (files (when (file-directory-p funcs-dir)
-                  (directory-files funcs-dir t "\\.el\\'"))))
-    (dolist (f (sort files #'string<))
-      (condition-case e
-          (load f nil t)
-        (error (message "⚠ functions.el: failed to load %s: %s" f e))))))
+  "Load the set of function modules from a nearby ../config/funcs/ directory.
+This is resilient to being moved around under ~/.config/doom/modules/*."
+  (let* ((here (or load-file-name (buffer-file-name)))
+         (base (file-name-directory here))
+         ;; Try these candidates in order; load whatever exists.
+         (candidates
+          (list
+           ;; If functions.el was tangled to ~/.config/doom/config/functions.el (preferred)
+           (expand-file-name "funcs" (expand-file-name "config" (expand-file-name "~/.config/doom/")))
+           ;; If someone tangled into modules-local config (fallback)
+           (expand-file-name "funcs" (expand-file-name "../config" base))
+           ;; If functions.el itself is in ~/.config/doom/config/, build funcs relative to it
+           (expand-file-name "funcs" (file-name-directory (or load-file-name default-directory))))))
+    (catch 'done
+      (dolist (dir candidates)
+        (when (file-directory-p dir)
+          (dolist (m '("sidebar-tools.el"
+                       "buffer-management.el"
+                       "theming.el"
+                       "pdf-tools-enhancements.el"
+                       "general-helpers.el"
+                       "file-ops.el"
+                       "build-tools.el"))
+            (let ((path (expand-file-name m dir)))
+              (when (file-exists-p path)
+                (load path nil 'nomessage))))
+          (throw 'done t)))))
+  (provide 'functions))
 
+;; Load immediately at startup when this file is required.
 (my/functions-load-each)
-
-(message "functions.el loaded")
-(provide 'functions)
-;;; functions.el ends here
+;; Implementation:1 ends here

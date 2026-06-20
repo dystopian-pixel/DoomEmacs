@@ -1,5 +1,17 @@
 ;;; config.el -*- lexical-binding: t; -*-
 
+
+;;; Quiet native-comp background noise on Emacs 30/Nix.
+(setq native-comp-async-report-warnings-errors nil
+      native-comp-warning-on-missing-source nil)
+
+(when (boundp 'native-comp-jit-compilation)
+  (setq native-comp-jit-compilation nil))
+
+(when (boundp 'native-comp-deferred-compilation)
+  (setq native-comp-deferred-compilation nil))
+
+
 ;; Force a POSIX shell for Emacs/Doom internals, but only when launched from Fish/Nushell.
 (let ((user-shell (file-name-nondirectory (or (getenv "SHELL") ""))))
   (when (member user-shell '("fish" "nu" "nushell"))
@@ -27,10 +39,22 @@
 
 
 ;; ─────────────────────────────────────────────────────────────────────────────
+;; Optional experimental/network helpers
+;; ─────────────────────────────────────────────────────────────────────────────
+
+(defvar my/enable-local-emacs-server nil
+  "When non-nil, load and start the local simple-httpd Emacs helper.")
+
+(defvar my/enable-theme-gallery nil
+  "When non-nil, load the experimental theme gallery integration.")
+
+;; ─────────────────────────────────────────────────────────────────────────────
 ;; Load all module config files
 ;; ─────────────────────────────────────────────────────────────────────────────
 
-(load! "modules/config/local-emacs-server")
+(when my/enable-local-emacs-server
+  (load! "modules/config/local-emacs-server"))
+
 (load! "modules/config/ui")
 ;;(load! "modules/config/dashboard")
 (load! "modules/config/development-tools")
@@ -40,5 +64,8 @@
 (load! "modules/config/functions")
 (load! "modules/config/hydras")
 (load! "modules/config/agenda")
-(load! "modules/config/theme-gallery")
+
+(when my/enable-theme-gallery
+  (load! "modules/config/theme-gallery"))
+
 (load! "modules/config/keybindings")

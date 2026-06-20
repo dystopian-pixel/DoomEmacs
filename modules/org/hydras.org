@@ -23,6 +23,8 @@
 
 * Buffer Management Hydra
 #+BEGIN_SRC emacs-lisp
+(require 'hydra)
+
 (defhydra hydra-buffer (:hint nil :color blue)
   "
 ^Buffer Management^
@@ -301,6 +303,15 @@ _R_: open all   _M_: close all
         (mod (+ my/current-theme-index direction) (length my/doom-themes-list)))
   (my/apply-theme (my/theme-at-index)))
 
+
+(defun my/open-theme-gallery ()
+  "Open the optional theme gallery when it is loaded."
+  (interactive)
+  (if (fboundp 'my/theme-gallery-split-html)
+      (my/theme-gallery-split-html)
+    (user-error
+     "Theme gallery is disabled; set `my/enable-theme-gallery' non-nil and reload config")))
+
 (defhydra hydra-themes (:hint nil)
   "
 ^Theme Gallery^
@@ -312,7 +323,7 @@ _q_ Quit
 "
   ("n" (my/rotate-theme +1))
   ("p" (my/rotate-theme -1))
-  ("o" (my/theme-gallery-split-html) :exit t)
+  ("o" (my/open-theme-gallery) :exit t)
   ("u" (my/generate-gallery-screenshot-script) :exit t)
   ("RET" (my/save-theme doom-theme) :exit t)
   ("q" nil "Quit"))

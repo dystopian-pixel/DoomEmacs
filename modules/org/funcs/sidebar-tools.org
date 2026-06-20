@@ -111,11 +111,20 @@ This module provides unified helpers for Treemacs, Imenu List and Minimap so the
 (defvar my/sidebar--sync-in-progress nil
   "Guard against recursive sidebar visibility synchronization.")
 
+(defun my/tramp-buffer-p ()
+  "Return non-nil when the current buffer/default-directory is remote or sudo."
+  (file-remote-p (or buffer-file-name default-directory)))
+
 (defun my/sidebar-file-buffer-p (&optional buffer)
-  "Return non-nil when BUFFER is a real file-visiting buffer."
-  (let ((buf (get-buffer (or buffer (current-buffer)))))
-    (and (buffer-live-p buf)
-         (buffer-file-name buf)
+  "Return non-nil when BUFFER is a local real file-visiting buffer.
+
+Remote/TRAMP buffers are deliberately excluded so sidebar synchronization does
+not cause extra sudo/TRAMP probes after opening privileged files."
+  (let* ((buf  (get-buffer (or buffer (current-buffer))))
+         (file (and (buffer-live-p buf)
+                    (buffer-file-name buf))))
+    (and file
+         (not (file-remote-p file))
          (not (my/sidebar-buffer-p buf)))))
 
 (defun my/sidebar-eligible-buffer ()
