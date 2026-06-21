@@ -88,6 +88,21 @@
 (defvar my/sidebar--sync-in-progress nil
   "Guard against recursive sidebar visibility synchronization.")
 
+(defvar my/sidebar-left-width 30
+  "Fixed width, in columns, for the left sidebar column.")
+
+(defvar my/sidebar-minimap-width 18
+  "Fixed width, in columns, for the right minimap sidebar.")
+
+(defvar my/minimap-scroll-lines 5
+  "Number of source-buffer lines to scroll from minimap mouse-wheel events.")
+
+(defvar my/minimap--source-window nil
+  "Last real editing window used as the minimap scroll target.")
+
+(defvar my/sidebar--normalizing-layout nil
+  "Non-nil while sidebar layout normalization is running.")
+
 (defun my/tramp-buffer-p ()
   "Return non-nil when the current buffer/default-directory is remote or sudo."
   (file-remote-p (or buffer-file-name default-directory)))
@@ -146,11 +161,7 @@ not cause extra sudo/TRAMP probes after opening privileged files."
 
 (defun my/left-column-target-width ()
   "Return the fixed width to use for the left sidebar column."
-  (max (if (boundp 'treemacs-width) treemacs-width 0)
-       (if (and (boundp 'imenu-list-size)
-                (integerp imenu-list-size))
-           imenu-list-size
-         30)))
+  my/sidebar-left-width)
 
 (defun my/left-column--ensure-width (&optional cols)
   "Normalize the left sidebar column width to COLS."
@@ -167,35 +178,163 @@ not cause extra sudo/TRAMP probes after opening privileged files."
         (set-window-parameter win 'no-other-window t)
         (set-window-parameter win 'no-delete-other-windows t)
         (set-window-dedicated-p win t)))))
+(defun my/sidebar--hide-tabs-in-buffer (&optional buffer)
+  "Hide tab/header UI in sidebar BUFFER."
+  (when-let ((buf (get-buffer (or buffer (current-buffer)))))
+    (with-current-buffer buf
+      (setq-local header-line-format nil)
+      (setq-local tab-line-format nil)
+      ;; Doom's tabs module may use package-specific buffer-local hiding knobs.
+      (setq-local tab-bar-format nil)
+      (setq-local centaur-tabs-hide-tabs t)
+      (setq-local awesome-tab-hide-tabs t))))
+
+(defun my/sidebar--hide-tabs-in-window (&optional window)
+  "Hide tab/header UI in WINDOW's buffer."
+  (let ((win (or window (selected-window))))
+    (when (window-live-p win)
+      (my/sidebar--hide-tabs-in-buffer (window-buffer win)))))
+
+(defun my/minimap-window ()
+  "Return the visible minimap window, if any."
+  (when-let ((buf (my/minimap--buffer)))
+    (get-buffer-window buf t)))
+
+(defun my/sidebar--resize-window-width (window cols)
+  "Resize WINDOW horizontally to COLS columns as closely as possible."
+  (when (window-live-p window)
+    (let ((window-size-fixed nil)
+          (ignore-window-parameters t)
+          (window-min-width 1))
+      (dotimes (_ 4)
+        (let ((delta (- cols (window-total-width window))))
+          (unless (zerop delta)
+            (ignore-errors
+              (window-resize window delta t t))
+            (let ((remaining (- cols (window-total-width window))))
+              (unless (zerop remaining)
+                (ignore-errors
+                  (adjust-window-trailing-edge window remaining t))))))))))
+
+(defun my/minimap-setup ()
+  "Keep the minimap on the right with a hard fixed width."
+  (when-let ((win (my/minimap-window)))
+    (let ((dedicated (window-dedicated-p win)))
+      (set-window-dedicated-p win nil)
+      (set-window-parameter win 'window-size-fixed nil)
+      (my/sidebar--resize-window-width win my/sidebar-minimap-width)
+      (set-window-parameter win 'window-size-fixed 'width)
+      (set-window-parameter win 'no-other-window t)
+      (set-window-parameter win 'no-delete-other-windows t)
+      (set-window-dedicated-p win dedicated)
+      (set-window-dedicated-p win t)
+      (my/minimap-install-scroll-bindings))))
+
+(defun my/sidebar-normalize-layout (&rest _)
+  "Normalize sidebar widths after window layout changes."
+  (unless my/sidebar--normalizing-layout
+    (let ((my/sidebar--normalizing-layout t))
+      (when-let ((win (my/treemacs-window)))
+        (my/sidebar--resize-window-width win my/sidebar-left-width)
+        (set-window-parameter win 'window-size-fixed 'width)
+        (set-window-parameter win 'no-other-window t)
+        (set-window-parameter win 'no-delete-other-windows t)
+        (set-window-dedicated-p win t))
+      (when-let ((win (my/imenu-list-window)))
+        (my/sidebar--resize-window-width win my/sidebar-left-width)
+        (set-window-parameter win 'window-size-fixed 'width)
+        (set-window-parameter win 'no-other-window t)
+        (set-window-parameter win 'no-delete-other-windows t)
+        (set-window-dedicated-p win t))
+      (when (and (bound-and-true-p minimap-mode)
+                 (my/minimap-window))
+        (my/minimap-setup)))))
+
+(defun my/sidebar-schedule-normalize-layout (&rest _)
+  "Schedule repeated sidebar normalization after window changes."
+  (dolist (delay '(0.01 0.05 0.15 0.35))
+    (run-at-time delay nil #'my/sidebar-normalize-layout)))
+
+(defun my/minimap-remember-source-window (&rest _)
+  "Remember the selected real editing window for minimap scrolling."
+  (let ((win (selected-window)))
+    (when (and (window-live-p win)
+               (not (my/sidebar-window-p win))
+               (my/sidebar-file-buffer-p (window-buffer win)))
+      (setq my/minimap--source-window win))))
+
+(defun my/minimap-source-window ()
+  "Return the window that minimap mouse-wheel events should scroll."
+  (or (and (window-live-p my/minimap--source-window)
+           (not (my/sidebar-window-p my/minimap--source-window))
+           my/minimap--source-window)
+      (my/sidebar-main-window)))
+
+(defun my/minimap-scroll-source-window (direction)
+  "Scroll the minimap source window in DIRECTION.
+
+DIRECTION should be `up' to move toward the beginning of the buffer, or
+`down' to move toward the end of the buffer."
+  (let ((target (my/minimap-source-window))
+        (origin (selected-window)))
+    (unless (window-live-p target)
+      (user-error "No source window available for minimap scrolling"))
+    (with-selected-window target
+      (condition-case nil
+          (pcase direction
+            ('up
+             (scroll-down-command my/minimap-scroll-lines))
+            ('down
+             (scroll-up-command my/minimap-scroll-lines)))
+        (beginning-of-buffer nil)
+        (end-of-buffer nil)))
+    (when (window-live-p origin)
+      (select-window origin))
+    (my/sidebar-schedule-normalize-layout)))
+
+(defun my/minimap-wheel-up (_event)
+  "Scroll the source buffer up from the minimap."
+  (interactive "e")
+  (my/minimap-scroll-source-window 'up))
+
+(defun my/minimap-wheel-down (_event)
+  "Scroll the source buffer down from the minimap."
+  (interactive "e")
+  (my/minimap-scroll-source-window 'down))
+
+(defun my/minimap-install-scroll-bindings ()
+  "Make mouse-wheel events in the minimap scroll the source buffer."
+  (when-let ((buf (my/minimap--buffer)))
+    (with-current-buffer buf
+      (let ((map (copy-keymap (or (current-local-map)
+                                  (make-sparse-keymap)))))
+        (define-key map [wheel-up] #'my/minimap-wheel-up)
+        (define-key map [wheel-down] #'my/minimap-wheel-down)
+        (define-key map [double-wheel-up] #'my/minimap-wheel-up)
+        (define-key map [double-wheel-down] #'my/minimap-wheel-down)
+        (define-key map [triple-wheel-up] #'my/minimap-wheel-up)
+        (define-key map [triple-wheel-down] #'my/minimap-wheel-down)
+        ;; Some builds/toolkits report wheel movement as mouse-4/mouse-5.
+        (define-key map [mouse-4] #'my/minimap-wheel-up)
+        (define-key map [mouse-5] #'my/minimap-wheel-down)
+        (use-local-map map)))))
 ;;; --- Minimap ---------------------------------------------------------------
 
 (with-eval-after-load 'minimap
   (setq minimap-window-location 'right
         minimap-width-fraction 0.12
-        minimap-minimum-width 18
+        minimap-minimum-width my/sidebar-minimap-width
         minimap-dedicated-window t)
 
   (dolist (mode '(org-mode text-mode conf-mode))
     (cl-pushnew mode minimap-major-modes))
 
-  (defun my/minimap-setup ()
-    "Keep the minimap on the right with a fixed width."
-    (when-let* ((buf (my/minimap--buffer))
-                (win (get-buffer-window buf t)))
-      (set-window-parameter win 'window-size-fixed 'width)
-      (set-window-parameter win 'no-other-window t)
-      (set-window-parameter win 'no-delete-other-windows t)
-      (set-window-dedicated-p win t)
-      (let* ((target (or minimap-minimum-width 18))
-             (delta  (- target (window-total-width win))))
-        (unless (zerop delta)
-          (ignore-errors
-            (adjust-window-trailing-edge win delta t))))))
-
   (add-hook 'minimap-mode-hook
             (lambda ()
               (when minimap-mode
-                (run-at-time 0.05 nil #'my/minimap-setup)))))
+                (my/minimap-remember-source-window)
+                (my/sidebar-schedule-normalize-layout)
+                (run-at-time 0.05 nil #'my/minimap-install-scroll-bindings)))))
 
 ;;;###autoload
 (defun my/toggle-minimap ()
@@ -218,7 +357,7 @@ not cause extra sudo/TRAMP probes after opening privileged files."
            (dolist (mode '(org-mode text-mode conf-mode))
              (cl-pushnew mode minimap-major-modes)))
          (minimap-mode 1)))
-      (run-at-time 0.05 nil #'my/minimap-setup))))
+      (my/sidebar-schedule-normalize-layout))))
 
 ;;;###autoload
 (defun my/minimap ()
@@ -232,32 +371,52 @@ not cause extra sudo/TRAMP probes after opening privileged files."
         treemacs-is-never-other-window t
         treemacs-width-is-initially-locked t))
 
+(run-with-idle-timer
+ 3 nil
+ (lambda ()
+   "Warm-load Treemacs after startup so the first manual toggle is faster."
+   (require 'treemacs nil t)))
+
 (defun my/imenu-list-refresh-layout ()
-  "Redisplay *Ilist* using the current left-sidebar layout."
+  "Normalize the visible *Ilist* sidebar."
   (interactive)
-  (when-let ((buf (my/imenu-list-buffer)))
-    (when-let ((win (get-buffer-window buf t)))
-      (delete-window win))
-    (when (featurep 'imenu-list)
-      (my/display-imenu-list buf nil))
-    (run-at-time 0.01 nil #'my/left-column--ensure-width)))
+  (when-let ((win (my/imenu-list-window)))
+    (my/sidebar--hide-tabs-in-window win)
+    (set-window-parameter win 'window-size-fixed 'width)
+    (set-window-parameter win 'no-other-window t)
+    (set-window-parameter win 'no-delete-other-windows t)
+    (set-window-dedicated-p win t)
+    (my/sidebar--resize-window-width win my/sidebar-left-width)
+    (my/sidebar-schedule-normalize-layout)))
 
 ;;;###autoload
 (defun my/toggle-treemacs ()
-  "Toggle Treemacs from the main editing window and refresh iMenu layout."
+  "Toggle Treemacs using Doom's native command when available."
   (interactive)
-  (unless (require 'treemacs nil t)
+  (unless (or (fboundp '+treemacs/toggle)
+              (require 'treemacs nil t))
     (user-error "treemacs is not available"))
   (unless (or (my/sidebar-eligible-buffer)
               (window-live-p (my/treemacs-window)))
     (user-error "Open a file-visiting buffer first"))
   (when (my/sidebar-eligible-buffer)
     (setq my/sidebar--suspended-state nil))
-  (my/sidebar-call-from-main-window #'treemacs)
+  (my/sidebar-call-from-main-window
+   (lambda ()
+     (cond
+      ((fboundp '+treemacs/toggle)
+       (+treemacs/toggle))
+      ;; Raw `treemacs' is only a fallback.  We avoid all file-follow/project
+      ;; commands because they were causing Dired jumps.
+      ((fboundp 'treemacs)
+       (treemacs))
+      (t
+       (user-error "No Treemacs toggle command is available")))))
+  (my/sidebar-schedule-normalize-layout)
   (run-at-time
    0.05 nil
    (lambda ()
-     (my/left-column--ensure-width)
+     (my/sidebar-schedule-normalize-layout)
      (when (my/imenu-list-window)
        (my/imenu-list-refresh-layout)))))
 ;;; --- iMenu List ------------------------------------------------------------
@@ -283,14 +442,18 @@ left side."
                        buffer
                        `((side . left)
                          (slot . ,slot)
+                         (window-width . ,my/sidebar-left-width)
                          (window-parameters
                           . ((no-other-window . t)
-                             (no-delete-other-windows . t)))))))
+                             (no-delete-other-windows . t)
+                             (window-size-fixed . width)))))))
+      (my/sidebar--hide-tabs-in-buffer buffer)
+      (my/sidebar--hide-tabs-in-window win)
       (set-window-parameter win 'window-size-fixed 'width)
       (set-window-parameter win 'no-other-window t)
       (set-window-parameter win 'no-delete-other-windows t)
       (set-window-dedicated-p win t)
-      (my/left-column--ensure-width)
+      (my/sidebar--resize-window-width win my/sidebar-left-width)
       win))
 
   (setq display-buffer-alist
@@ -317,22 +480,33 @@ left side."
   (unless (advice-member-p #'my/imenu-list-update-from-main-buffer-a #'imenu-list-update)
     (advice-add 'imenu-list-update :around #'my/imenu-list-update-from-main-buffer-a)))
 
+(defun my/imenu-list-close ()
+  "Close all windows showing the iMenu List buffer."
+  (when-let ((buf (my/imenu-list-buffer)))
+    (dolist (win (get-buffer-window-list buf nil t))
+      (when (window-live-p win)
+        (ignore-errors
+          (delete-window win))))
+    (when (get-buffer-window buf t)
+      (quit-windows-on buf nil))))
+
 ;;;###autoload
 (defun my/toggle-imenu-list ()
-  "Toggle iMenu List from the main editing window and keep its layout stable."
+  "Toggle iMenu List from the main editing window and keep it on the left."
   (interactive)
   (unless (require 'imenu-list nil t)
     (user-error "imenu-list is not available"))
-  (unless (or (my/sidebar-eligible-buffer)
-              (window-live-p (my/imenu-list-window)))
-    (user-error "Open a file-visiting buffer first"))
-  (when (my/sidebar-eligible-buffer)
-    (setq my/sidebar--suspended-state nil))
-  (my/sidebar-call-from-main-window #'imenu-list-smart-toggle)
-  (run-at-time
-   0.05 nil
-   (lambda ()
-     (when (my/imenu-list-window)
+  (if (my/imenu-list-window)
+      (my/imenu-list-close)
+    (unless (my/sidebar-eligible-buffer)
+      (user-error "Open a file-visiting buffer first"))
+    (setq my/sidebar--suspended-state nil)
+    (let ((display-buffer-overriding-action
+           '(my/display-imenu-list)))
+      (my/sidebar-call-from-main-window #'imenu-list-smart-toggle))
+    (run-at-time
+     0.01 nil
+     (lambda ()
        (my/imenu-list-refresh-layout)))))
 ;;; --- Unified toggles -------------------------------------------------------
 
@@ -358,8 +532,7 @@ left side."
   (interactive)
   (when (window-live-p (my/treemacs-window))
     (my/toggle-treemacs))
-  (when (window-live-p (my/imenu-list-window))
-    (my/toggle-imenu-list))
+  (my/imenu-list-close)
   (when (bound-and-true-p minimap-mode)
     (minimap-mode -1)))
 
@@ -392,6 +565,12 @@ left side."
 
 (add-hook 'buffer-list-update-hook #'my/sidebar-sync-visibility-h)
 (add-hook 'window-selection-change-functions #'my/sidebar-sync-visibility-h)
+(add-hook 'buffer-list-update-hook #'my/minimap-remember-source-window)
+(add-hook 'window-selection-change-functions #'my/minimap-remember-source-window)
+(add-hook 'window-configuration-change-hook #'my/sidebar-schedule-normalize-layout)
+(add-hook 'window-size-change-functions #'my/sidebar-schedule-normalize-layout)
+(when (boundp 'window-state-change-hook)
+  (add-hook 'window-state-change-hook #'my/sidebar-schedule-normalize-layout))
 (message "☑️ sidebar-tools.el loaded")
 (provide 'sidebar-tools)
 ;;; sidebar-tools.el ends here
