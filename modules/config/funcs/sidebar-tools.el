@@ -216,24 +216,130 @@ not cause extra sudo/TRAMP probes after opening privileged files."
                 (ignore-errors
                   (adjust-window-trailing-edge window remaining t))))))))))
 
-(defun my/minimap-setup ()
-  "Keep the minimap on the right with a hard fixed width."
-  (when-let ((win (my/minimap-window)))
-    (let ((dedicated (window-dedicated-p win)))
-      (set-window-dedicated-p win nil)
-      (set-window-parameter win 'window-size-fixed nil)
-      (my/sidebar--resize-window-width win my/sidebar-minimap-width)
-      (set-window-parameter win 'window-size-fixed 'width)
-      (set-window-parameter win 'no-other-window t)
-      (set-window-parameter win 'no-delete-other-windows t)
-      (set-window-dedicated-p win dedicated)
-      (set-window-dedicated-p win t)
+(defun my/sidebar-main-windows (&optional frame)
+  "Return non-sidebar windows in FRAME."
+  (cl-remove-if
+   #'my/sidebar-window-p
+   (window-list (or frame (selected-frame)) 'nomini)))
+
+(defun my/sidebar--window-row-key (window)
+  "Return a stable visual row key for WINDOW."
+  (let ((edges (window-edges window)))
+    (list (nth 1 edges) (nth 3 edges))))
+
+(defun my/sidebar--balance-window-row (windows)
+  "Make non-sidebar WINDOWS in the same visual row equal width."
+  (let* ((wins (sort (cl-remove-if-not #'window-live-p windows)
+                     (lambda (a b)
+                       (< (car (window-edges a))
+                          (car (window-edges b))))))
+         (count (length wins)))
+    (when (> count 1)
+      (let* ((total (apply #'+ (mapcar #'window-total-width wins)))
+             (target (/ total count))
+             (window-size-fixed nil)
+             (ignore-window-parameters t))
+        (dolist (win (butlast wins))
+          (when (window-live-p win)
+            (ignore-errors
+              (window-resize win
+                             (- target (window-total-width win))
+                             t t))))))))
+
+(defun my/sidebar-balance-main-window-rows ()
+  "Balance non-sidebar editing windows row by row."
+  (dolist (row (seq-group-by #'my/sidebar--window-row-key
+                             (my/sidebar-main-windows)))
+    (my/sidebar--balance-window-row (cdr row))))
+
+
+(defun my/minimap-active-source-window ()
+  "Return the active file-editing window that minimap should follow."
+  (let ((win (selected-window)))
+    (or (and (window-live-p win)
+             (not (my/sidebar-window-p win))
+             (my/sidebar-file-buffer-p (window-buffer win))
+             win)
+        (and (window-live-p my/minimap--source-window)
+             (not (my/sidebar-window-p my/minimap--source-window))
+             (my/sidebar-file-buffer-p (window-buffer my/minimap--source-window))
+             my/minimap--source-window)
+        (my/sidebar-main-window))))
+
+(defun my/minimap-window-next-to-source-p (minimap-window source-window)
+  "Return non-nil when MINIMAP-WINDOW is beside SOURCE-WINDOW in the same row."
+  (and (window-live-p minimap-window)
+       (window-live-p source-window)
+       (equal (my/sidebar--window-row-key minimap-window)
+              (my/sidebar--window-row-key source-window))
+       (>= (car (window-edges minimap-window))
+           (nth 2 (window-edges source-window)))))
+
+(defun my/minimap--clamp-window (window)
+  "Clamp WINDOW to `my/sidebar-minimap-width'."
+  (when (window-live-p window)
+    (let ((dedicated (window-dedicated-p window)))
+      (set-window-dedicated-p window nil)
+      (set-window-parameter window 'window-size-fixed nil)
+      (my/sidebar--resize-window-width window my/sidebar-minimap-width)
+      (set-window-parameter window 'window-size-fixed 'width)
+      (set-window-parameter window 'no-other-window t)
+      (set-window-parameter window 'no-delete-other-windows t)
+      (set-window-dedicated-p window dedicated)
+      (set-window-dedicated-p window t)
       (my/minimap-install-scroll-bindings))))
 
+(defun my/minimap-place-next-to-active-window ()
+  "Display minimap as a sidecar for the active editing window."
+  (when-let* ((buf (my/minimap--buffer))
+              (source (my/minimap-active-source-window)))
+    (when (and (window-live-p source)
+               (not (my/sidebar-window-p source)))
+      (let ((existing (my/minimap-window)))
+        (unless (and (window-live-p existing)
+                     (my/minimap-window-next-to-source-p existing source))
+          (when (and (window-live-p existing)
+                     (not (eq existing source)))
+            (ignore-errors
+              (delete-window existing)))
+          (setq existing
+                (let ((display-buffer-overriding-action nil))
+                  (display-buffer-in-direction
+                   buf
+                   `((direction . right)
+                     (window . ,source)
+                     (window-width . ,my/sidebar-minimap-width)
+                     (window-parameters
+                      . ((no-other-window . t)
+                         (no-delete-other-windows . t)
+                         (window-size-fixed . width))))))))
+        (when (window-live-p existing)
+          (my/minimap--clamp-window existing)
+          (ignore-errors
+            (with-selected-window source
+              (when (fboundp 'minimap-update)
+                (minimap-update))
+              (when (fboundp 'minimap-recenter)
+                (minimap-recenter)))))))))
+
+(defun my/minimap-follow-active-window-h (&rest _)
+  "Make minimap follow the selected file-editing window."
+  (my/minimap-remember-source-window)
+  (when (bound-and-true-p minimap-mode)
+    (my/sidebar-schedule-normalize-layout)))
+
+(defun my/minimap-setup ()
+  "Keep minimap beside the active file-editing window."
+  (when (bound-and-true-p minimap-mode)
+    (my/minimap-place-next-to-active-window)
+    (when-let ((win (my/minimap-window)))
+      (my/minimap--clamp-window win))))
+
 (defun my/sidebar-normalize-layout (&rest _)
-  "Normalize sidebar widths after window layout changes."
+  "Normalize sidebar widths and balance editing windows after layout changes."
   (unless my/sidebar--normalizing-layout
     (let ((my/sidebar--normalizing-layout t))
+      ;; Treemacs and iMenu remain full-height left sidebars.
       (when-let ((win (my/treemacs-window)))
         (my/sidebar--resize-window-width win my/sidebar-left-width)
         (set-window-parameter win 'window-size-fixed 'width)
@@ -245,10 +351,18 @@ not cause extra sudo/TRAMP probes after opening privileged files."
         (set-window-parameter win 'window-size-fixed 'width)
         (set-window-parameter win 'no-other-window t)
         (set-window-parameter win 'no-delete-other-windows t)
-        (set-window-dedicated-p win t))
+        (set-window-dedicated-p win t)
+        (my/sidebar--hide-tabs-in-window win))
+      ;; Minimap follows the active editing window, not the full frame.
+      (when (and (bound-and-true-p minimap-mode)
+                 (my/minimap--buffer))
+        (my/minimap-setup))
+      ;; Balance only real editing windows, row by row.
+      (my/sidebar-balance-main-window-rows)
+      ;; Re-clamp minimap after balancing.
       (when (and (bound-and-true-p minimap-mode)
                  (my/minimap-window))
-        (my/minimap-setup)))))
+        (my/minimap--clamp-window (my/minimap-window))))))
 
 (defun my/sidebar-schedule-normalize-layout (&rest _)
   "Schedule repeated sidebar normalization after window changes."
@@ -347,6 +461,7 @@ DIRECTION should be `up' to move toward the beginning of the buffer, or
     (user-error "Open a file-visiting buffer first"))
   (when (my/sidebar-eligible-buffer)
     (setq my/sidebar--suspended-state nil))
+  (my/minimap-remember-source-window)
   (let ((minimap-window-location 'right)
         (minimap-width-fraction 0.12))
     (if (bound-and-true-p minimap-mode)
@@ -567,6 +682,7 @@ left side."
 (add-hook 'window-selection-change-functions #'my/sidebar-sync-visibility-h)
 (add-hook 'buffer-list-update-hook #'my/minimap-remember-source-window)
 (add-hook 'window-selection-change-functions #'my/minimap-remember-source-window)
+(add-hook 'window-selection-change-functions #'my/minimap-follow-active-window-h)
 (add-hook 'window-configuration-change-hook #'my/sidebar-schedule-normalize-layout)
 (add-hook 'window-size-change-functions #'my/sidebar-schedule-normalize-layout)
 (when (boundp 'window-state-change-hook)
