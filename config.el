@@ -42,7 +42,7 @@
 ;; Optional experimental/network helpers
 ;; ─────────────────────────────────────────────────────────────────────────────
 
-(defvar my/enable-local-emacs-server nil
+(defvar my/enable-local-emacs-server t
   "When non-nil, load and start the local simple-httpd Emacs helper.")
 
 (defvar my/enable-theme-gallery nil
