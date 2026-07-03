@@ -1,0 +1,5013 @@
+/* Theme Creator MVP */
+.tc-open-button {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2147483000;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--tc-shell-border, rgba(255,255,255,.18));
+  background: var(--tc-shell-card, var(--card, #1b1b25));
+  color: var(--tc-shell-fg, var(--fg, #f0f0f0));
+  cursor: pointer;
+  box-shadow: 0 14px 38px rgba(0,0,0,.38);
+  font-weight: 700;
+}
+
+.tc-modal[hidden] { display: none; }
+
+.tc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,.45);
+  display: grid;
+  place-items: center;
+}
+
+.tc-panel {
+  width: 95vw;
+  height: 90vh;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--tc-shell-bg, var(--bg, #111119));
+  color: var(--tc-shell-fg, var(--fg, #eeeeee));
+  border: 1px solid var(--tc-shell-border, rgba(255,255,255,.16));
+  box-shadow: 0 28px 110px rgba(0,0,0,.45);
+  display: flex;
+  flex-direction: column;
+}
+
+.tc-header,
+.tc-footer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+  background: var(--tc-shell-card, var(--card, rgba(255,255,255,.06)));
+  color: var(--tc-shell-fg, var(--fg, inherit));
+  border-bottom: 1px solid var(--tc-shell-border, rgba(255,255,255,.12));
+}
+
+.tc-footer {
+  border-top: 1px solid rgba(255,255,255,.12);
+  border-bottom: 0;
+  justify-content: flex-end;
+}
+
+.tc-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(680px, 48%) minmax(0, 1fr);
+  gap: 24px;
+  padding: 20px 24px;
+  overflow: hidden;
+}
+
+.tc-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: minmax(132px, 1fr) 82px minmax(132px, 1fr) 82px;
+  gap: 9px 14px;
+  align-content: start;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--tc-shell-soft, rgba(255,255,255,.05));
+  border: 1px solid var(--tc-shell-border, rgba(255,255,255,.08));
+}
+
+.tc-fields {
+  min-height: 0;
+  overflow: hidden;
+  padding-right: 8px;
+  scrollbar-gutter: stable;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--tc-shell-border, rgba(255,255,255,.08));
+}
+
+.tc-field {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tc-field label,
+.tc-grid label {
+  font-size: 12px;
+  line-height: 1.2;
+  opacity: .84;
+  letter-spacing: .015em;
+}
+
+.tc-field input,
+.tc-field textarea,
+.tc-grid input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--tc-shell-border, rgba(255,255,255,.14));
+  background: var(--tc-shell-input, rgba(255,255,255,.055));
+  color: var(--tc-shell-fg, inherit);
+  outline: none;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+.tc-grid input[type="color"] {
+  width: 82px;
+  height: 34px;
+  padding: 3px;
+  border-radius: 12px;
+  border: 1px solid var(--tc-shell-border, rgba(255,255,255,.16));
+  background: var(--tc-shell-input, rgba(255,255,255,.06));
+  cursor: pointer;
+  transition: transform .12s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.tc-button {
+  border: 1px solid var(--tc-shell-border, rgba(255,255,255,.18));
+  background: var(--tc-shell-button, rgba(255,255,255,.08));
+  color: var(--tc-shell-fg, inherit);
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.tc-button.primary {
+  background: #5b8cff;
+  color: #0b1020;
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.tc-preview {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--tc-preview-border, rgba(255,255,255,.14));
+  background: var(--tc-preview-bg, #101018);
+  color: var(--tc-preview-fg, #e8e8f0);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tc-preview-title {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 12px;
+  background: var(--tc-preview-tab-bg, #171728);
+  color: var(--tc-preview-tab-fg, #e8e8f0);
+  border-bottom: 1px solid var(--tc-preview-border, rgba(255,255,255,.12));
+}
+
+.tc-preview-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 700;
+}
+
+.tc-preview-heading small {
+  font-weight: 500;
+  opacity: .72;
+}
+
+.tc-preview-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tc-preview-tab {
+  border: 1px solid var(--tc-preview-border, rgba(255,255,255,.16));
+  background: var(--tc-preview-tab-inactive, rgba(255,255,255,.06));
+  color: var(--tc-preview-tab-muted, inherit);
+  padding: 7px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.tc-preview-tab.is-active {
+  background: var(--tc-preview-tab-active, #82aaff);
+  color: var(--tc-preview-tab-active-fg, #0b1020);
+  border-color: var(--tc-preview-accent, transparent);
+  font-weight: 700;
+}
+
+.tc-code {
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  white-space: normal;
+  overflow: auto;
+  background: var(--tc-preview-bg, #101018);
+  color: var(--tc-preview-fg, #e8e8f0);
+  caret-color: var(--tc-preview-cursor, #82aaff);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+
+.tc-field input:focus,
+.tc-field textarea:focus {
+  border-color: rgba(130,170,255,.72);
+  background: rgba(255,255,255,.075);
+  box-shadow: 0 0 0 3px rgba(130,170,255,.16);
+}
+
+.tc-grid input[type="color"]:hover {
+  transform: translateY(-1px);
+  border-color: rgba(130,170,255,.62);
+  box-shadow: 0 6px 18px rgba(0,0,0,.24);
+}
+
+.tc-grid input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.tc-grid input[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: 9px;
+}
+
+.tc-grid input[type="color"]::-moz-color-swatch {
+  border: 0;
+  border-radius: 9px;
+}
+
+.tc-grid label:nth-child(4n+1),
+.tc-grid label:nth-child(4n+3) {
+  padding-left: 2px;
+}
+
+.tc-fields::-webkit-scrollbar,
+.tc-code::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.tc-fields::-webkit-scrollbar-thumb,
+.tc-code::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.tc-fields::-webkit-scrollbar-thumb:hover,
+.tc-code::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.28);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+
+.tc-preview-modeline {
+  flex: 0 0 auto;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 7px 12px;
+  border-top: 1px solid var(--tc-preview-border, rgba(255,255,255,.18));
+  background: var(--tc-preview-modeline, #232338);
+  color: var(--tc-preview-fg, #e8e8f0);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tc-preview-modeline-left,
+.tc-preview-modeline-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tc-preview-modeline-left {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tc-preview-modeline-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  font-weight: 700;
+}
+
+
+.tc-code-line {
+  display: block;
+  min-height: 1.55em;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 17px;
+  padding-right: 20px;
+  border-left: 3px solid transparent;
+  box-sizing: border-box;
+}
+
+.tc-code-line.is-current {
+  background: var(--tc-preview-hl-line, rgba(130,170,255,.18));
+  border-left-color: var(--tc-preview-accent, #82aaff);
+}
+
+
+.tc-colour-heading {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 8px;
+  color: var(--tc-shell-fg, inherit);
+}
+
+.tc-colour-heading strong {
+  font-size: 13px;
+}
+
+.tc-colour-heading span {
+  font-size: 12px;
+  opacity: .68;
+}
+
+.tc-fields {
+  border-right: 1px solid var(--tc-shell-border, rgba(255,255,255,.08));
+}
+
+
+.tc-role-chip {
+  display: inline-block;
+  min-width: 15ch;
+  margin: 1px 6px 1px 0;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--tc-preview-border, rgba(255,255,255,.14));
+  background: var(--chip-bg, transparent);
+  color: var(--chip-fg, inherit);
+  font-weight: 600;
+}
+
+.tc-role-chip.wide {
+  min-width: 22ch;
+}
+
+.tc-role-rule {
+  display: inline-block;
+  width: 28ch;
+  height: 1.1em;
+  vertical-align: -0.18em;
+  border-left: 3px solid var(--tc-preview-accent, #82aaff);
+  background: var(--chip-bg, transparent);
+}
+
+.tc-code .tc-cursor-demo {
+  display: inline-block;
+  width: .62em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: var(--tc-preview-cursor, #82aaff);
+}
+
+.tc-code .tc-popup-demo {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--tc-preview-border, rgba(255,255,255,.16));
+  background: var(--tc-preview-popup-bg, #171728);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-popup-selected-demo {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 7px;
+  background: var(--tc-preview-popup-selected, #303044);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-search-demo {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--tc-preview-search-match, #4a3f1f);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-search-current-demo {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--tc-preview-search-current, #ecbe7b);
+  color: var(--tc-preview-bg, #101018);
+  font-weight: 700;
+}
+
+.tc-code .tc-diff-added {
+  display: inline-block;
+  min-width: 32ch;
+  background: var(--tc-preview-diff-added, #203820);
+  color: var(--tc-preview-success, #98be65);
+}
+
+.tc-code .tc-diff-removed {
+  display: inline-block;
+  min-width: 32ch;
+  background: var(--tc-preview-diff-removed, #3a1f1f);
+  color: var(--tc-preview-error, #ff6c6b);
+}
+
+.tc-code .tc-diff-changed {
+  display: inline-block;
+  min-width: 32ch;
+  background: var(--tc-preview-diff-changed, #3a321f);
+  color: var(--tc-preview-warning, #ecbe7b);
+}
+
+
+.tc-grid::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.tc-grid::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.tc-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.28);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.tc-muted { opacity: .7; }
+
+.tc-status {
+  margin-right: auto;
+  opacity: .82;
+  font-size: 13px;
+}
+
+@media (max-width: 980px) {
+  .tc-panel {
+    width: 94vw;
+    height: 94vh;
+    max-width: 94vw;
+    max-height: 94vh;
+  }
+
+  .tc-body {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  .tc-grid {
+    grid-template-columns: minmax(120px, 1fr) 92px;
+    gap: 12px 14px;
+    max-height: 42vh;
+  }
+
+  .tc-preview {
+    min-height: 420px;
+  }
+
+  .tc-code {
+    min-height: 320px;
+  }
+}
+  .tc-preview { min-height: 420px; }
+  .tc-code { min-height: 320px; }
+}
+
+
+.tc-code-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 38%);
+  min-height: 100%;
+}
+
+.tc-code-pane {
+  min-width: 0;
+  padding: 16px 0 18px;
+  overflow: visible;
+}
+
+.tc-code-pane + .tc-code-pane {
+  border-left: 1px solid var(--tc-preview-border, rgba(255,255,255,.14));
+  background: color-mix(in srgb, var(--tc-preview-bg, #101018) 92%, var(--tc-preview-bg-alt, #171728));
+}
+
+.tc-code-pane-title {
+  display: grid;
+  grid-template-columns: 4.5ch minmax(0, 1fr);
+  gap: 10px;
+  padding: 0 18px 8px 0;
+  color: var(--tc-preview-comments, #7f849c);
+  font-weight: 700;
+}
+
+.tc-code-line {
+  display: grid;
+  grid-template-columns: 4.5ch minmax(0, 1fr);
+  gap: 10px;
+  min-height: 1.55em;
+  padding-right: 18px;
+  border-left: 3px solid transparent;
+  box-sizing: border-box;
+}
+
+.tc-code-line-number {
+  user-select: none;
+  text-align: right;
+  color: var(--tc-preview-line-number, #565f89);
+  background: var(--tc-preview-fringe, transparent);
+  padding-right: 4px;
+}
+
+.tc-code-line-content {
+  min-width: 0;
+  white-space: pre;
+}
+
+.tc-code-line.is-current {
+  background: var(--tc-preview-hl-line, rgba(130,170,255,.18));
+  border-left-color: var(--tc-preview-accent, #82aaff);
+}
+
+.tc-code-line.is-current .tc-code-line-number {
+  color: var(--tc-preview-line-number-current, #ffffff);
+  font-weight: 700;
+}
+
+.tc-code-line.diff-added .tc-code-line-content {
+  background: var(--tc-preview-diff-added, #203820);
+  color: var(--tc-preview-success, #98be65);
+}
+
+.tc-code-line.diff-removed .tc-code-line-content {
+  background: var(--tc-preview-diff-removed, #3a1f1f);
+  color: var(--tc-preview-error, #ff6c6b);
+}
+
+.tc-code-line.diff-changed .tc-code-line-content {
+  background: var(--tc-preview-diff-changed, #3a321f);
+  color: var(--tc-preview-warning, #ecbe7b);
+}
+
+.tc-code ::selection,
+.tc-code-line-content::selection,
+.tc-code-line-content *::selection {
+  background: var(--tc-preview-region, #303044);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-cursor-demo {
+  display: inline-block;
+  width: .62em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: var(--tc-preview-cursor, #82aaff);
+}
+
+.tc-code .tc-popup-demo {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 7px;
+  border: 1px solid var(--tc-preview-border, rgba(255,255,255,.16));
+  background: var(--tc-preview-popup-bg, #171728);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-popup-selected-demo {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 7px;
+  background: var(--tc-preview-popup-selected, #303044);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-search-demo {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--tc-preview-search-match, #4a3f1f);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-search-current-demo {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--tc-preview-search-current, #ecbe7b);
+  color: var(--tc-preview-bg, #101018);
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .tc-code-split {
+    grid-template-columns: 1fr;
+  }
+
+  .tc-code-pane + .tc-code-pane {
+    border-left: 0;
+    border-top: 1px solid var(--tc-preview-border, rgba(255,255,255,.14));
+  }
+}
+
+
+/* Forced split preview layout */
+.tc-code-split {
+  display: grid;
+  grid-template-columns: minmax(0, 62%) minmax(320px, 38%);
+  min-height: 100%;
+  height: 100%;
+}
+
+.tc-code-pane {
+  min-width: 0;
+  padding: 0 0 18px;
+  overflow: auto;
+}
+
+.tc-code-pane + .tc-code-pane {
+  border-left: 2px solid var(--tc-preview-border, rgba(255,255,255,.18));
+  background: color-mix(in srgb, var(--tc-preview-bg, #101018) 90%, var(--tc-preview-bg-alt, #171728));
+}
+
+.tc-code-pane-title {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 4.5ch minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 18px 8px 0;
+  background: var(--tc-preview-modeline, #232338);
+  color: var(--tc-preview-fg, #e8e8f0);
+  border-bottom: 1px solid var(--tc-preview-border, rgba(255,255,255,.18));
+  font-weight: 700;
+}
+
+.tc-code-line {
+  display: grid;
+  grid-template-columns: 4.5ch minmax(0, 1fr);
+  gap: 10px;
+  min-height: 1.55em;
+  padding-right: 18px;
+  border-left: 3px solid transparent;
+  box-sizing: border-box;
+}
+
+.tc-code-line-number {
+  user-select: none;
+  text-align: right;
+  color: var(--tc-preview-line-number, #565f89);
+  background: var(--tc-preview-fringe, transparent);
+  padding-right: 4px;
+}
+
+.tc-code-line-content {
+  min-width: 0;
+  white-space: pre;
+}
+
+.tc-code-line.is-current {
+  background: var(--tc-preview-hl-line, rgba(130,170,255,.18));
+  border-left-color: var(--tc-preview-accent, #82aaff);
+}
+
+.tc-code-line.is-current .tc-code-line-number {
+  color: var(--tc-preview-line-number-current, #ffffff);
+  font-weight: 700;
+}
+
+.tc-code-line.diff-added .tc-code-line-content {
+  background: var(--tc-preview-diff-added, #203820);
+  color: var(--tc-preview-success, #98be65);
+}
+
+.tc-code-line.diff-removed .tc-code-line-content {
+  background: var(--tc-preview-diff-removed, #3a1f1f);
+  color: var(--tc-preview-error, #ff6c6b);
+}
+
+.tc-code-line.diff-changed .tc-code-line-content {
+  background: var(--tc-preview-diff-changed, #3a321f);
+  color: var(--tc-preview-warning, #ecbe7b);
+}
+
+.tc-code ::selection,
+.tc-code-line-content::selection,
+.tc-code-line-content *::selection {
+  background: var(--tc-preview-region, #303044);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-cursor-demo {
+  display: inline-block;
+  width: .62em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: var(--tc-preview-cursor, #82aaff);
+}
+
+.tc-code .tc-popup-demo {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 7px;
+  border: 1px solid var(--tc-preview-border, rgba(255,255,255,.16));
+  background: var(--tc-preview-popup-bg, #171728);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-popup-selected-demo {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 7px;
+  background: var(--tc-preview-popup-selected, #303044);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-search-demo {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--tc-preview-search-match, #4a3f1f);
+  color: var(--tc-preview-fg, #e8e8f0);
+}
+
+.tc-code .tc-search-current-demo {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--tc-preview-search-current, #ecbe7b);
+  color: var(--tc-preview-bg, #101018);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .tc-code-split {
+    grid-template-columns: 1fr;
+  }
+
+  .tc-code-pane + .tc-code-pane {
+    border-left: 0;
+    border-top: 2px solid var(--tc-preview-border, rgba(255,255,255,.18));
+  }
+}
+
+/* Known-good Theme Creator rescue layer */
+.tc-open-button {
+  position: fixed !important;
+  right: 24px !important;
+  bottom: 24px !important;
+  z-index: 2147483000 !important;
+  padding: 12px 16px !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+}
+
+.tc-panel {
+  width: 95vw !important;
+  height: 90vh !important;
+  max-width: 95vw !important;
+  max-height: 90vh !important;
+}
+
+.tc-code {
+  padding: 0 !important;
+  white-space: normal !important;
+  background: var(--tc-preview-bg, #101018) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code-split {
+  display: grid !important;
+  grid-template-columns: minmax(0, 62%) minmax(320px, 38%) !important;
+  min-height: 100% !important;
+  height: 100% !important;
+}
+
+.tc-code-pane {
+  min-width: 0 !important;
+  padding: 0 0 18px !important;
+  overflow: auto !important;
+}
+
+.tc-code-pane + .tc-code-pane {
+  border-left: 2px solid var(--tc-preview-border, rgba(255,255,255,.18)) !important;
+  background: var(--tc-preview-bg-alt, #171728) !important;
+}
+
+.tc-code-pane-title {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2 !important;
+  display: grid !important;
+  grid-template-columns: 4.5ch minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 8px 18px 8px 0 !important;
+  background: var(--tc-preview-modeline, #232338) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+  border-bottom: 1px solid var(--tc-preview-border, rgba(255,255,255,.18)) !important;
+  font-weight: 700 !important;
+}
+
+.tc-code-line {
+  display: grid !important;
+  grid-template-columns: 4.5ch minmax(0, 1fr) !important;
+  gap: 10px !important;
+  min-height: 1.55em !important;
+  padding-right: 18px !important;
+  border-left: 3px solid transparent !important;
+  box-sizing: border-box !important;
+}
+
+.tc-code-line-number {
+  user-select: none !important;
+  text-align: right !important;
+  color: var(--tc-preview-line-number, #565f89) !important;
+  background: var(--tc-preview-fringe, transparent) !important;
+  padding-right: 4px !important;
+}
+
+.tc-code-line-content {
+  min-width: 0 !important;
+  white-space: pre !important;
+}
+
+.tc-code-line.is-current {
+  background: var(--tc-preview-hl-line, rgba(130,170,255,.18)) !important;
+  border-left-color: var(--tc-preview-accent, #82aaff) !important;
+}
+
+.tc-code-line.is-current .tc-code-line-number {
+  color: var(--tc-preview-line-number-current, #ffffff) !important;
+  font-weight: 700 !important;
+}
+
+.tc-code-line.diff-added .tc-code-line-content {
+  background: var(--tc-preview-diff-added, #203820) !important;
+  color: var(--tc-preview-success, #98be65) !important;
+}
+
+.tc-code-line.diff-removed .tc-code-line-content {
+  background: var(--tc-preview-diff-removed, #3a1f1f) !important;
+  color: var(--tc-preview-error, #ff6c6b) !important;
+}
+
+.tc-code-line.diff-changed .tc-code-line-content {
+  background: var(--tc-preview-diff-changed, #3a321f) !important;
+  color: var(--tc-preview-warning, #ecbe7b) !important;
+}
+
+.tc-code ::selection,
+.tc-code-line-content::selection,
+.tc-code-line-content *::selection {
+  background: var(--tc-preview-region, #303044) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code .tc-cursor-demo {
+  display: inline-block !important;
+  width: .62em !important;
+  height: 1.05em !important;
+  margin-left: 2px !important;
+  vertical-align: -0.16em !important;
+  background: var(--tc-preview-cursor, #82aaff) !important;
+}
+
+.tc-code .tc-popup-demo {
+  display: inline-block !important;
+  padding: 1px 7px !important;
+  border-radius: 7px !important;
+  border: 1px solid var(--tc-preview-border, rgba(255,255,255,.16)) !important;
+  background: var(--tc-preview-popup-bg, #171728) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code .tc-popup-selected-demo {
+  display: inline-block !important;
+  padding: 1px 7px !important;
+  border-radius: 7px !important;
+  background: var(--tc-preview-popup-selected, #303044) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code .tc-search-demo {
+  display: inline-block !important;
+  padding: 0 5px !important;
+  border-radius: 4px !important;
+  background: var(--tc-preview-search-match, #4a3f1f) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code .tc-search-current-demo {
+  display: inline-block !important;
+  padding: 0 5px !important;
+  border-radius: 4px !important;
+  background: var(--tc-preview-search-current, #ecbe7b) !important;
+  color: var(--tc-preview-bg, #101018) !important;
+  font-weight: 700 !important;
+}
+
+@media (max-width: 900px) {
+  .tc-code-split {
+    grid-template-columns: 1fr !important;
+  }
+
+  .tc-code-pane + .tc-code-pane {
+    border-left: 0 !important;
+    border-top: 2px solid var(--tc-preview-border, rgba(255,255,255,.18)) !important;
+  }
+}
+
+
+/* Theme Creator wider code preview layout */
+.tc-body {
+  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr) !important;
+  gap: 16px !important;
+  min-width: 0 !important;
+}
+
+.tc-fields {
+  min-width: 0 !important;
+  padding-right: 6px !important;
+}
+
+.tc-field {
+  margin-bottom: 8px !important;
+}
+
+.tc-colour-heading {
+  margin: 8px 0 7px !important;
+}
+
+.tc-colour-heading span {
+  font-size: 11px !important;
+  white-space: nowrap !important;
+}
+
+.tc-grid {
+  grid-template-columns: minmax(94px, 1fr) 54px minmax(94px, 1fr) 54px !important;
+  gap: 7px 8px !important;
+  padding: 9px !important;
+}
+
+.tc-grid label {
+  min-width: 0 !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+}
+
+.tc-grid input[type="color"] {
+  width: 50px !important;
+  min-width: 50px !important;
+  height: 30px !important;
+  padding: 2px !important;
+}
+
+.tc-preview {
+  min-width: 0 !important;
+}
+
+.tc-code-split {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+
+.tc-code-pane {
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.tc-code-line {
+  grid-template-columns: 3.8ch minmax(0, 1fr) !important;
+  gap: 8px !important;
+  padding-right: 10px !important;
+}
+
+.tc-code-pane-title {
+  grid-template-columns: 3.8ch minmax(0, 1fr) !important;
+  gap: 8px !important;
+  padding-right: 10px !important;
+}
+
+.tc-code-line-content {
+  min-width: 0 !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+.tc-code {
+  overflow-x: hidden !important;
+}
+
+@media (max-width: 1250px) {
+  .tc-body {
+    grid-template-columns: clamp(280px, 27vw, 340px) minmax(0, 1fr) !important;
+  }
+
+  .tc-grid {
+    grid-template-columns: minmax(120px, 1fr) 54px !important;
+  }
+}
+
+
+/* Theme Creator adjusted controls width and same-theme compare panes */
+.tc-body {
+  grid-template-columns: clamp(340px, 28vw, 440px) minmax(0, 1fr) !important;
+  gap: 16px !important;
+  min-width: 0 !important;
+}
+
+.tc-fields {
+  min-width: 0 !important;
+  padding-right: 8px !important;
+}
+
+.tc-grid {
+  grid-template-columns: minmax(112px, 1fr) 58px minmax(112px, 1fr) 58px !important;
+  gap: 8px 10px !important;
+  padding: 10px !important;
+}
+
+.tc-grid label {
+  min-width: 0 !important;
+  font-size: 11.5px !important;
+  line-height: 1.25 !important;
+}
+
+.tc-grid input[type="color"] {
+  width: 54px !important;
+  min-width: 54px !important;
+  height: 31px !important;
+  padding: 2px !important;
+}
+
+/* A and B are two buffers in the same theme. Only diff lines differ. */
+.tc-code-pane {
+  background: var(--tc-preview-bg, #101018) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code-pane + .tc-code-pane {
+  border-left: 2px solid var(--tc-preview-border, rgba(255,255,255,.18)) !important;
+  background: var(--tc-preview-bg, #101018) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code-pane-title {
+  background: var(--tc-preview-modeline, #232338) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+}
+
+.tc-code-line-content {
+  min-width: 0 !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
+
+.tc-code-pane,
+.tc-code {
+  overflow-x: hidden !important;
+}
+
+@media (max-width: 1250px) {
+  .tc-body {
+    grid-template-columns: clamp(320px, 31vw, 400px) minmax(0, 1fr) !important;
+  }
+
+  .tc-grid {
+    grid-template-columns: minmax(130px, 1fr) 58px !important;
+  }
+}
+
+
+/* Same-line A/B diff colouring */
+.tc-code-line.diff-added {
+  background: var(--tc-preview-diff-added, #203820) !important;
+}
+
+.tc-code-line.diff-removed {
+  background: var(--tc-preview-diff-removed, #3a1f1f) !important;
+}
+
+.tc-code-line.diff-changed {
+  background: var(--tc-preview-diff-changed, #3a321f) !important;
+}
+
+.tc-code-line.diff-added .tc-code-line-content {
+  color: var(--tc-preview-success, #98be65) !important;
+}
+
+.tc-code-line.diff-removed .tc-code-line-content {
+  color: var(--tc-preview-error, #ff6c6b) !important;
+}
+
+.tc-code-line.diff-changed .tc-code-line-content {
+  color: var(--tc-preview-warning, #ecbe7b) !important;
+}
+
+.tc-code-line.is-current.diff-added,
+.tc-code-line.is-current.diff-removed,
+.tc-code-line.is-current.diff-changed {
+  box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--tc-preview-hl-line, transparent) 28%, transparent);
+}
+
+
+/* Mirrored A/B selection region */
+.tc-code-line.is-selected .tc-code-line-content {
+  background: var(--tc-preview-region, #303044) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+  outline: 1px solid color-mix(in srgb, var(--tc-preview-region, #303044) 70%, var(--tc-preview-fg, #e8e8f0)) !important;
+  outline-offset: -1px !important;
+}
+
+.tc-code-line.is-selected .tc-code-line-number {
+  background: var(--tc-preview-region, #303044) !important;
+  color: var(--tc-preview-line-number-current, #ffffff) !important;
+  font-weight: 700 !important;
+}
+
+.tc-code-line.is-selected.diff-added,
+.tc-code-line.is-selected.diff-removed,
+.tc-code-line.is-selected.diff-changed {
+  box-shadow:
+    inset 0 0 0 9999px color-mix(in srgb, var(--tc-preview-region, #303044) 42%, transparent),
+    inset 3px 0 0 var(--tc-preview-accent, #82aaff) !important;
+}
+
+
+/* Strong mirrored A/B selection region */
+.tc-code-line.is-selected {
+  background: var(--tc-preview-region, #303044) !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+  box-shadow:
+    inset 3px 0 0 var(--tc-preview-accent, #82aaff),
+    inset 0 0 0 9999px color-mix(in srgb, var(--tc-preview-region, #303044) 78%, transparent) !important;
+}
+
+.tc-code-line.is-selected .tc-code-line-number {
+  background: transparent !important;
+  color: var(--tc-preview-line-number-current, #ffffff) !important;
+  font-weight: 800 !important;
+}
+
+.tc-code-line.is-selected .tc-code-line-content {
+  background: transparent !important;
+  color: var(--tc-preview-fg, #e8e8f0) !important;
+  outline: 1px solid color-mix(in srgb, var(--tc-preview-region, #303044) 65%, var(--tc-preview-fg, #e8e8f0)) !important;
+  outline-offset: -1px !important;
+}
+
+.tc-code-line.is-selected.diff-added .tc-code-line-content {
+  color: var(--tc-preview-success, #98be65) !important;
+}
+
+.tc-code-line.is-selected.diff-removed .tc-code-line-content {
+  color: var(--tc-preview-error, #ff6c6b) !important;
+}
+
+.tc-code-line.is-selected.diff-changed .tc-code-line-content {
+  color: var(--tc-preview-warning, #ecbe7b) !important;
+}
+
+
+/* Forced visible mirrored A/B selection */
+.tc-code-line.is-selected {
+  position: relative !important;
+  background: var(--tc-preview-region, #303044) !important;
+  box-shadow:
+    inset 3px 0 0 var(--tc-preview-accent, #82aaff),
+    inset 0 0 0 9999px color-mix(in srgb, var(--tc-preview-region, #303044) 82%, transparent) !important;
+}
+
+.tc-code-line.is-selected .tc-code-line-number {
+  background: transparent !important;
+  color: var(--tc-preview-line-number-current, #ffffff) !important;
+  font-weight: 900 !important;
+}
+
+.tc-code-line.is-selected .tc-code-line-content {
+  background: transparent !important;
+}
+
+.tc-selection-fill {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  padding: 0 4px !important;
+  margin-left: -4px !important;
+  border-radius: 3px !important;
+  background: var(--tc-preview-region, #303044) !important;
+  outline: 2px solid color-mix(in srgb, var(--tc-preview-region, #303044) 55%, var(--tc-preview-accent, #82aaff)) !important;
+  outline-offset: -2px !important;
+}
+
+.tc-code-pane[data-tc-pane="A"] .tc-code-line.is-selected::after,
+.tc-code-pane[data-tc-pane="B"] .tc-code-line.is-selected::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 2px 4px 2px auto !important;
+  width: 6px !important;
+  border-radius: 999px !important;
+  background: var(--tc-preview-accent, #82aaff) !important;
+  opacity: .95 !important;
+}
+
+.tc-code-line.is-selected.diff-added .tc-selection-fill,
+.tc-code-line.is-selected.diff-removed .tc-selection-fill,
+.tc-code-line.is-selected.diff-changed .tc-selection-fill {
+  background:
+    linear-gradient(
+      90deg,
+      var(--tc-preview-region, #303044),
+      color-mix(in srgb, var(--tc-preview-region, #303044) 72%, transparent)
+    ) !important;
+}
+
+
+/* Theme Creator fixes: title cells, mirrored selection, live tab colours */
+.tc-code-pane-title {
+  display: block !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  padding: 8px 12px !important;
+}
+
+.tc-code-pane-title .tc-code-line-number {
+  display: none !important;
+}
+
+.tc-preview-title {
+  background: var(--tc-preview-tab-bg, #171728) !important;
+  color: var(--tc-preview-tab-fg, #e8e8f0) !important;
+  border-bottom-color: var(--tc-preview-border, rgba(255,255,255,.14)) !important;
+}
+
+.tc-preview-tab {
+  background: var(--tc-preview-tab-inactive, #171728) !important;
+  color: var(--tc-preview-tab-muted, #7f849c) !important;
+  border-color: var(--tc-preview-border, rgba(255,255,255,.16)) !important;
+}
+
+.tc-preview-tab.is-active {
+  background: var(--tc-preview-tab-active, #232338) !important;
+  color: var(--tc-preview-tab-fg, #e8e8f0) !important;
+  border-color: var(--tc-preview-accent, #82aaff) !important;
+}
+
+.tc-code-line.is-selected {
+  background: var(--tc-preview-region, #303044) !important;
+  box-shadow:
+    inset 4px 0 0 var(--tc-preview-accent, #82aaff),
+    inset 0 0 0 9999px color-mix(in srgb, var(--tc-preview-region, #303044) 86%, transparent) !important;
+  outline: 1px solid color-mix(in srgb, var(--tc-preview-region, #303044) 55%, var(--tc-preview-accent, #82aaff)) !important;
+}
+
+.tc-code-line.is-selected .tc-code-line-number {
+  background: var(--tc-preview-region, #303044) !important;
+  color: var(--tc-preview-line-number-current, #ffffff) !important;
+  font-weight: 900 !important;
+}
+
+.tc-code-line.is-selected .tc-code-line-content {
+  background: transparent !important;
+}
+
+.tc-selection-fill {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  padding: 0 4px !important;
+  margin-left: -4px !important;
+  border-radius: 3px !important;
+  background: var(--tc-preview-region, #303044) !important;
+  outline: 2px solid var(--tc-preview-accent, #82aaff) !important;
+  outline-offset: -2px !important;
+}
+
+
+/* Manual mirrored A/B selection only */
+.tc-code-line.is-user-selected {
+  background: var(--tc-preview-region, #303044) !important;
+  box-shadow:
+    inset 4px 0 0 var(--tc-preview-accent, #82aaff),
+    inset 0 0 0 9999px color-mix(in srgb, var(--tc-preview-region, #303044) 84%, transparent) !important;
+  outline: 1px solid color-mix(in srgb, var(--tc-preview-region, #303044) 55%, var(--tc-preview-accent, #82aaff)) !important;
+}
+
+.tc-code-line.is-user-selected .tc-code-line-number {
+  background: var(--tc-preview-region, #303044) !important;
+  color: var(--tc-preview-line-number-current, #ffffff) !important;
+  font-weight: 900 !important;
+}
+
+.tc-code-line.is-user-selected .tc-code-line-content {
+  background: transparent !important;
+}
+
+.tc-code-line.is-user-selected.diff-added .tc-code-line-content {
+  color: var(--tc-preview-success, #98be65) !important;
+}
+
+.tc-code-line.is-user-selected.diff-removed .tc-code-line-content {
+  color: var(--tc-preview-error, #ff6c6b) !important;
+}
+
+.tc-code-line.is-user-selected.diff-changed .tc-code-line-content {
+  color: var(--tc-preview-warning, #ecbe7b) !important;
+}
+
+/* Keep hl-line separate from manual selection. */
+.tc-code-line.is-current:not(.is-user-selected) {
+  background: var(--tc-preview-hl-line, rgba(130,170,255,.18)) !important;
+  border-left-color: var(--tc-preview-accent, #82aaff) !important;
+}
+
+
+/* Theme Creator v70: clean final Centaur/layout override */
+
+/* Keep modal layout stable. */
+.tc-modal[hidden] {
+  display: none !important;
+}
+
+.tc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.tc-modal .tc-dialog {
+  width: 95vw;
+  height: 90vh;
+  overflow: hidden;
+  border: 1px solid var(--tc-region, #313244);
+  border-radius: 16px;
+  background: var(--tc-bg, #11111b);
+  color: var(--tc-fg, #cdd6f4);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.tc-modal .tc-header {
+  height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--tc-region, #313244);
+  background: var(--tc-bg-alt, #181825);
+}
+
+.tc-modal .tc-body {
+  height: calc(90vh - 66px);
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(340px, 390px) minmax(0, 1fr);
+}
+
+/* Left panel. Keep controls lifted, but put buttons safely inside the bottom. */
+.tc-modal .tc-sidebar {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 14px 18px;
+  border-right: 1px solid var(--tc-region, #313244);
+  background: var(--tc-bg, #11111b);
+  box-sizing: border-box;
+}
+
+.tc-modal .tc-field {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.tc-modal .tc-field input,
+.tc-modal .tc-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--tc-region, #313244);
+  border-radius: 10px;
+  background: var(--tc-bg-alt, #181825);
+  color: var(--tc-fg, #cdd6f4);
+  padding: 8px 10px;
+}
+
+.tc-modal .tc-colour-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 8px 10px;
+  padding: 0 6px 15px 0;
+}
+
+.tc-modal .tc-colour-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border: 1px solid color-mix(in srgb, var(--tc-region, #313244) 74%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tc-bg-alt, #181825) 72%, transparent);
+}
+
+.tc-modal .tc-colour-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tc-modal .tc-colour-row input[type="color"] {
+  width: 42px;
+  height: 30px;
+  padding: 2px;
+  border: 1px solid var(--tc-region, #313244);
+  border-radius: 8px;
+  background: var(--tc-bg, #11111b);
+  cursor: pointer;
+}
+
+.tc-modal .tc-transparency-row {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 64px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--tc-region, #313244) 74%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tc-bg-alt, #181825) 72%, transparent);
+}
+
+.tc-modal .tc-transparency-row span {
+  font-size: 0.88rem;
+  color: var(--tc-fg, #cdd6f4);
+}
+
+.tc-modal .tc-transparency-row input[type="number"] {
+  width: 64px;
+  color: var(--tc-fg, #cdd6f4);
+  background: var(--tc-bg, #1e1e2e);
+  border: 1px solid color-mix(in srgb, var(--tc-region, #313244) 74%, transparent);
+  border-radius: 8px;
+  padding: 4px 6px;
+}
+
+.tc-modal .tc-transparency-row small {
+  grid-column: 1 / -1;
+  color: var(--tc-comment, #6c7086);
+  font-size: 0.78rem;
+}
+
+
+.tc-modal .tc-actions {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--tc-region, #313244);
+  background: var(--tc-bg, #11111b);
+  transform: translateY(-5px);
+}
+
+.tc-modal .tc-actions button {
+  min-height: 36px;
+  border: 1px solid var(--tc-region, #313244);
+  border-radius: 10px;
+  background: var(--tc-bg-alt, #181825);
+  color: var(--tc-fg, #cdd6f4);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tc-modal .tc-actions button:hover {
+  border-color: var(--tc-accent, #89b4fa);
+  background: color-mix(in srgb, var(--tc-accent, #89b4fa) 18%, var(--tc-bg-alt, #181825));
+}
+
+/* Preview area: more room for tabs/description, less height for code panels. */
+.tc-modal .tc-preview {
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 50px 38px minmax(0, 1fr);
+  padding-bottom: 34px;
+  background: var(--tc-bg, #11111b);
+  color: var(--tc-fg, #cdd6f4);
+}
+
+.tc-modal .tc-preview-top {
+  box-sizing: border-box;
+  height: 50px;
+  min-height: 50px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  align-items: end;
+  gap: 4px;
+  padding: 14px 10px 8px;
+  overflow: visible;
+  background: var(--tc-inactive-modeline-bg, #11111b);
+  border-bottom: 1px solid var(--tc-region, #313244);
+}
+
+.tc-modal .tc-mode-line {
+  box-sizing: border-box;
+  height: 38px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  background: var(--tc-modeline-bg, #181825);
+  color: var(--tc-modeline-fg, #cdd6f4);
+  border-bottom: 1px solid var(--tc-region, #313244);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tc-modal .tc-ab {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--tc-region, #313244);
+}
+
+/* Doom Centaur Tabs config approximation:
+   centaur-tabs-style "bar"
+   centaur-tabs-height 28
+   centaur-tabs-set-bar 'over
+   centaur-tabs-show-navigation-buttons t
+   centaur-tabs-set-icons t
+   centaur-tabs-set-modified-marker t
+*/
+.tc-modal .tc-preview-tabs {
+  box-sizing: border-box;
+  height: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--tc-inactive-modeleline-bg, var(--tc-inactive-modeline-bg, #11111b));
+  scrollbar-width: thin;
+}
+
+.tc-modal .tc-preview-tab {
+  box-sizing: border-box;
+  position: relative;
+  height: 28px;
+  min-height: 28px;
+  min-width: 112px;
+  max-width: 156px;
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 0;
+  border-top: 3px solid transparent;
+  border-radius: 0;
+  margin: 0;
+  padding: 0 12px;
+
+  background: var(--tc-tab-inactive-bg, #11111b);
+  color: var(--tc-tab-inactive, #6c7086);
+
+  box-shadow:
+    inset 0 -1px 0 var(--tc-region, #313244),
+    inset 1px 0 0 color-mix(in srgb, var(--tc-region, #313244) 52%, transparent);
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 25px;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: background-color 130ms ease, color 130ms ease, border-color 130ms ease;
+}
+
+.tc-modal .tc-preview-tab::before,
+.tc-modal .tc-preview-tab::after {
+  content: none;
+  display: none;
+}
+
+/* Active Tab Bar maps only to the 3px top border. */
+.tc-modal .tc-preview-tab.is-active {
+  z-index: 2;
+  border-top-color: var(--tc-tab-bar, #89b4fa);
+  background: var(--tc-tab-active-bg, #181825);
+  color: var(--tc-tab-active, #cdd6f4);
+  font-weight: 700;
+  box-shadow:
+    inset 0 -1px 0 var(--tc-tab-active-bg, #181825),
+    inset 1px 0 0 color-mix(in srgb, var(--tc-region, #313244) 64%, transparent),
+    inset -1px 0 0 color-mix(in srgb, var(--tc-region, #313244) 64%, transparent);
+}
+
+.tc-modal .tc-preview-tab:hover {
+  border-top-color: color-mix(in srgb, var(--tc-tab-bar, #89b4fa) 62%, transparent);
+  background: color-mix(in srgb, var(--tc-tab-active-bg, #181825) 58%, var(--tc-tab-inactive-bg, #11111b));
+  color: color-mix(in srgb, var(--tc-tab-active, #cdd6f4) 84%, var(--tc-tab-inactive, #6c7086));
+}
+
+.tc-modal .tc-tab-icon {
+  display: inline-flex;
+  min-width: 18px;
+  justify-content: center;
+  color: currentColor;
+  opacity: 0.72;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tc-modal .tc-tab-label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.tc-modal .tc-tab-mod {
+  display: inline-flex;
+  color: var(--tc-strings, #a6e3a1);
+  font-size: 7px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+/* Navigation buttons stay in the newer side positions, fully visible. */
+.tc-modal .tc-centaur-nav {
+  box-sizing: border-box;
+  height: 28px;
+  min-height: 28px;
+  width: 36px;
+  display: inline-grid;
+  place-items: center;
+
+  border: 0;
+  border-top: 3px solid transparent;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+
+  background: var(--tc-tab-inactive-bg, #11111b);
+  color: var(--tc-tab-inactive, #6c7086);
+
+  box-shadow:
+    inset 0 -1px 0 var(--tc-region, #313244),
+    inset 0 0 0 1px color-mix(in srgb, var(--tc-region, #313244) 58%, transparent);
+
+  font-size: 19px;
+  line-height: 25px;
+  overflow: visible;
+  transform: none;
+}
+
+.tc-modal .tc-centaur-nav:hover {
+  border-top-color: var(--tc-tab-bar, #89b4fa);
+  background: color-mix(in srgb, var(--tc-tab-active-bg, #181825) 58%, var(--tc-tab-inactive-bg, #11111b));
+  color: var(--tc-tab-active, #cdd6f4);
+  transform: none;
+}
+
+/* Code panes */
+.tc-modal .tc-pane {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 30px minmax(0, 1fr);
+  background: var(--tc-bg, #11111b);
+}
+
+.tc-modal .tc-pane-title {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: var(--tc-bg-alt, #181825);
+  color: var(--tc-fg-alt, #bac2de);
+  font-size: 12px;
+}
+
+.tc-modal .tc-code {
+  margin: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 0 18px;
+  font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  tab-size: 2;
+}
+
+.tc-modal .tc-code-line {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  white-space: pre;
+  color: var(--tc-fg, #cdd6f4);
+}
+
+.tc-modal .tc-ln {
+  padding-right: 12px;
+  text-align: right;
+  color: var(--tc-comments, #6c7086);
+  user-select: none;
+}
+
+/* Syntax highlighting retained. */
+.tc-modal .tc-tok-comment {
+  color: var(--tc-comments, #6c7086);
+  font-style: italic;
+}
+
+.tc-modal .tc-tok-keyword {
+  color: var(--tc-keywords, #cba6f7);
+  font-weight: 700;
+}
+
+.tc-modal .tc-tok-string {
+  color: var(--tc-strings, #a6e3a1);
+}
+
+.tc-modal .tc-tok-function {
+  color: var(--tc-functions, #89b4fa);
+  font-weight: 600;
+}
+
+.tc-modal .tc-tok-variable {
+  color: var(--tc-variables, #f9e2af);
+}
+
+.tc-modal .tc-tok-number {
+  color: var(--tc-accent, #89b4fa);
+}
+
+.tc-modal .tc-tok-type {
+  color: color-mix(in srgb, var(--tc-functions, #89b4fa) 62%, var(--tc-keywords, #cba6f7));
+  font-weight: 600;
+}
+
+.tc-modal .tc-org-marker {
+  color: var(--tc-accent, #89b4fa);
+  font-weight: 800;
+}
+
+.tc-modal .tc-org-heading {
+  color: var(--tc-functions, #89b4fa);
+  font-weight: 800;
+}
+
+
+/* Theme Creator v71: arrows use the same top border as Centaur tabs */
+.tc-modal .tc-preview-top > .tc-centaur-nav {
+  border-top: 3px solid var(--tc-tab-bar, #89b4fa) !important;
+  line-height: 25px !important;
+}
+
+.tc-modal .tc-preview-top > .tc-centaur-nav:hover {
+  border-top-color: var(--tc-tab-bar, #89b4fa) !important;
+}
+
+
+/* Theme Creator v72: grey arrow top bars + square colour controls */
+
+/* Arrows should have the same neutral grey top border as inactive tabs,
+   not the active blue tab bar colour. */
+.tc-modal .tc-preview-top > .tc-centaur-nav {
+  border-top: 3px solid var(--tc-region, #313244) !important;
+  line-height: 25px !important;
+}
+
+.tc-modal .tc-preview-top > .tc-centaur-nav:hover {
+  border-top-color: var(--tc-region, #313244) !important;
+}
+
+/* Remove rounded borders from colour controls/theme rows. */
+.tc-modal .tc-colour-row,
+.tc-modal .tc-colour-row input[type="color"],
+.tc-modal .tc-colour-row input[type="color"]::-webkit-color-swatch,
+.tc-modal .tc-colour-row input[type="color"]::-webkit-color-swatch-wrapper,
+.tc-modal .tc-colour-row input[type="color"]::-moz-color-swatch {
+  border-radius: 0 !important;
+}
+
+/* Reduce the colour selector panel height by 5px. */
+.tc-modal .tc-colour-grid {
+  margin-bottom: 5px !important;
+}
+
+
+/* Theme Creator v73: BASIC tab visibility + colour panel 5px shorter */
+
+/* Make the Centaur-style tabs compact enough that BASIC remains visible. */
+.tc-modal .tc-preview-tab {
+  min-width: 78px !important;
+  max-width: 118px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  gap: 4px !important;
+}
+
+.tc-modal .tc-preview-tab[data-tc-preview-tab="hyprland"] {
+  min-width: 92px !important;
+}
+
+.tc-modal .tc-preview-tab[data-tc-preview-tab="text"] {
+  min-width: 88px !important;
+}
+
+.tc-modal .tc-tab-icon {
+  min-width: 14px !important;
+  max-width: 18px !important;
+  font-size: 9px !important;
+}
+
+.tc-modal .tc-tab-label {
+  min-width: 0 !important;
+}
+
+/* Ensure the tab strip itself never hides the BASIC tab vertically. */
+.tc-modal .tc-preview-tabs {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+/* Reduce the colour selector panel by another 5px. */
+.tc-modal .tc-colour-grid {
+  margin-bottom: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+
+/* Theme Creator v74: remove modified disks, fix C++ icon, shorten colour panel */
+
+/* Remove the solid disk modified markers completely. */
+.tc-modal .tc-tab-mod {
+  display: none !important;
+}
+
+/* Keep tab icons/signs on one line. Fixes C++ icon wrapping vertically. */
+.tc-modal .tc-tab-icon {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  min-width: 18px !important;
+  max-width: 24px !important;
+  overflow: visible !important;
+}
+
+/* Z80 ASM needs a little more room. */
+.tc-modal .tc-preview-tab[data-tc-preview-tab="z80"] {
+  min-width: 94px !important;
+}
+
+/* Reduce the colour theme selector height by another 10px. */
+.tc-modal .tc-colour-grid {
+  margin-bottom: 20px !important;
+}
+
+
+/* Theme Creator v75: full colour buttons + footer spacing */
+
+/* Keep the left controls area slightly clear of the bottom edge. */
+.tc-modal .tc-left-panel,
+.tc-modal .tc-left-pane,
+.tc-modal .tc-creator-left,
+.tc-modal .tc-sidebar,
+.tc-modal .tc-form-panel {
+  padding-bottom: 14px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure the colour-role area stays in two columns where supported. */
+.tc-modal .tc-colour-grid,
+.tc-modal .tc-color-grid,
+.tc-modal .tc-colours-grid,
+.tc-modal .tc-colour-roles {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 10px 14px !important;
+  align-items: stretch !important;
+}
+
+/* Make each colour row align label + full-size control cleanly. */
+.tc-modal .tc-colour-grid > *,
+.tc-modal .tc-color-grid > *,
+.tc-modal .tc-colours-grid > * {
+  min-width: 0 !important;
+}
+
+.tc-modal .tc-colour-row,
+.tc-modal .tc-color-row,
+.tc-modal .tc-colour-field,
+.tc-modal .tc-color-field,
+.tc-modal .tc-colour-item,
+.tc-modal .tc-color-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 88px !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 42px !important;
+}
+
+/* Full button appearance for the colour picker control. */
+.tc-modal .tc-colour-grid button,
+.tc-modal .tc-color-grid button,
+.tc-modal .tc-colours-grid button,
+.tc-modal .tc-colour-grid input[type="color"],
+.tc-modal .tc-color-grid input[type="color"],
+.tc-modal .tc-colours-grid input[type="color"],
+.tc-modal .tc-colour-chip,
+.tc-modal .tc-color-chip,
+.tc-modal .tc-swatch,
+.tc-modal .tc-swatch-button,
+.tc-modal .tc-colour-button,
+.tc-modal .tc-color-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* If the browser colour input is being used, let the colour fill the control. */
+.tc-modal input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0 !important;
+}
+.tc-modal input[type="color"]::-webkit-color-swatch {
+  border: 0 !important;
+  border-radius: 6px !important;
+}
+.tc-modal input[type="color"]::-moz-color-swatch {
+  border: 0 !important;
+  border-radius: 6px !important;
+}
+
+/* Footer buttons: keep them inside the panel with a small gap below. */
+.tc-modal .tc-actions,
+.tc-modal .tc-button-row,
+.tc-modal .tc-footer-actions,
+.tc-modal .tc-left-actions {
+  margin-top: 12px !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 8px !important;
+  box-sizing: border-box !important;
+}
+
+.tc-modal .tc-actions button,
+.tc-modal .tc-button-row button,
+.tc-modal .tc-footer-actions button,
+.tc-modal .tc-left-actions button {
+  min-height: 38px !important;
+}
+
+/* Make sure the footer doesn’t stick to the panel bottom edge. */
+.tc-modal .tc-left-panel > :last-child,
+.tc-modal .tc-left-pane > :last-child,
+.tc-modal .tc-creator-left > :last-child,
+.tc-modal .tc-sidebar > :last-child,
+.tc-modal .tc-form-panel > :last-child {
+  margin-bottom: 8px !important;
+}
+
+
+/* Theme Creator v76: slimmer colour theme buttons */
+
+/* Do not touch the bottom action buttons; only reduce colour controls. */
+.tc-modal .tc-colour-row,
+.tc-modal .tc-color-row,
+.tc-modal .tc-colour-field,
+.tc-modal .tc-color-field,
+.tc-modal .tc-colour-item,
+.tc-modal .tc-color-item {
+  min-height: 34px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  gap: 10px !important;
+}
+
+.tc-modal .tc-colour-grid button,
+.tc-modal .tc-color-grid button,
+.tc-modal .tc-colours-grid button,
+.tc-modal .tc-colour-grid input[type="color"],
+.tc-modal .tc-color-grid input[type="color"],
+.tc-modal .tc-colours-grid input[type="color"],
+.tc-modal .tc-colour-chip,
+.tc-modal .tc-color-chip,
+.tc-modal .tc-swatch,
+.tc-modal .tc-swatch-button,
+.tc-modal .tc-colour-button,
+.tc-modal .tc-color-button {
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+}
+
+.tc-modal .tc-colour-row input[type="color"],
+.tc-modal .tc-color-row input[type="color"] {
+  height: 24px !important;
+}
+
+
+/* Theme Creator v77: colour panel ends 5px above footer divider */
+
+/* Keep footer/action buttons unchanged. Only extend the colour grid downward. */
+.tc-modal .tc-colour-grid,
+.tc-modal .tc-color-grid,
+.tc-modal .tc-colours-grid,
+.tc-modal .tc-colour-roles {
+  margin-bottom: 0 !important;
+  padding-bottom: 5px !important;
+}
+
+/* Keep the divider/action row exactly where it is, with a small 5px breathing gap above it. */
+.tc-modal .tc-actions,
+.tc-modal .tc-button-row,
+.tc-modal .tc-footer-actions,
+.tc-modal .tc-left-actions {
+  margin-top: 5px !important;
+}
+
+
+/* Theme Creator v78: colour button rounding, scrollbar gap, equal spacing */
+
+/* Colour panel spacing: equal button gaps and a 5px gutter before the scrollbar. */
+.tc-modal .tc-colour-grid,
+.tc-modal .tc-color-grid,
+.tc-modal .tc-colours-grid,
+.tc-modal .tc-colour-roles {
+  gap: 8px !important;
+  column-gap: 8px !important;
+  row-gap: 8px !important;
+  padding-right: 5px !important;
+  padding-bottom: 5px !important;
+  scrollbar-gutter: stable !important;
+  align-content: start !important;
+}
+
+/* Equal-sized colour rows/buttons. */
+.tc-modal .tc-colour-row,
+.tc-modal .tc-color-row,
+.tc-modal .tc-colour-field,
+.tc-modal .tc-color-field,
+.tc-modal .tc-colour-item,
+.tc-modal .tc-color-item {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 4px 6px !important;
+  gap: 8px !important;
+  border-radius: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* Small rounded border around the actual colour button/swatch. */
+.tc-modal .tc-colour-grid button,
+.tc-modal .tc-color-grid button,
+.tc-modal .tc-colours-grid button,
+.tc-modal .tc-colour-grid input[type="color"],
+.tc-modal .tc-color-grid input[type="color"],
+.tc-modal .tc-colours-grid input[type="color"],
+.tc-modal .tc-colour-chip,
+.tc-modal .tc-color-chip,
+.tc-modal .tc-swatch,
+.tc-modal .tc-swatch-button,
+.tc-modal .tc-colour-button,
+.tc-modal .tc-color-button {
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  border-radius: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* Let the visible colour fill use a small rounded shape too. */
+.tc-modal input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0 !important;
+  border-radius: 4px !important;
+}
+
+.tc-modal input[type="color"]::-webkit-color-swatch {
+  border: 0 !important;
+  border-radius: 3px !important;
+}
+
+.tc-modal input[type="color"]::-moz-color-swatch {
+  border: 0 !important;
+  border-radius: 3px !important;
+}
+
+
+/* Theme Creator v79: modeline belongs at the bottom */
+
+/* Layout order:
+   1. Centaur tab strip
+   2. A/B code sample panes
+   3. Mode-line / sample description
+*/
+.tc-modal .tc-preview {
+  display: grid !important;
+  grid-template-rows: 50px minmax(0, 1fr) 38px !important;
+  padding-bottom: 0 !important;
+}
+
+.tc-modal .tc-preview-top {
+  grid-row: 1 !important;
+}
+
+.tc-modal .tc-ab {
+  grid-row: 2 !important;
+  min-height: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.tc-modal .tc-mode-line {
+  grid-row: 3 !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  line-height: 38px !important;
+  border-top: 1px solid var(--tc-region, #313244) !important;
+  border-bottom: 0 !important;
+}
+
+
+/* Theme Creator v80: modeline as real bottom row, no overlay */
+
+/* Explicit preview grid:
+   tabs at top, code in the middle, modeline at bottom. */
+.tc-modal .tc-preview {
+  box-sizing: border-box !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-areas:
+    "tabs"
+    "code"
+    "modeline" !important;
+  grid-template-rows: 50px minmax(0, 1fr) 38px !important;
+  padding: 0 !important;
+}
+
+.tc-modal .tc-preview-top {
+  grid-area: tabs !important;
+  grid-row: auto !important;
+  min-height: 50px !important;
+  height: 50px !important;
+  box-sizing: border-box !important;
+}
+
+.tc-modal .tc-ab {
+  grid-area: code !important;
+  grid-row: auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+}
+
+.tc-modal .tc-mode-line {
+  grid-area: modeline !important;
+  grid-row: auto !important;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  z-index: 1 !important;
+
+  box-sizing: border-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  line-height: normal !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+
+  border-top: 1px solid var(--tc-region, #313244) !important;
+  border-bottom: 0 !important;
+  background: var(--tc-modeline-bg, #181825) !important;
+  color: var(--tc-modeline-fg, #cdd6f4) !important;
+}
+
+/* Ensure the code panes shrink instead of running underneath the modeline. */
+.tc-modal .tc-pane {
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.tc-modal .tc-code {
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+
+
+/* Theme Creator v81: restored code panes + real bottom modeline */
+
+/* Actual DOM order is now:
+   1. tabs
+   2. code panes
+   3. modeline
+*/
+.tc-modal .tc-preview {
+  box-sizing: border-box !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-areas: none !important;
+  grid-template-rows: 50px minmax(0, 1fr) 38px !important;
+  padding: 0 !important;
+}
+
+.tc-modal .tc-preview-top {
+  grid-row: 1 !important;
+  grid-area: auto !important;
+  box-sizing: border-box !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  overflow: visible !important;
+}
+
+.tc-modal .tc-ab {
+  grid-row: 2 !important;
+  grid-area: auto !important;
+  box-sizing: border-box !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 1px !important;
+  margin: 0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.tc-modal .tc-pane {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-rows: 30px minmax(0, 1fr) !important;
+  background: var(--tc-bg, #11111b) !important;
+}
+
+.tc-modal .tc-pane-title {
+  display: flex !important;
+  align-items: center !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  background: var(--tc-bg-alt, #181825) !important;
+  color: var(--tc-fg-alt, #bac2de) !important;
+  font-size: 12px !important;
+}
+
+.tc-modal .tc-code {
+  display: block !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: auto !important;
+  margin: 0 !important;
+  padding: 8px 0 18px !important;
+  font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  tab-size: 2 !important;
+  background: var(--tc-bg, #11111b) !important;
+  color: var(--tc-fg, #cdd6f4) !important;
+}
+
+.tc-modal .tc-code-line {
+  display: grid !important;
+  grid-template-columns: 52px minmax(0, 1fr) !important;
+  white-space: pre !important;
+  color: var(--tc-fg, #cdd6f4) !important;
+}
+
+.tc-modal .tc-mode-line {
+  grid-row: 3 !important;
+  grid-area: auto !important;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  z-index: 1 !important;
+
+  box-sizing: border-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  line-height: normal !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+
+  border-top: 1px solid var(--tc-region, #313244) !important;
+  border-bottom: 0 !important;
+  background: var(--tc-modeline-bg, #181825) !important;
+  color: var(--tc-modeline-fg, #cdd6f4) !important;
+}
+
+
+/* Theme Creator v82: reduce code sample panels so bottom modeline fits */
+
+/* Use a vertical flex layout now that the DOM order is:
+   tabs -> code panes -> modeline.
+   This forces the code panels to give up height to the modeline. */
+.tc-modal .tc-preview {
+  box-sizing: border-box !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  height: auto !important;
+  overflow: hidden !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  padding: 0 0 8px 0 !important;
+  gap: 0 !important;
+}
+
+.tc-modal .tc-preview-top {
+  flex: 0 0 50px !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  box-sizing: border-box !important;
+}
+
+.tc-modal .tc-ab {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: calc(100% - 96px) !important;
+  overflow: hidden !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 1px !important;
+
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.tc-modal .tc-pane {
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.tc-modal .tc-pane-title {
+  flex: 0 0 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+}
+
+.tc-modal .tc-code {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+
+/* The modeline is a reserved bottom row, not an overlay. */
+.tc-modal .tc-mode-line {
+  flex: 0 0 38px !important;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+
+  box-sizing: border-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+
+  margin: 0 !important;
+  padding: 0 14px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+
+  border-top: 1px solid var(--tc-region, #313244) !important;
+  border-bottom: 0 !important;
+}
+
+/* Theme Creator v133 visual polish begin */
+.tc-modal .tc-actions,
+.tc-modal .theme-creator-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tc-modal .tc-actions button,
+.tc-modal .theme-creator-actions button,
+.tc-modal .tc-actions .button,
+.tc-modal .theme-creator-actions .button,
+.tc-modal .tc-actions [role="button"],
+.tc-modal .theme-creator-actions [role="button"] {
+  appearance: none !important;
+  box-sizing: border-box !important;
+  min-height: 2.25rem !important;
+  padding: 0.45rem 0.85rem !important;
+  border: 1px solid color-mix(in srgb, var(--tc-region, #313244) 78%, transparent) !important;
+  border-radius: 10px !important;
+  background: color-mix(in srgb, var(--tc-bg-alt, #181825) 88%, var(--tc-accent, #89b4fa) 12%) !important;
+  background-image: none !important;
+  color: var(--tc-fg, #cdd6f4) !important;
+  font: inherit !important;
+  font-weight: 650 !important;
+  line-height: 1.1 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.tc-modal .tc-actions button:hover,
+.tc-modal .theme-creator-actions button:hover,
+.tc-modal .tc-actions .button:hover,
+.tc-modal .theme-creator-actions .button:hover,
+.tc-modal .tc-actions [role="button"]:hover,
+.tc-modal .theme-creator-actions [role="button"]:hover {
+  border-color: var(--tc-accent, #89b4fa) !important;
+  background: color-mix(in srgb, var(--tc-bg-alt, #181825) 76%, var(--tc-accent, #89b4fa) 24%) !important;
+}
+
+.tc-modal .tc-transparency-row {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(3.75rem, 12vw, 4.75rem);
+  grid-template-areas:
+    "label label"
+    "range number"
+    "hint hint"
+    "status status";
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+}
+
+.tc-modal .tc-transparency-row > span {
+  grid-area: label;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tc-modal .tc-transparency-row input[type="range"] {
+  grid-area: range;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.tc-modal .tc-transparency-row input[type="number"] {
+  grid-area: number;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.tc-modal .tc-transparency-row small {
+  grid-area: hint;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tc-modal .tc-transparency-row em[data-tc-transparency-status] {
+  grid-area: status;
+  font-style: normal;
+  color: var(--tc-comment, #6c7086);
+  font-size: 0.76rem;
+}
+
+.tc-modal,
+.tc-modal .tc-panel,
+.tc-modal .tc-editor,
+.tc-modal .tc-modal-body,
+.tc-modal .tc-creator,
+.tc-modal .theme-creator-panel,
+.tc-modal .theme-creator-editor {
+  background-color: var(--tc-panel-bg, var(--tc-bg, #1e1e2e)) !important;
+}
+
+/* Only the preview background is translucent. No element opacity. */
+.tc-modal .theme-creator-preview,
+.tc-modal [data-tc-preview],
+.tc-modal .tc-preview,
+.tc-modal .tc-preview-pane {
+  opacity: 1 !important;
+  background-color: var(--tc-preview-bg-transparent, var(--tc-bg, #1e1e2e)) !important;
+  filter: none !important;
+}
+
+.tc-modal .theme-creator-preview *,
+.tc-modal [data-tc-preview] *,
+.tc-modal .tc-preview *,
+.tc-modal .tc-preview-pane * {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+@media (max-width: 520px) {
+  .tc-modal .tc-transparency-row {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "label"
+      "range"
+      "number"
+      "hint"
+      "status";
+  }
+
+  .tc-modal .tc-transparency-row input[type="number"] {
+    width: 5rem;
+    justify-self: end;
+  }
+}
+/* Theme Creator v133 visual polish end */
+
+/* Theme Creator v137 preview-only background begin */
+/* Keep the Theme Gallery / Creator shell on the gallery UI colours. */
+.tc-modal,
+.tc-modal .tc-panel,
+.tc-modal .tc-editor,
+.tc-modal .tc-modal-body,
+.tc-modal .tc-creator,
+.tc-modal .theme-creator-panel,
+.tc-modal .theme-creator-editor {
+  background-color: var(--bg-2, #151823) !important;
+}
+
+/* Only the preview surface receives the selected theme background. */
+.tc-modal .theme-creator-preview,
+.tc-modal [data-tc-preview],
+.tc-modal .tc-preview,
+.tc-modal .tc-preview-pane {
+  opacity: 1 !important;
+  filter: none !important;
+  background-color: var(--tc-preview-bg-transparent, var(--tc-bg, #1e1e2e)) !important;
+}
+
+.tc-modal .theme-creator-preview *,
+.tc-modal [data-tc-preview] *,
+.tc-modal .tc-preview *,
+.tc-modal .tc-preview-pane * {
+  opacity: 1 !important;
+  filter: none !important;
+}
+/* Theme Creator v137 preview-only background end */
+
+/* Theme Creator v146 professional colour editor begin */
+
+.tc-modal .tc-colour-original-hidden-v146 {
+  display: none !important;
+}
+
+.tc-modal .tc-colour-editor-v146 {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.95rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.tc-modal .tc-colour-section-v146 {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 0.65rem;
+  align-items: stretch;
+}
+
+.tc-modal .tc-colour-heading-v146 {
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  color: color-mix(in srgb, var(--tc-fg, #cdd6f4) 80%, var(--tc-accent, #89b4fa) 20%);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.075em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.tc-modal .tc-colour-heading-v146::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: color-mix(in srgb, var(--tc-region, #313244) 62%, transparent);
+}
+
+.tc-modal .tc-colour-card-v146 {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 3.15rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2rem;
+  grid-template-rows: auto auto;
+  gap: 0.15rem 0.55rem;
+  align-items: center;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--tc-region, #313244) 58%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tc-bg-alt, #181825) 76%, transparent);
+  color: var(--tc-fg, #cdd6f4);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.tc-modal .tc-colour-card-v146:hover {
+  border-color: color-mix(in srgb, var(--tc-accent, #89b4fa) 52%, transparent);
+  background: color-mix(in srgb, var(--tc-bg-alt, #181825) 86%, var(--tc-accent, #89b4fa) 7%);
+}
+
+.tc-modal .tc-colour-label-v146 {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--tc-fg, #cdd6f4);
+  font-size: 0.78rem;
+  font-weight: 680;
+  letter-spacing: 0.005em;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+}
+
+.tc-modal .tc-colour-hex-v146 {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--tc-fg, #cdd6f4) 58%, transparent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.69rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.tc-modal .tc-colour-card-v146 input[type="color"] {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  justify-self: end;
+  align-self: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--tc-region, #313244) 80%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  opacity: 1;
+  visibility: visible;
+  cursor: pointer;
+}
+
+.tc-modal .tc-colour-card-v146 input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.tc-modal .tc-colour-card-v146 input[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: 7px;
+}
+
+.tc-modal .tc-colour-card-v146 input[type="color"]::-moz-color-swatch {
+  border: 0;
+  border-radius: 7px;
+}
+
+@media (max-width: 820px) {
+  .tc-modal .tc-colour-section-v146 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tc-modal .tc-colour-heading-v146 {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Theme Creator v146 professional colour editor end */
+
+/* Theme Creator v152 single compact colour viewport begin */
+
+/* Only one colour selector viewport. */
+.tc-modal .tc-colour-editor-shell-v152,
+[data-theme-creator] .tc-colour-editor-shell-v152 {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+
+  height: clamp(17rem, 39vh, 27rem) !important;
+  max-height: clamp(17rem, 39vh, 27rem) !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable !important;
+
+  margin: 0.75rem 0 0.85rem !important;
+  padding: 0.55rem 0.55rem 0.6rem 0.55rem !important;
+
+  border: 1px solid color-mix(in srgb, var(--tc-region, #313244) 52%, transparent) !important;
+  border-radius: 12px !important;
+  background: color-mix(in srgb, var(--tc-bg, #1e1e2e) 70%, transparent) !important;
+}
+
+/* Hide any stale duplicate/legacy viewport if the browser has old DOM cached. */
+.tc-modal .tc-colour-scroll-v151,
+[data-theme-creator] .tc-colour-scroll-v151 {
+  display: none !important;
+}
+
+/* Visible scrollbar on the actual colour selector panel. */
+.tc-modal .tc-colour-editor-shell-v152::-webkit-scrollbar,
+[data-theme-creator] .tc-colour-editor-shell-v152::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+.tc-modal .tc-colour-editor-shell-v152::-webkit-scrollbar-track,
+[data-theme-creator] .tc-colour-editor-shell-v152::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--tc-bg-alt, #181825) 78%, transparent) !important;
+  border-radius: 999px !important;
+}
+
+.tc-modal .tc-colour-editor-shell-v152::-webkit-scrollbar-thumb,
+[data-theme-creator] .tc-colour-editor-shell-v152::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--tc-region, #313244) 65%, var(--tc-accent, #89b4fa) 35%) !important;
+  border-radius: 999px !important;
+}
+
+.tc-modal .tc-colour-editor-shell-v152,
+[data-theme-creator] .tc-colour-editor-shell-v152 {
+  scrollbar-width: thin !important;
+  scrollbar-color:
+    color-mix(in srgb, var(--tc-region, #313244) 65%, var(--tc-accent, #89b4fa) 35%)
+    color-mix(in srgb, var(--tc-bg-alt, #181825) 78%, transparent) !important;
+}
+
+/* The editor itself should not create extra panels or extra height. */
+.tc-modal .tc-colour-editor-v146.tc-colour-editor-compact-v152,
+[data-theme-creator] .tc-colour-editor-v146.tc-colour-editor-compact-v152 {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0.7rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Compact category sections. */
+.tc-modal .tc-colour-editor-compact-v152 .tc-colour-section-v146,
+[data-theme-creator] .tc-colour-editor-compact-v152 .tc-colour-section-v146 {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.42rem 0.55rem !important;
+}
+
+/* Compact headings. */
+.tc-modal .tc-colour-editor-compact-v152 .tc-colour-heading-v146,
+[data-theme-creator] .tc-colour-editor-compact-v152 .tc-colour-heading-v146 {
+  grid-column: 1 / -1 !important;
+  margin: 0.1rem 0 0.05rem !important;
+  padding: 0 !important;
+  font-size: 0.68rem !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.07em !important;
+}
+
+/* Compact colour cards: remove the dead vertical space. */
+.tc-modal .tc-colour-editor-compact-v152 .tc-colour-card-v146,
+[data-theme-creator] .tc-colour-editor-compact-v152 .tc-colour-card-v146 {
+  min-height: 2.85rem !important;
+  height: auto !important;
+  padding: 0.4rem 0.45rem !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 1.8rem !important;
+  grid-template-rows: auto auto !important;
+  gap: 0.08rem 0.45rem !important;
+  align-items: center !important;
+
+  border-radius: 9px !important;
+  overflow: hidden !important;
+}
+
+.tc-modal .tc-colour-editor-compact-v152 .tc-colour-label-v146,
+[data-theme-creator] .tc-colour-editor-compact-v152 .tc-colour-label-v146 {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  align-self: end !important;
+
+  font-size: 0.7rem !important;
+  line-height: 1.08 !important;
+  font-weight: 660 !important;
+
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.tc-modal .tc-colour-editor-compact-v152 .tc-colour-hex-v146,
+[data-theme-creator] .tc-colour-editor-compact-v152 .tc-colour-hex-v146 {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  align-self: start !important;
+
+  font-size: 0.62rem !important;
+  line-height: 1.05 !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.tc-modal .tc-colour-editor-compact-v152 .tc-colour-card-v146 input[type="color"],
+[data-theme-creator] .tc-colour-editor-compact-v152 .tc-colour-card-v146 input[type="color"] {
+  grid-column: 2 !important;
+  grid-row: 1 / 3 !important;
+
+  width: 1.8rem !important;
+  height: 1.8rem !important;
+  min-width: 1.8rem !important;
+  min-height: 1.8rem !important;
+  max-width: 1.8rem !important;
+  max-height: 1.8rem !important;
+
+  justify-self: end !important;
+  align-self: center !important;
+
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* The four action buttons remain outside the colour viewport and span the panel. */
+.tc-modal .tc-actions,
+.tc-modal .theme-creator-actions,
+.tc-modal [data-tc-actions],
+[data-theme-creator] .tc-actions,
+[data-theme-creator] .theme-creator-actions,
+[data-theme-creator] [data-tc-actions] {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.6rem !important;
+}
+
+.tc-modal .tc-actions button,
+.tc-modal .theme-creator-actions button,
+.tc-modal [data-tc-actions] button,
+[data-theme-creator] .tc-actions button,
+[data-theme-creator] .theme-creator-actions button,
+[data-theme-creator] [data-tc-actions] button {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 2.45rem !important;
+  padding: 0.45rem 0.6rem !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.12 !important;
+  text-align: center !important;
+}
+
+/* Collapse only on genuinely narrow panels. */
+@media (max-width: 760px) {
+  .tc-modal .tc-colour-editor-compact-v152 .tc-colour-section-v146,
+  [data-theme-creator] .tc-colour-editor-compact-v152 .tc-colour-section-v146 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Theme Creator v152 single compact colour viewport end */
+
+/* Theme Creator v158 lightweight UI/theme separation begin */
+
+/*
+   Safe replacement for v157:
+   - no MutationObserver
+   - no pointermove handler
+   - neutral Theme Creator UI
+   - only preview pane receives selected theme background
+*/
+
+.tc-modal,
+[data-theme-creator],
+.tc-modal .tc-editor,
+.tc-modal .theme-creator-editor,
+.tc-modal .tc-panel,
+.tc-modal .tc-controls,
+.tc-modal .tc-sidebar,
+.tc-modal .tc-modal-body,
+.tc-modal .theme-creator-body,
+.tc-modal .tc-content,
+.tc-modal .tc-colour-editor-shell-v152,
+.tc-modal .tc-colour-editor-v146,
+.tc-modal .tc-colour-section-v146,
+[data-theme-creator] .tc-editor,
+[data-theme-creator] .theme-creator-editor,
+[data-theme-creator] .tc-panel,
+[data-theme-creator] .tc-controls,
+[data-theme-creator] .tc-sidebar,
+[data-theme-creator] .tc-colour-editor-shell-v152,
+[data-theme-creator] .tc-colour-editor-v146,
+[data-theme-creator] .tc-colour-section-v146 {
+  --tc-bg: var(--tc-shell-bg-v158, #0f111a) !important;
+  --tc-panel-bg: var(--tc-ui-panel-v158, #121625) !important;
+  --tc-bg-alt: var(--tc-ui-panel-alt-v158, #171b2d) !important;
+  --tc-fg: var(--tc-ui-text-v158, #cdd6f4) !important;
+  --tc-muted: var(--tc-ui-muted-v158, #8b93ad) !important;
+  --tc-accent: var(--tc-ui-accent-v158, #89b4fa) !important;
+
+  background: var(--tc-shell-bg-v158, #0f111a) !important;
+  background-color: var(--tc-shell-bg-v158, #0f111a) !important;
+  background-image: none !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.tc-modal .tc-colour-card-v146,
+[data-theme-creator] .tc-colour-card-v146 {
+  background: var(--tc-ui-panel-v158, #121625) !important;
+  background-color: var(--tc-ui-panel-v158, #121625) !important;
+  background-image: none !important;
+  border-color: var(--tc-ui-border-v158, #30364f) !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+}
+
+.tc-modal .tc-colour-card-v146:hover,
+[data-theme-creator] .tc-colour-card-v146:hover {
+  background: var(--tc-ui-panel-alt-v158, #171b2d) !important;
+  background-color: var(--tc-ui-panel-alt-v158, #171b2d) !important;
+  border-color: var(--tc-ui-accent-v158, #89b4fa) !important;
+}
+
+/* Action buttons, including Preview, stay neutral. */
+.tc-modal button,
+[data-theme-creator] button,
+.tc-modal .tc-actions button,
+.tc-modal .theme-creator-actions button,
+.tc-modal [data-tc-actions] button,
+[data-theme-creator] .tc-actions button,
+[data-theme-creator] .theme-creator-actions button,
+[data-theme-creator] [data-tc-actions] button {
+  background: var(--tc-ui-button-v158, #242a40) !important;
+  background-color: var(--tc-ui-button-v158, #242a40) !important;
+  background-image: none !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+  border-color: var(--tc-ui-border-v158, #30364f) !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.tc-modal button:hover,
+[data-theme-creator] button:hover,
+.tc-modal .tc-actions button:hover,
+.tc-modal .theme-creator-actions button:hover,
+.tc-modal [data-tc-actions] button:hover,
+[data-theme-creator] .tc-actions button:hover,
+[data-theme-creator] .theme-creator-actions button:hover,
+[data-theme-creator] [data-tc-actions] button:hover {
+  background: var(--tc-ui-button-hover-v158, #2b334d) !important;
+  background-color: var(--tc-ui-button-hover-v158, #2b334d) !important;
+  color: #ffffff !important;
+}
+
+/* Only this preview surface may use selected Background + Transparency. */
+.tc-modal .theme-creator-preview,
+.tc-modal [data-tc-preview],
+.tc-modal .tc-preview,
+.tc-modal .tc-preview-pane,
+[data-theme-creator] .theme-creator-preview,
+[data-theme-creator] [data-tc-preview],
+[data-theme-creator] .tc-preview,
+[data-theme-creator] .tc-preview-pane {
+  background: var(--tc-preview-bg-transparent-v158, #11111b) !important;
+  background-color: var(--tc-preview-bg-transparent-v158, #11111b) !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Compact transparency: slider only. */
+.tc-modal .tc-transparency-compact-v158,
+[data-theme-creator] .tc-transparency-compact-v158 {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  display: block !important;
+  margin: 0.35rem 0 0.55rem !important;
+  padding: 0.25rem 0 !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.tc-modal .tc-hidden-v158,
+[data-theme-creator] .tc-hidden-v158,
+.tc-modal .tc-transparency-compact-v158 [data-tc-transparency-output],
+.tc-modal .tc-transparency-compact-v158 [data-tc-transparency-status],
+.tc-modal .tc-transparency-compact-v158 [data-tc-transparency-number],
+.tc-modal .tc-transparency-compact-v158 small,
+[data-theme-creator] .tc-transparency-compact-v158 [data-tc-transparency-output],
+[data-theme-creator] .tc-transparency-compact-v158 [data-tc-transparency-status],
+[data-theme-creator] .tc-transparency-compact-v158 [data-tc-transparency-number],
+[data-theme-creator] .tc-transparency-compact-v158 small {
+  display: none !important;
+}
+
+.tc-modal .tc-transparency-compact-v158 [data-tc-transparency],
+[data-theme-creator] .tc-transparency-compact-v158 [data-tc-transparency] {
+  display: block !important;
+  width: 100% !important;
+  height: 1.05rem !important;
+  margin: 0 !important;
+}
+
+/* Theme Creator v158 lightweight UI/theme separation end */
+
+/* Theme Creator v159 comments alias and transparency panel begin */
+
+/* Compact panel around the transparency slider, with no title/value clutter. */
+.tc-modal .tc-transparency-panel-v159,
+[data-theme-creator] .tc-transparency-panel-v159 {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  display: block !important;
+
+  margin: 0.45rem 0 0.65rem !important;
+  padding: 0.5rem 0.6rem !important;
+
+  border: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  border-radius: 10px !important;
+  background: var(--tc-ui-panel-v158, #121625) !important;
+  background-color: var(--tc-ui-panel-v158, #121625) !important;
+  background-image: none !important;
+}
+
+.tc-modal .tc-hidden-v159,
+[data-theme-creator] .tc-hidden-v159,
+.tc-modal .tc-transparency-panel-v159 [data-tc-transparency-output],
+.tc-modal .tc-transparency-panel-v159 [data-tc-transparency-status],
+.tc-modal .tc-transparency-panel-v159 [data-tc-transparency-number],
+.tc-modal .tc-transparency-panel-v159 small,
+[data-theme-creator] .tc-transparency-panel-v159 [data-tc-transparency-output],
+[data-theme-creator] .tc-transparency-panel-v159 [data-tc-transparency-status],
+[data-theme-creator] .tc-transparency-panel-v159 [data-tc-transparency-number],
+[data-theme-creator] .tc-transparency-panel-v159 small {
+  display: none !important;
+}
+
+.tc-modal .tc-transparency-panel-v159 [data-tc-transparency],
+[data-theme-creator] .tc-transparency-panel-v159 [data-tc-transparency] {
+  display: block !important;
+  width: 100% !important;
+  height: 1.05rem !important;
+  margin: 0 !important;
+}
+
+/* Theme Creator v159 comments alias and transparency panel end */
+
+/* Theme Creator v160 explicit transparency panel begin */
+
+.tc-modal .tc-transparency-panel-v160,
+[data-theme-creator] .tc-transparency-panel-v160 {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: block !important;
+
+  margin: 0.55rem 0 0.75rem !important;
+  padding: 0.55rem 0.65rem !important;
+
+  border: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  border-radius: 10px !important;
+
+  background: var(--tc-ui-panel-v158, #121625) !important;
+  background-color: var(--tc-ui-panel-v158, #121625) !important;
+  background-image: none !important;
+}
+
+.tc-modal .tc-transparency-panel-v160 [data-tc-transparency],
+[data-theme-creator] .tc-transparency-panel-v160 [data-tc-transparency],
+.tc-modal .tc-transparency-slider-v160,
+[data-theme-creator] .tc-transparency-slider-v160 {
+  display: block !important;
+  width: 100% !important;
+  height: 1.05rem !important;
+  margin: 0 !important;
+}
+
+.tc-modal .tc-transparency-hidden-v160,
+[data-theme-creator] .tc-transparency-hidden-v160 {
+  display: none !important;
+}
+
+/* Keep old compact classes from interfering with the new explicit panel. */
+.tc-modal .tc-transparency-panel-v160.tc-transparency-compact-v158,
+.tc-modal .tc-transparency-panel-v160.tc-transparency-panel-v159,
+[data-theme-creator] .tc-transparency-panel-v160.tc-transparency-compact-v158,
+[data-theme-creator] .tc-transparency-panel-v160.tc-transparency-panel-v159 {
+  display: block !important;
+}
+
+/* Theme Creator v160 explicit transparency panel end */
+
+/* Theme Creator v161 transparency header begin */
+
+/*
+   Transparency panel now uses the same visual language as the colour
+   selector section headers, such as Core/Syntax/Tabs.
+*/
+
+.tc-modal .tc-transparency-panel-with-heading-v161,
+[data-theme-creator] .tc-transparency-panel-with-heading-v161 {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0.45rem !important;
+
+  margin: 0.55rem 0 0.75rem !important;
+  padding: 0.55rem 0.6rem 0.6rem !important;
+
+  border: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  border-radius: 10px !important;
+
+  background: var(--tc-ui-panel-v158, #121625) !important;
+  background-color: var(--tc-ui-panel-v158, #121625) !important;
+  background-image: none !important;
+}
+
+/* Copy the compact section-header style used by the colour selector headers. */
+.tc-modal .tc-transparency-heading-v161,
+[data-theme-creator] .tc-transparency-heading-v161 {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+
+  margin: 0 0 0.1rem !important;
+  padding: 0 !important;
+
+  color: color-mix(
+    in srgb,
+    var(--tc-ui-text-v158, #cdd6f4) 80%,
+    var(--tc-ui-accent-v158, #89b4fa) 20%
+  ) !important;
+
+  font-size: 0.68rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.07em !important;
+  line-height: 1.15 !important;
+  text-transform: uppercase !important;
+
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.tc-modal .tc-transparency-heading-v161::after,
+[data-theme-creator] .tc-transparency-heading-v161::after {
+  content: "" !important;
+  flex: 1 1 auto !important;
+  height: 1px !important;
+  background: color-mix(
+    in srgb,
+    var(--tc-ui-border-v158, #30364f) 72%,
+    transparent
+  ) !important;
+}
+
+.tc-modal .tc-transparency-slider-with-heading-v161,
+[data-theme-creator] .tc-transparency-slider-with-heading-v161 {
+  display: block !important;
+  width: 100% !important;
+  height: 1.05rem !important;
+  margin: 0 !important;
+}
+
+/* Keep old title/value/status elements hidden. The new heading is inside the panel. */
+.tc-modal .tc-transparency-panel-with-heading-v161 [data-tc-transparency-output],
+.tc-modal .tc-transparency-panel-with-heading-v161 [data-tc-transparency-status],
+.tc-modal .tc-transparency-panel-with-heading-v161 [data-tc-transparency-number],
+.tc-modal .tc-transparency-panel-with-heading-v161 small,
+[data-theme-creator] .tc-transparency-panel-with-heading-v161 [data-tc-transparency-output],
+[data-theme-creator] .tc-transparency-panel-with-heading-v161 [data-tc-transparency-status],
+[data-theme-creator] .tc-transparency-panel-with-heading-v161 [data-tc-transparency-number],
+[data-theme-creator] .tc-transparency-panel-with-heading-v161 small {
+  display: none !important;
+}
+
+/* Theme Creator v161 transparency header end */
+
+/* Theme Creator v163 force taller colour selector begin */
+
+.tc-modal .tc-colour-selector-tall-v163,
+[data-theme-creator] .tc-colour-selector-tall-v163,
+.tc-modal .tc-colour-editor-shell-v152.tc-colour-selector-tall-v163,
+[data-theme-creator] .tc-colour-editor-shell-v152.tc-colour-selector-tall-v163 {
+  height: var(--tc-colour-selector-height-v163, 560px) !important;
+  max-height: var(--tc-colour-selector-height-v163, 560px) !important;
+  min-height: min(var(--tc-colour-selector-height-v163, 560px), 430px) !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable !important;
+}
+
+.tc-modal .tc-colour-column-tall-v163,
+[data-theme-creator] .tc-colour-column-tall-v163 {
+  max-height: calc(100vh - 5.5rem) !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Strong fallback in case inline style is blocked or the shell is recreated. */
+.tc-modal .tc-colour-editor-shell-v152,
+[data-theme-creator] .tc-colour-editor-shell-v152 {
+  height: var(--tc-colour-selector-height-v163, 560px) !important;
+  max-height: var(--tc-colour-selector-height-v163, 560px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Theme Creator v163 force taller colour selector end */
+
+/* Theme Creator v164 tighter colour/transparency gap begin */
+
+/* Tighten space after the colour selector viewport. */
+.tc-modal .tc-colour-editor-shell-v152,
+[data-theme-creator] .tc-colour-editor-shell-v152,
+.tc-modal .tc-colour-selector-tall-v163,
+[data-theme-creator] .tc-colour-selector-tall-v163 {
+  margin-bottom: 0.25rem !important;
+}
+
+/* Remove extra bottom padding inside the colour selector panel. */
+.tc-modal .tc-colour-editor-shell-v152 .tc-colour-editor-v146,
+[data-theme-creator] .tc-colour-editor-shell-v152 .tc-colour-editor-v146 {
+  padding-bottom: 0.25rem !important;
+}
+
+/* Pull the Transparency panel closer to the colour selector. */
+.tc-modal .tc-transparency-panel-v160,
+.tc-modal .tc-transparency-panel-with-heading-v161,
+[data-theme-creator] .tc-transparency-panel-v160,
+[data-theme-creator] .tc-transparency-panel-with-heading-v161 {
+  margin-top: 0.25rem !important;
+}
+
+/* Strong sibling rule for the actual rendered layout. */
+.tc-modal .tc-colour-editor-shell-v152 + .tc-transparency-panel-v160,
+.tc-modal .tc-colour-editor-shell-v152 + .tc-transparency-panel-with-heading-v161,
+[data-theme-creator] .tc-colour-editor-shell-v152 + .tc-transparency-panel-v160,
+[data-theme-creator] .tc-colour-editor-shell-v152 + .tc-transparency-panel-with-heading-v161 {
+  margin-top: 0.15rem !important;
+}
+
+/* Theme Creator v164 tighter colour/transparency gap end */
+
+/* Theme Creator v173 existing preview refinements begin */
+
+/* Close button inside existing preview tabs. */
+.tc-modal [data-tc-preview-area] .tc-preview-tab-with-close-v173,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-with-close-v173 {
+  gap: 0.35rem !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v173,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v173 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 0.95rem !important;
+  height: 0.95rem !important;
+  flex: 0 0 auto !important;
+
+  border-radius: 999px !important;
+  color: var(--tc-v173-tab-close, var(--tc-tab-inactive, #a6adc8)) !important;
+  background: color-mix(in srgb, var(--tc-v173-tab-close, #a6adc8) 13%, transparent) !important;
+
+  font-size: 0.68rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Existing preview gutters and line-number cells. */
+.tc-modal [data-tc-preview-area] .tc-v173-line-number-gutter,
+[data-theme-creator] [data-tc-preview-area] .tc-v173-line-number-gutter {
+  background-color: var(--tc-v173-line-number-bg, var(--tc-bg-alt, #181825)) !important;
+  color: var(--tc-v173-line-number-fg, var(--tc-fg-alt, #a6adc8)) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v173-line-number,
+[data-theme-creator] [data-tc-preview-area] .tc-v173-line-number {
+  color: var(--tc-v173-line-number-fg, var(--tc-fg-alt, #a6adc8)) !important;
+  background-color: var(--tc-v173-line-number-bg, var(--tc-bg-alt, #181825)) !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v173-line-number-current,
+[data-theme-creator] [data-tc-preview-area] .tc-v173-line-number-current {
+  color: var(--tc-v173-current-line-number-fg, var(--tc-fg, #cdd6f4)) !important;
+  background-color: var(--tc-v173-current-line-number-bg, var(--tc-hl-line, #252535)) !important;
+  font-weight: 800 !important;
+}
+
+/* Org emacs-lisp source block delimiters and source lines. */
+.tc-modal [data-tc-preview-area] .tc-v173-org-src-delim,
+[data-theme-creator] [data-tc-preview-area] .tc-v173-org-src-delim {
+  display: inline-block !important;
+  color: var(--tc-v173-org-block-meta, var(--tc-comments, #6c7086)) !important;
+  background-color: var(--tc-v173-org-block-bg, var(--tc-bg-alt, #181825)) !important;
+  border-radius: 4px !important;
+  padding: 0 0.25rem !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v173-org-src-code,
+[data-theme-creator] [data-tc-preview-area] .tc-v173-org-src-code {
+  display: inline-block !important;
+  background-color: var(--tc-v173-org-block-bg, var(--tc-bg-alt, #181825)) !important;
+  border-radius: 4px !important;
+  padding: 0 0.25rem !important;
+}
+
+/* Theme Creator v173 existing preview refinements end */
+
+/* Theme Creator v177 visible Org preview rows begin */
+
+.tc-modal [data-tc-preview-area] .tc-v177-org-block-delim,
+[data-theme-creator] [data-tc-preview-area] .tc-v177-org-block-delim {
+  display: inline-block !important;
+  color: var(--tc-v173-org-block-meta, var(--tc-comments, #6c7086)) !important;
+  background-color: var(--tc-v173-org-block-bg, var(--tc-bg-alt, #181825)) !important;
+  border-radius: 4px !important;
+  padding: 0 0.25rem !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v177-org-elisp-line,
+[data-theme-creator] [data-tc-preview-area] .tc-v177-org-elisp-line {
+  display: inline-block !important;
+  background-color: var(--tc-v173-org-block-bg, var(--tc-bg-alt, #181825)) !important;
+  border-radius: 4px !important;
+  padding: 0 0.25rem !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v177-org-heading,
+[data-theme-creator] [data-tc-preview-area] .tc-v177-org-heading {
+  font-weight: 800 !important;
+}
+
+/* Theme Creator v177 visible Org preview rows end */
+
+/* Theme Creator v183 Org modified match and bgAlt sync begin */
+
+.tc-modal [data-tc-preview-area].tc-v183-org-buffer-preview,
+[data-theme-creator] [data-tc-preview-area].tc-v183-org-buffer-preview {
+  --tc-v183-org-block-bg: color-mix(in srgb, var(--tc-v183-bg-alt, #181825) 88%, var(--tc-v183-bg, #11111b) 12%);
+  --tc-v183-org-block-border: color-mix(in srgb, var(--tc-v183-accent, #89b4fa) 42%, transparent);
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-property code,
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-file-title code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-property code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-file-title code {
+  color: var(--tc-v183-comment, #6c7086) !important;
+  font-style: italic !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-property-key,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-property-key {
+  color: var(--tc-v183-comment, #6c7086) !important;
+  font-weight: 750 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-file-title .tc-v183-org-property-value,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-file-title .tc-v183-org-property-value {
+  color: var(--tc-v183-fg, #cdd6f4) !important;
+  font-weight: 850 !important;
+  font-style: normal !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-stars,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-stars {
+  color: var(--tc-v183-comment, #6c7086) !important;
+  font-weight: 750 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-heading,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-heading {
+  color: var(--tc-v183-accent, #89b4fa) !important;
+  font-weight: 850 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-heading-1 code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-heading-1 code {
+  font-size: 1.16em !important;
+  font-weight: 850 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-heading-2 code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-heading-2 code {
+  font-size: 1.06em !important;
+  font-weight: 800 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-bullet,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-bullet {
+  color: var(--tc-v183-comment, #6c7086) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-toc-link,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-toc-link {
+  color: var(--tc-v183-function, var(--tc-v183-accent, #89b4fa)) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.16em !important;
+  cursor: default !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-prose,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-prose {
+  color: var(--tc-v183-fg, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-src-begin,
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-src-code,
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-src-end,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-src-begin,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-src-code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-src-end {
+  background-color: var(--tc-v183-bg-alt, #181825) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-src-begin code,
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-src-code code,
+.tc-modal [data-tc-preview-area] .tc-v183-org-row-src-end code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-src-begin code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-src-code code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-row-src-end code {
+  background-color: var(--tc-v183-bg-alt, #181825) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-delim,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-delim {
+  color: var(--tc-v183-comment, #6c7086) !important;
+  background-color: var(--tc-v183-bg-alt, #181825) !important;
+  font-style: italic !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code {
+  display: inline-block !important;
+  min-width: 100% !important;
+  padding-left: 0.55rem !important;
+  border-left: 2px solid var(--tc-v183-accent, #89b4fa) !important;
+  background-color: var(--tc-v183-bg-alt, #181825) !important;
+  color: var(--tc-v183-fg, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-comment,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-comment {
+  color: var(--tc-v183-comment, #6c7086) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-keyword,
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-builtin,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-keyword,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-builtin {
+  color: var(--tc-v183-keyword, #cba6f7) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-function,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-function {
+  color: var(--tc-v183-function, #89b4fa) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-variable,
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-constant,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-variable,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-constant {
+  color: var(--tc-v183-variable, #f38ba8) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-string,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-org-src-code .tc-tok-string {
+  color: var(--tc-v183-string, #a6e3a1) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-modified-window-row,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-modified-window-row {
+  border-left: 2px solid color-mix(in srgb, var(--tc-v183-tab-modified, #f9e2af) 58%, transparent) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v183-modified-changed-row,
+[data-theme-creator] [data-tc-preview-area] .tc-v183-modified-changed-row {
+  background-color: color-mix(in srgb, var(--tc-v183-tab-modified, #f9e2af) 9%, transparent) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tab-modified-v183,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-modified-v183 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 0.25rem !important;
+  color: var(--tc-v183-tab-modified, var(--tc-v183-accent, #89b4fa)) !important;
+  font-size: 0.68rem !important;
+  line-height: 1 !important;
+}
+
+/* Theme Creator v183 Org modified match and bgAlt sync end */
+
+/* Theme Creator v184 Doom match preview polish begin */
+
+/* Doom-like gap between gutter/line numbers and code. */
+.tc-modal [data-tc-preview-area].tc-v184-doom-match-preview .tc-v184-code-gap,
+[data-theme-creator] [data-tc-preview-area].tc-v184-doom-match-preview .tc-v184-code-gap {
+  display: inline-block !important;
+  padding-left: 0.72rem !important;
+}
+
+/* Keep source block rows aligned after adding the gutter/code gap. */
+.tc-modal [data-tc-preview-area].tc-v184-doom-match-preview .tc-v183-org-src-code,
+[data-theme-creator] [data-tc-preview-area].tc-v184-doom-match-preview .tc-v183-org-src-code {
+  padding-left: 0.72rem !important;
+}
+
+/* Preview tabs: Theme Creator top border, Doom-like body. */
+.tc-modal [data-tc-preview-area] .tc-preview-tabs,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tabs {
+  background: var(--tc-v184-tab-bar, var(--tc-tab-bar, #181825)) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--tc-v184-fg-alt, #a6adc8) 24%, transparent) !important;
+  min-height: 1.92rem !important;
+  align-items: end !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab {
+  box-sizing: border-box !important;
+  min-height: 1.78rem !important;
+  height: 1.78rem !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.34rem !important;
+
+  margin: 0 !important;
+  padding: 0.25rem 0.48rem 0.22rem !important;
+
+  border: 0 !important;
+  border-top: 3px solid transparent !important;
+  border-radius: 0 !important;
+
+  background: var(--tc-v184-tab-inactive-bg, #181825) !important;
+  color: var(--tc-v184-tab-inactive-fg, #a6adc8) !important;
+
+  font-size: 0.72rem !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab.is-active,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab[aria-selected="true"],
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab.is-active,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab[aria-selected="true"] {
+  border-top-color: var(--tc-v184-tab-indicator, #89b4fa) !important;
+  background: var(--tc-v184-tab-active-bg, #11111b) !important;
+  color: var(--tc-v184-tab-active-fg, #cdd6f4) !important;
+  font-weight: 700 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v184,
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v173,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v184,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v173 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 0.88rem !important;
+  height: 0.88rem !important;
+  flex: 0 0 auto !important;
+
+  border-radius: 999px !important;
+  color: var(--tc-v184-tab-close, #a6adc8) !important;
+  background: color-mix(in srgb, var(--tc-v184-tab-close, #a6adc8) 13%, transparent) !important;
+
+  font-size: 0.62rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tab-modified-v183,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-modified-v183 {
+  color: var(--tc-v184-tab-modified, #f9e2af) !important;
+}
+
+/* Compact property coverage panel. */
+.tc-modal [data-tc-preview-area] .tc-v184-coverage,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-coverage {
+  box-sizing: border-box !important;
+  margin: 0.65rem 0 0 !important;
+  padding: 0.55rem !important;
+
+  border-top: 1px solid color-mix(in srgb, var(--tc-v184-fg-alt, #a6adc8) 28%, transparent) !important;
+  background: color-mix(in srgb, var(--tc-v184-bg, #11111b) 88%, transparent) !important;
+  color: var(--tc-v184-fg, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-coverage-title,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-coverage-title {
+  margin: 0 0 0.45rem !important;
+  color: var(--tc-v184-fg-alt, #a6adc8) !important;
+  font-size: 0.68rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-coverage-grid,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-coverage-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 0.42rem !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-card,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-card {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  min-height: 3.1rem !important;
+
+  display: grid !important;
+  align-content: start !important;
+  gap: 0.22rem !important;
+
+  padding: 0.42rem !important;
+  border: 1px solid color-mix(in srgb, var(--tc-v184-fg-alt, #a6adc8) 22%, transparent) !important;
+  border-radius: 7px !important;
+
+  background: var(--tc-v184-bg-alt, #181825) !important;
+  color: var(--tc-v184-fg, #cdd6f4) !important;
+
+  font-size: 0.66rem !important;
+  line-height: 1.25 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-card strong,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-card strong {
+  color: var(--tc-v184-accent, #89b4fa) !important;
+  font-weight: 850 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-selection,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-selection {
+  background: var(--tc-v184-region, #313244) !important;
+  color: var(--tc-v184-selection-fg, #ffffff) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-current-line,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-current-line {
+  background: var(--tc-v184-hl-line, #252535) !important;
+  color: var(--tc-v184-hl-line-fg, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-comment,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-comment {
+  color: var(--tc-v184-comment, #6c7086) !important;
+  font-style: italic !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-keyword,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-keyword {
+  color: var(--tc-v184-keyword, #cba6f7) !important;
+  font-weight: 750 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-function,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-function {
+  color: var(--tc-v184-function, #89b4fa) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-variable,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-variable {
+  color: var(--tc-v184-variable, #f38ba8) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-string,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-string {
+  color: var(--tc-v184-string, #a6e3a1) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-tabs-demo,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-tabs-demo {
+  background: var(--tc-v184-tab-bar, #181825) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-tab,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-tab {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  padding: 0.25rem 0.35rem !important;
+  border-top: 2px solid transparent !important;
+  background: var(--tc-v184-tab-inactive-bg, #181825) !important;
+  color: var(--tc-v184-tab-inactive-fg, #a6adc8) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-tab.is-active,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-tab.is-active {
+  border-top-color: var(--tc-v184-tab-indicator, #89b4fa) !important;
+  background: var(--tc-v184-tab-active-bg, #11111b) !important;
+  color: var(--tc-v184-tab-active-fg, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-tab.is-modified em,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-tab.is-modified em {
+  color: var(--tc-v184-tab-modified, #f9e2af) !important;
+  font-style: normal !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-tab b,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-tab b {
+  color: var(--tc-v184-tab-close, #a6adc8) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-modeline-active,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-modeline-active {
+  display: block !important;
+  padding: 0.2rem 0.32rem !important;
+  background: var(--tc-v184-modeline-bg, #181825) !important;
+  color: var(--tc-v184-modeline-fg, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-modeline-inactive,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-modeline-inactive {
+  display: block !important;
+  padding: 0.2rem 0.32rem !important;
+  background: var(--tc-v184-inactive-modeline-bg, #11111b) !important;
+  color: var(--tc-v184-inactive-modeline-fg, #a6adc8) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-added,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-added {
+  color: var(--tc-v184-added, #a6e3a1) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-changed,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-changed {
+  color: var(--tc-v184-changed, #f9e2af) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-removed,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-removed {
+  color: var(--tc-v184-removed, #f38ba8) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-gutter-demo,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-gutter-demo {
+  background: var(--tc-v184-bg, #11111b) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-gutter-demo span,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-gutter-demo span {
+  display: grid !important;
+  grid-template-columns: 2.1rem minmax(0, 1fr) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-gutter-demo b,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-gutter-demo b {
+  padding-right: 0.55rem !important;
+  text-align: right !important;
+  color: var(--tc-v184-line-number-fg, #a6adc8) !important;
+  background: var(--tc-v184-line-number-bg, #181825) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-gutter-demo code,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-gutter-demo code {
+  padding-left: 0.72rem !important;
+  color: var(--tc-v184-fg, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-gutter-demo .is-current b,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-gutter-demo .is-current b {
+  color: var(--tc-v184-current-line-number-fg, #cdd6f4) !important;
+  background: var(--tc-v184-current-line-number-bg, #252535) !important;
+}
+
+@media (max-width: 1100px) {
+  .tc-modal [data-tc-preview-area] .tc-v184-coverage-grid,
+  [data-theme-creator] [data-tc-preview-area] .tc-v184-coverage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Theme Creator v184 Doom match preview polish end */
+
+/* Theme Creator v187 preview cleanup no minimap begin */
+
+/* Remove the unwanted v186 minimap/right column. */
+.tc-modal [data-tc-preview-area] .tc-v186-minimap,
+.tc-modal [data-tc-preview-area] [data-tc-v186-minimap],
+[data-theme-creator] [data-tc-preview-area] .tc-v186-minimap,
+[data-theme-creator] [data-tc-preview-area] [data-tc-v186-minimap] {
+  display: none !important;
+}
+
+/* Remove the v185 fake dashboard overlay. */
+.tc-modal [data-tc-preview-area] .tc-v185-dashboard-preview,
+.tc-modal [data-tc-preview-area] [data-tc-v185-dashboard-preview],
+[data-theme-creator] [data-tc-preview-area] .tc-v185-dashboard-preview,
+[data-theme-creator] [data-tc-preview-area] [data-tc-v185-dashboard-preview] {
+  display: none !important;
+}
+
+/* Hide non-interactive Original / Modified labels. */
+.tc-modal [data-tc-preview-area] .tc-v187-hidden-original-modified-label,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-hidden-original-modified-label {
+  display: none !important;
+}
+
+/* Selection inside preview code blocks uses the Theme Creator selection colours. */
+.tc-modal [data-tc-preview-area] code::selection,
+.tc-modal [data-tc-preview-area] code *::selection,
+.tc-modal [data-tc-preview-area] pre::selection,
+.tc-modal [data-tc-preview-area] pre *::selection,
+[data-theme-creator] [data-tc-preview-area] code::selection,
+[data-theme-creator] [data-tc-preview-area] code *::selection,
+[data-theme-creator] [data-tc-preview-area] pre::selection,
+[data-theme-creator] [data-tc-preview-area] pre *::selection {
+  background: var(--tc-v187-region, var(--tc-region, #313244)) !important;
+  color: var(--tc-v187-selection-fg, var(--tc-selection-fg, #ffffff)) !important;
+}
+
+.tc-modal [data-tc-preview-area] code::-moz-selection,
+.tc-modal [data-tc-preview-area] code *::-moz-selection,
+.tc-modal [data-tc-preview-area] pre::-moz-selection,
+.tc-modal [data-tc-preview-area] pre *::-moz-selection,
+[data-theme-creator] [data-tc-preview-area] code::-moz-selection,
+[data-theme-creator] [data-tc-preview-area] code *::-moz-selection,
+[data-theme-creator] [data-tc-preview-area] pre::-moz-selection,
+[data-theme-creator] [data-tc-preview-area] pre *::-moz-selection {
+  background: var(--tc-v187-region, var(--tc-region, #313244)) !important;
+  color: var(--tc-v187-selection-fg, var(--tc-selection-fg, #ffffff)) !important;
+}
+
+/* Hide every old close icon/modified dot. v187 leaves one close icon. */
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v173,
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v184,
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v185,
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v186,
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab-modified-v182],
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab-modified-v183],
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab-modified-v184],
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab-modified-v186],
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v173,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v184,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v185,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v186,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab-modified-v182],
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab-modified-v183],
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab-modified-v184],
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab-modified-v186] {
+  display: none !important;
+}
+
+/*
+   Correct tab colour mapping:
+   - Tab Bar Background colours the strip only.
+   - Tab Indicator colours the active top border.
+   - Active Tab Background colours the active tab body.
+   - Inactive Tab Background colours inactive tab bodies.
+*/
+.tc-modal [data-tc-preview-area] .tc-preview-tabs,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tabs {
+  background: var(--tc-v187-tab-bar, #181825) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--tc-v187-fg-alt, #a6adc8) 24%, transparent) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab {
+  border-top: 3px solid transparent !important;
+  background: var(--tc-v187-tab-inactive-bg, #181825) !important;
+  color: var(--tc-v187-tab-inactive-fg, #a6adc8) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab.is-active,
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab[aria-selected="true"],
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab.is-active,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab[aria-selected="true"],
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab.is-active,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab[aria-selected="true"],
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab.is-active,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab[aria-selected="true"] {
+  border-top-color: var(--tc-v187-tab-indicator, var(--tc-v187-accent, #89b4fa)) !important;
+  background: var(--tc-v187-tab-active-bg, #11111b) !important;
+  color: var(--tc-v187-tab-active-fg, #cdd6f4) !important;
+  font-weight: 700 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v187,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v187 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 0.88rem !important;
+  height: 0.88rem !important;
+  flex: 0 0 auto !important;
+  margin-left: 0.18rem !important;
+
+  border-radius: 999px !important;
+  color: var(--tc-v187-tab-close, #a6adc8) !important;
+  background: color-mix(in srgb, var(--tc-v187-tab-close, #a6adc8) 13%, transparent) !important;
+
+  font-size: 0.62rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Theme Creator v187 preview cleanup no minimap end */
+
+/* Theme Creator v188 tabs fill tab bar height begin */
+
+/*
+   Make preview tabs fill the full height of the tab bar.
+
+   Keep:
+   - Tab Bar Background on the strip
+   - Tab Indicator on the active top border
+   - Active/Inactive Tab Background on tab bodies
+*/
+
+.tc-modal [data-tc-preview-area] .tc-preview-top,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-top {
+  align-items: stretch !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tabs,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tabs {
+  box-sizing: border-box !important;
+
+  display: flex !important;
+  align-items: stretch !important;
+
+  min-height: 2.08rem !important;
+  height: 2.08rem !important;
+
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  background: var(--tc-v187-tab-bar, var(--tc-v186-tab-bar, var(--tc-v184-tab-bar, #181825))) !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab],
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab],
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab {
+  box-sizing: border-box !important;
+
+  align-self: stretch !important;
+  height: 100% !important;
+  min-height: 100% !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0.52rem !important;
+  padding-right: 0.44rem !important;
+
+  border-top-width: 3px !important;
+  border-bottom-width: 0 !important;
+  border-radius: 0 !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab].is-active,
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab][aria-selected="true"],
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab.is-active,
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab[aria-selected="true"],
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab.is-active,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab[aria-selected="true"],
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab].is-active,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab][aria-selected="true"],
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab.is-active,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab[aria-selected="true"],
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab.is-active,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab[aria-selected="true"] {
+  border-top-color: var(--tc-v187-tab-indicator, var(--tc-v186-tab-indicator, var(--tc-v184-tab-indicator, var(--tc-v187-accent, #89b4fa)))) !important;
+  background: var(--tc-v187-tab-active-bg, var(--tc-v186-tab-active-bg, var(--tc-v184-tab-active-bg, #11111b))) !important;
+  color: var(--tc-v187-tab-active-fg, var(--tc-v186-tab-active-fg, var(--tc-v184-tab-active-fg, #cdd6f4))) !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab]:not(.is-active):not([aria-selected="true"]),
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab:not(.is-active):not([aria-selected="true"]),
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab:not(.is-active):not([aria-selected="true"]),
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab]:not(.is-active):not([aria-selected="true"]),
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab:not(.is-active):not([aria-selected="true"]),
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab:not(.is-active):not([aria-selected="true"]) {
+  background: var(--tc-v187-tab-inactive-bg, var(--tc-v186-tab-inactive-bg, var(--tc-v184-tab-inactive-bg, #181825))) !important;
+  color: var(--tc-v187-tab-inactive-fg, var(--tc-v186-tab-inactive-fg, var(--tc-v184-tab-inactive-fg, #a6adc8))) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v187,
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v186,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v187,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v186 {
+  align-self: center !important;
+}
+
+/* Keep the arrow buttons visually aligned with the filled tab bar. */
+.tc-modal [data-tc-preview-area] .tc-centaur-nav,
+[data-theme-creator] [data-tc-preview-area] .tc-centaur-nav {
+  align-self: stretch !important;
+  min-height: 2.08rem !important;
+  height: 2.08rem !important;
+}
+
+/* Theme Creator v188 tabs fill tab bar height end */
+
+/* Theme Creator v189 tab descender fix begin */
+
+/*
+   v188 made the tabs fill the bar, but the text box became too tight.
+   This restores a little vertical breathing room so descenders
+   (p, j, g, y, q) render fully.
+*/
+
+.tc-modal [data-tc-preview-area] .tc-preview-tabs,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tabs {
+  min-height: 2.18rem !important;
+  height: 2.18rem !important;
+  overflow: visible !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab],
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab],
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab {
+  min-height: 100% !important;
+  height: 100% !important;
+
+  /* Small vertical breathing room without breaking the “fills bar” look */
+  padding-top: 1px !important;
+  padding-bottom: 2px !important;
+
+  line-height: 1.18 !important;
+  overflow: visible !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-label,
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-label,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-label,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-label,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-label,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1.18 !important;
+  overflow: visible !important;
+  padding-bottom: 1px !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-icon,
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-icon,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-icon,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-icon,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-icon,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-icon {
+  line-height: 1 !important;
+  align-self: center !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-centaur-nav,
+[data-theme-creator] [data-tc-preview-area] .tc-centaur-nav {
+  min-height: 2.18rem !important;
+  height: 2.18rem !important;
+}
+
+/* Theme Creator v189 tab descender fix end */
+
+/* Theme Creator v190 prevent preview tab wrapping begin */
+
+/*
+   Keep all preview tabs on one row.
+
+   v189 fixed descenders by increasing vertical room, but some tabs wrapped
+   onto a second line.  This keeps the tab strip single-line and lets labels
+   compress with ellipsis.
+*/
+
+.tc-modal [data-tc-preview-area] .tc-preview-top,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-top {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tabs,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tabs {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab],
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab],
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  max-width: 8.6rem !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+
+  gap: 0.28rem !important;
+  padding-left: 0.46rem !important;
+  padding-right: 0.36rem !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-label,
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-label,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-label,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-label,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-label,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-label {
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  display: inline-block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  line-height: 1.18 !important;
+  padding-bottom: 1px !important;
+}
+
+.tc-modal [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-icon,
+.tc-modal [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-icon,
+.tc-modal [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-icon,
+[data-theme-creator] [data-tc-preview-area] [data-tc-preview-tab] .tc-tab-icon,
+[data-theme-creator] [data-tc-preview-area] .tc-v187-preview-tab .tc-tab-icon,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-doom-tab .tc-tab-icon {
+  flex: 0 0 auto !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v187,
+.tc-modal [data-tc-preview-area] .tc-preview-tab-close-v186,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v187,
+[data-theme-creator] [data-tc-preview-area] .tc-preview-tab-close-v186 {
+  flex: 0 0 auto !important;
+  margin-left: 0.12rem !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-centaur-nav,
+[data-theme-creator] [data-tc-preview-area] .tc-centaur-nav {
+  flex: 0 0 2rem !important;
+  min-width: 2rem !important;
+  max-width: 2rem !important;
+}
+
+/* Theme Creator v190 prevent preview tab wrapping end */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Theme Creator v218 UI styles begin */
+
+/* One colour-properties panel. Category titles are rows inside this panel. */
+.tc-colour-grid,
+.tc-colour-grid-v218 {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: auto !important;
+  gap: .55rem !important;
+  padding: .7rem !important;
+  overflow: hidden !important;
+  border: 1px solid var(--tc-border, rgba(255,255,255,.10)) !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--tc-panel-bg, #181825) 88%, transparent) !important;
+}
+
+.tc-colour-category-title-v218 {
+  grid-column: 1 / -1 !important;
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  margin: .55rem 0 .05rem !important;
+  padding: .45rem .1rem .15rem !important;
+  border-top: 1px solid var(--tc-border, rgba(255,255,255,.10)) !important;
+  font-size: .76rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .08em !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+  color: var(--tc-muted, #a6adc8) !important;
+}
+
+.tc-colour-category-title-v218:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+.tc-colour-card-v218 {
+  position: relative !important;
+  z-index: auto !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 3.15rem !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 2.85rem !important;
+  grid-template-areas:
+    "label swatch"
+    "hex swatch" !important;
+  gap: .12rem .55rem !important;
+  align-items: center !important;
+  padding: .52rem .58rem !important;
+  border: 1px solid var(--tc-border, rgba(255,255,255,.10)) !important;
+  border-radius: 10px !important;
+  background: color-mix(in srgb, var(--tc-bg, #11111b) 82%, transparent) !important;
+  overflow: hidden !important;
+}
+
+.tc-colour-label-v218 {
+  grid-area: label !important;
+  min-width: 0 !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.12 !important;
+  font-size: .8rem !important;
+}
+
+.tc-colour-hex-v218 {
+  grid-area: hex !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  font-size: .68rem !important;
+  color: var(--tc-muted, #a6adc8) !important;
+}
+
+.tc-colour-card-v218 input[type="color"] {
+  grid-area: swatch !important;
+  position: relative !important;
+  display: block !important;
+  width: 2.6rem !important;
+  min-width: 2.6rem !important;
+  height: 2.35rem !important;
+  min-height: 2.35rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: .5rem !important;
+  background: transparent !important;
+  cursor: pointer !important;
+}
+
+/* Transparency: label + slider + swatch only. The fill's opacity is set by JS. */
+.tc-transparency-row-v218 {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  grid-template-areas: "label slider swatch" !important;
+  align-items: center !important;
+  gap: .42rem !important;
+  min-height: 0 !important;
+  padding: .42rem .55rem !important;
+  overflow: hidden !important;
+}
+
+.tc-transparency-label-v218 {
+  grid-area: label !important;
+  min-width: max-content !important;
+}
+
+.tc-transparency-row-v218 [data-tc-transparency] {
+  grid-area: slider !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+.tc-transparency-row-v218 output,
+.tc-transparency-row-v218 small,
+.tc-transparency-row-v218 [data-tc-transparency-output],
+.tc-transparency-row-v218 [data-tc-transparency-number],
+.tc-transparency-row-v218 [data-tc-transparency-status],
+[data-tc-transparency-output],
+[data-tc-transparency-number],
+[data-tc-transparency-status] {
+  display: none !important;
+}
+
+.tc-transparency-swatch-v218 {
+  grid-area: swatch !important;
+  position: relative !important;
+  display: inline-block !important;
+  width: 2.25rem !important;
+  height: 1.28rem !important;
+  min-width: 2.25rem !important;
+  border-radius: .42rem !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(45deg, rgba(255,255,255,.30) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,.30) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,.30) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.30) 75%),
+    #313244 !important;
+  background-size: .5rem .5rem !important;
+  background-position: 0 0, 0 .25rem, .25rem -.25rem, -.25rem 0 !important;
+}
+
+.tc-transparency-swatch-fill-v218 {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  background-color: var(--tc-bg, #11111b);
+  opacity: 1;
+}
+
+/* Dashboard: one themed Doom Dashboard window only. */
+.tc-dashboard-single-window-v218 [data-tc-pane-left] {
+  display: none !important;
+}
+
+.tc-dashboard-single-parent-v218,
+.tc-dashboard-single-window-v218 .tc-comparison,
+.tc-dashboard-single-window-v218 .tc-preview-comparison,
+.tc-dashboard-single-window-v218 .tc-panes,
+.tc-dashboard-single-window-v218 .tc-code-panes {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+}
+
+.tc-dashboard-single-window-v218 [data-tc-pane-right] {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  background: var(--tc-dashboard-bg-v218, var(--tc-bg, #11111b)) !important;
+  color: var(--tc-dashboard-fg-v218, var(--tc-fg, #cdd6f4)) !important;
+  border-color: var(--tc-border, rgba(255,255,255,.12)) !important;
+}
+
+.tc-dashboard-single-window-v218 .tc-code-line {
+  background: var(--tc-dashboard-bg-v218, var(--tc-bg, #11111b)) !important;
+  color: var(--tc-dashboard-fg-v218, var(--tc-fg, #cdd6f4)) !important;
+}
+
+.tc-dashboard-single-window-v218 .tc-ln {
+  display: none !important;
+}
+
+.tc-dashboard-single-window-v218 code {
+  color: var(--tc-dashboard-fg-v218, var(--tc-fg, #cdd6f4)) !important;
+}
+
+.tc-dashboard-single-window-v218 .tc-current-line {
+  background: var(--tc-dashboard-bg-alt-v218, var(--tc-bg-alt, #181825)) !important;
+}
+
+/* Org preview: visually styled like Org, not literal raw markup. */
+.tc-org-heading-v218 {
+  display: inline-block !important;
+  font-weight: 800 !important;
+  color: var(--tc-keywords, #cba6f7) !important;
+}
+
+.tc-org-heading-level-1-v218 {
+  font-size: 1.38em !important;
+  color: var(--tc-accent, #89b4fa) !important;
+}
+
+.tc-org-heading-level-2-v218 {
+  font-size: 1.18em !important;
+  color: var(--tc-functions, #89b4fa) !important;
+}
+
+.tc-org-heading-level-3-v218 {
+  font-size: 1.06em !important;
+  color: var(--tc-keywords, #cba6f7) !important;
+}
+
+.tc-org-meta-key-v218 {
+  color: var(--tc-comments, #6c7086) !important;
+}
+
+.tc-org-meta-value-v218 {
+  color: var(--tc-fg-alt, #a6adc8) !important;
+}
+
+.tc-org-list-bullet-v218 {
+  color: var(--tc-accent, #89b4fa) !important;
+  font-weight: 800 !important;
+}
+
+.tc-org-link-v218 {
+  color: var(--tc-links, #74c7ec) !important;
+  text-decoration: underline !important;
+}
+
+.tc-org-src-header-v218 {
+  display: inline-block !important;
+  padding: .12rem .45rem !important;
+  border-radius: .45rem !important;
+  background: var(--tc-bg-alt, #181825) !important;
+  color: var(--tc-comments, #6c7086) !important;
+  font-size: .8em !important;
+  text-transform: uppercase !important;
+  letter-spacing: .04em !important;
+}
+
+.tc-org-src-line-v218 {
+  color: var(--tc-fg, #cdd6f4) !important;
+}
+
+.tc-org-prose-v218 {
+  color: var(--tc-fg-alt, #a6adc8) !important;
+}
+
+@media (max-width: 940px) {
+  .tc-colour-grid,
+  .tc-colour-grid-v218 {
+    grid-template-columns: 1fr !important;
+  }
+}
+/* Theme Creator v218 UI styles end */
+
+/* Theme Creator clean source layout begin */
+.tc-modal .tc-body {
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.tc-modal .tc-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding-bottom: 10px !important;
+  box-sizing: border-box !important;
+}
+
+.tc-modal .tc-sidebar > .tc-field,
+.tc-modal .tc-sidebar > .tc-transparency-row,
+.tc-modal .tc-sidebar > .tc-actions {
+  flex: 0 0 auto !important;
+}
+
+.tc-modal .tc-colour-grid {
+  flex: 1 1 auto !important;
+  min-height: 7rem !important;
+  max-height: none !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: max-content !important;
+  align-content: start !important;
+  gap: .65rem .75rem !important;
+  margin: 0 0 10px !important;
+  padding: .7rem !important;
+  border: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  border-radius: 14px !important;
+  background: var(--tc-ui-panel-v158, #121625) !important;
+}
+
+.tc-modal .tc-colour-category-title,
+.tc-modal .tc-colour-heading-v146,
+.tc-modal .tc-colour-heading-v211 {
+  grid-column: 1 / -1 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 20px 0 0 !important;
+  padding: .45rem .1rem .15rem !important;
+  border-top: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+  font-size: .76rem !important;
+  font-weight: 850 !important;
+  letter-spacing: .08em !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+}
+
+.tc-modal .tc-colour-category-title:first-child,
+.tc-modal .tc-colour-heading-v146:first-child,
+.tc-modal .tc-colour-heading-v211:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+.tc-modal .tc-colour-card,
+.tc-modal .tc-colour-card-v146,
+.tc-modal .tc-colour-card-v211 {
+  grid-column: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 3.05rem !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 2.7rem !important;
+  grid-template-areas: "meta swatch" !important;
+  align-items: center !important;
+  gap: .55rem !important;
+  padding: .52rem .58rem !important;
+  border: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  border-radius: 10px !important;
+  background: var(--tc-ui-panel-alt-v158, #171b2d) !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+  overflow: hidden !important;
+}
+
+.tc-modal .tc-colour-meta {
+  grid-area: meta !important;
+  min-width: 0 !important;
+  display: grid !important;
+  gap: .18rem !important;
+}
+
+.tc-modal .tc-colour-label,
+.tc-modal .tc-colour-label-v146,
+.tc-modal .tc-colour-hex,
+.tc-modal .tc-colour-hex-v146 {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+.tc-modal .tc-colour-label,
+.tc-modal .tc-colour-label-v146 {
+  font-size: .8rem !important;
+  line-height: 1.15 !important;
+}
+
+.tc-modal .tc-colour-hex,
+.tc-modal .tc-colour-hex-v146 {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  font-size: .68rem !important;
+  color: var(--tc-ui-muted-v158, #8b93ad) !important;
+}
+
+.tc-modal .tc-colour-card input[type="color"],
+.tc-modal .tc-colour-card-v146 input[type="color"],
+.tc-modal .tc-colour-card-v211 input[type="color"],
+.tc-modal .tc-colour-grid input[type="color"] {
+  grid-area: swatch !important;
+  justify-self: end !important;
+  align-self: center !important;
+  display: block !important;
+  width: 2.55rem !important;
+  min-width: 2.55rem !important;
+  max-width: 2.55rem !important;
+  height: 2.3rem !important;
+  min-height: 2.3rem !important;
+  max-height: 2.3rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  border-radius: .45rem !important;
+  background: transparent !important;
+  cursor: pointer !important;
+}
+
+.tc-modal .tc-transparency-row {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: .45rem !important;
+  margin: 0 0 10px !important;
+  padding: .58rem .65rem !important;
+  border: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  border-radius: 10px !important;
+  background: var(--tc-ui-panel-v158, #121625) !important;
+  overflow: hidden !important;
+}
+
+.tc-modal .tc-transparency-title {
+  display: block !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+  font-size: .76rem !important;
+  font-weight: 850 !important;
+  letter-spacing: .08em !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+}
+
+.tc-modal .tc-transparency-controls {
+  display: grid !important;
+  grid-template-columns: 85% 2.5rem !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.tc-modal .tc-transparency-controls [data-tc-transparency] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+.tc-modal .tc-transparency-swatch {
+  position: relative !important;
+  justify-self: end !important;
+  display: block !important;
+  width: 2.5rem !important;
+  min-width: 2.5rem !important;
+  height: 1.45rem !important;
+  border-radius: .42rem !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(45deg, rgba(255,255,255,.30) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,.30) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,.30) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.30) 75%),
+    #313244 !important;
+  background-size: .5rem .5rem !important;
+  background-position: 0 0, 0 .25rem, .25rem -.25rem, -.25rem 0 !important;
+}
+
+.tc-modal .tc-transparency-swatch-fill,
+.tc-modal .tc-transparency-swatch > i {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  background: #11111b;
+  opacity: 1;
+}
+
+.tc-modal .tc-actions {
+  flex: 0 0 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: .55rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding-top: 10px !important;
+  padding-bottom: 0 !important;
+  border-top: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+.tc-modal .tc-actions button {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-coverage,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-coverage {
+  border-top-color: var(--tc-ui-border-v158, #30364f) !important;
+  background: var(--tc-ui-panel-v158, #121625) !important;
+  background-color: var(--tc-ui-panel-v158, #121625) !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+}
+
+.tc-modal [data-tc-preview-area] .tc-v184-card,
+[data-theme-creator] [data-tc-preview-area] .tc-v184-card {
+  border-color: var(--tc-ui-border-v158, #30364f) !important;
+  background: var(--tc-ui-panel-alt-v158, #171b2d) !important;
+  background-color: var(--tc-ui-panel-alt-v158, #171b2d) !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+}
+
+/* Stable transparency row: older rules left named grid areas on the range
+   input, which could place the slider off-row. Reset them inside the source
+   transparency line only. */
+.tc-modal .tc-transparency-row,
+[data-theme-creator] .tc-transparency-row {
+  grid-template-areas: "title" "controls" !important;
+}
+
+.tc-modal .tc-transparency-title,
+[data-theme-creator] .tc-transparency-title {
+  grid-area: title !important;
+}
+
+.tc-modal .tc-transparency-controls,
+[data-theme-creator] .tc-transparency-controls {
+  grid-area: controls !important;
+}
+
+.tc-modal .tc-transparency-controls [data-tc-transparency],
+[data-theme-creator] .tc-transparency-controls [data-tc-transparency],
+.tc-modal .tc-transparency-controls [data-tc-transparency-swatch],
+[data-theme-creator] .tc-transparency-controls [data-tc-transparency-swatch] {
+  grid-area: auto !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Theme Creator clean source layout end */
+
+/* Theme Creator v246 targeted dashboard/slider fix */
+.tc-modal.tc-dashboard-single-window-v218 .tc-ab,
+.tc-modal.tc-dashboard-single-window-v218 .tc-pane,
+.tc-modal.tc-dashboard-single-window-v218 [data-tc-pane-right],
+.tc-modal.tc-dashboard-single-window-v218 [data-tc-pane-right].tc-code,
+.tc-modal.tc-dashboard-single-window-v218 .tc-dashboard-pre,
+.tc-modal.tc-dashboard-single-window-v218 .tc-dashboard-line {
+  background: var(--tc-dashboard-bg-v218, var(--tc-bg, #11111b)) !important;
+  background-color: var(--tc-dashboard-bg-v218, var(--tc-bg, #11111b)) !important;
+}
+
+.tc-modal.tc-dashboard-single-window-v218 .tc-pane,
+.tc-modal.tc-dashboard-single-window-v218 [data-tc-pane-right],
+.tc-modal.tc-dashboard-single-window-v218 [data-tc-pane-right].tc-code,
+.tc-modal.tc-dashboard-single-window-v218 .tc-dashboard-pre {
+  color: var(--tc-dashboard-fg-v218, var(--tc-fg, #cdd6f4)) !important;
+}
+
+.tc-modal.tc-dashboard-single-window-v218 .tc-current-line {
+  background: var(--tc-dashboard-bg-alt-v218, var(--tc-bg-alt, #181825)) !important;
+  background-color: var(--tc-dashboard-bg-alt-v218, var(--tc-bg-alt, #181825)) !important;
+}
+
+/* Theme Creator v247 stability/layout refinements begin */
+
+/* Category headings: text first, then a short rule continuing on the same line.
+   This removes the separate full-width line above each category. */
+.tc-modal .tc-colour-section-v146,
+.tc-modal .tc-colour-section-v211 {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: .65rem .75rem !important;
+  margin: 20px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.tc-modal .tc-colour-section-v146:first-child,
+.tc-modal .tc-colour-section-v211:first-child {
+  margin-top: 0 !important;
+}
+
+.tc-modal .tc-colour-section-grid-v211 {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: .65rem .75rem !important;
+}
+
+.tc-modal .tc-colour-category-title,
+.tc-modal .tc-colour-heading-v146,
+.tc-modal .tc-colour-heading-v211 {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: .55rem !important;
+  margin: 0 !important;
+  padding: 0 .1rem !important;
+  border-top: 0 !important;
+  color: var(--tc-ui-text-v158, #cdd6f4) !important;
+  font-size: .70rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .07em !important;
+  line-height: 1.15 !important;
+  text-transform: uppercase !important;
+}
+
+.tc-modal .tc-colour-category-title::after,
+.tc-modal .tc-colour-heading-v146::after,
+.tc-modal .tc-colour-heading-v211::after {
+  content: "" !important;
+  flex: 1 1 auto !important;
+  min-width: 1.5rem !important;
+  height: 1px !important;
+  border-top: 1px solid var(--tc-ui-border-v158, #30364f) !important;
+  background: transparent !important;
+  opacity: .95 !important;
+}
+
+/* Keep the bottom action row visibly inside the creator panel. */
+.tc-modal .tc-sidebar {
+  padding-bottom: 0 !important;
+}
+
+.tc-modal .tc-actions {
+  margin-bottom: 10px !important;
+  padding-bottom: 0 !important;
+  transform: none !important;
+}
+
+/* While the transparency slider moves, never hide the already-active
+   dashboard pane. The JS no longer rebuilds it on range input; this keeps the
+   active pane visibly stable during the drag. */
+.tc-modal.tc-dashboard-single-window-v218 [data-tc-pane-right] {
+  display: block !important;
+  visibility: visible !important;
+}
+
+.tc-modal.tc-dashboard-single-window-v218 [data-tc-pane-left] {
+  display: none !important;
+}
+
+/* Theme Creator v247 stability/layout refinements end */

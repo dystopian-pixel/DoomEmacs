@@ -131,6 +131,10 @@
   #fs-nav-right::before{transform:translate(-50%,-50%) rotate(135deg)}
 
   /* Toast */
+  #toast.error{
+    border-color: color-mix(in oklab,#ff6c6b 70%,var(--border));
+    box-shadow: 0 14px 40px rgba(255,108,107,.25);
+  }
   #toast{
     position:fixed;top:14px;left:50%;transform:translate(-50%,-28px) scale(.98);
     opacity:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.06)),color-mix(in oklab,var(--bg-2) 85%,black 15%);
@@ -149,6 +153,7 @@
   @media (max-width:900px){.content{grid-template-columns:1fr;grid-template-rows:56vh 1fr}.grid-inner{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media (max-width:640px){.grid-inner{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
+  <link rel="stylesheet" href="./theme-creator.css?v=247">
 </head>
 <body>
 <div class="page">
@@ -156,8 +161,8 @@
     <h2 class="title">Doom Emacs Theme Gallery</h2>
     <div class="bar-actions">
       <input aria-label="Filter themes by name" id="filter-input" placeholder="Filter themes… (Esc to clear)" type="text"/>
-      <input id="theme-add-input" type="text" placeholder="Add theme name…"/>
-      <button class="toggle" id="theme-add-btn" title="Add theme">Add</button>
+      <input id="theme-add-input" type="text" placeholder="New theme name…"/>
+      <button class="toggle" id="theme-add-btn" title="Create a Doom theme">Create Theme</button>
       <button class="toggle" id="theme-scan-btn" title="Discover themes">Scan</button>
       <button class="toggle" id="toggle-theme" title="Switch gallery page to light mode"><span class="icon">☀️</span> <span class="label">Light</span></button>
       <input type="file" id="folder-picker" webkitdirectory multiple accept="image/*" style="display:none"/>
@@ -249,6 +254,43 @@
 
 <script>
 (function(){
+  /* Theme Creator v55 browser error reporter */
+  function reportThemeCreatorError(payload){
+    try{
+      const text = typeof payload === 'string'
+        ? payload
+        : JSON.stringify(payload, Object.getOwnPropertyNames(payload), 2);
+
+      fetch('/my-theme-creator-js-error/?payload=' + encodeURIComponent(String(text).slice(0, 6000)), {
+        cache: 'no-store'
+      }).catch(()=>{});
+    }catch(_){}
+  }
+
+  window.themeCreatorReportError = reportThemeCreatorError;
+
+  window.addEventListener('error', event => {
+    reportThemeCreatorError({
+      context: 'window.error',
+      message: event.message,
+      filename: event.filename,
+      line: event.lineno,
+      column: event.colno,
+      stack: event.error && event.error.stack,
+      version: window.themeCreatorScriptVersion || 'unknown'
+    });
+  });
+
+  window.addEventListener('unhandledrejection', event => {
+    const reason = event.reason;
+    reportThemeCreatorError({
+      context: 'unhandledrejection',
+      message: reason && (reason.message || String(reason)),
+      stack: reason && reason.stack,
+      version: window.themeCreatorScriptVersion || 'unknown'
+    });
+  });
+
   /* ===== Config ===== */
   let PREVIEWS_BASE = 'theme-previews/';
   { const u = new URL(location.href); const p = u.searchParams.get('previews'); if (p) PREVIEWS_BASE = p.endsWith('/')? p : (p+'/'); }
@@ -301,7 +343,52 @@
     /* Filter/Add/Scan */
     filterInput?.addEventListener('input', debounce(applyFilter, 80));
     filterInput?.addEventListener('keydown', e=>{ if(e.key==='Escape'){ filterInput.value=''; applyFilter(); }});
-    btnAdd?.addEventListener('click', ()=>{ const name=(addInput.value||'').trim(); if(!name) return toast('Enter a theme name','ℹ️'); addThemeTile(name, srcFor(name)); toast('Added: '+name,'➕'); });
+    const THEME_CREATOR_ASSET = 'theme-creator.js?v=247';
+
+    function themeCreatorReady(){
+      return typeof window.themeCreatorOpen === 'function';
+    }
+
+    function loadThemeCreatorScript(){
+      return new Promise(resolve => {
+        if(themeCreatorReady()) return resolve(true);
+
+        const script = document.createElement('script');
+        script.src = THEME_CREATOR_ASSET + '&retry=' + Date.now();
+        script.defer = true;
+        script.onload = () => resolve(themeCreatorReady());
+        script.onerror = () => resolve(false);
+        document.head.appendChild(script);
+      });
+    }
+
+    async function openThemeCreatorFromGallery(){
+      const name=(addInput.value||'').trim();
+
+      if(!name){
+        toast('Theme needs a name before it can be created.','⚠️','error');
+        return;
+      }
+
+      if(!themeCreatorReady()){
+        await loadThemeCreatorScript();
+      }
+
+      if(themeCreatorReady() && window.themeCreatorOpen(name)){
+        toast('Creating theme: '+name,'🎨');
+      } else {
+        const detail = window.themeCreatorLastError ? String(window.themeCreatorLastError).slice(0, 180) : 'themeCreatorOpen was not exposed';
+        toast('Theme Creator failed to load: '+detail,'⚠️','error');
+      }
+    }
+
+    btnAdd?.addEventListener('click', openThemeCreatorFromGallery);
+    addInput?.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){
+        e.preventDefault();
+        openThemeCreatorFromGallery();
+      }
+    });
     btnScan?.addEventListener('click', scanThemes);
 
     /* Folder picker */
@@ -369,10 +456,88 @@
       if(resetSel && themeFiles.length){ const first=themeFiles[0]; const name=String(first).replace(/\.(png|jpe?g|webp)$/i,''); const tile=$(`.theme-tile[data-theme="${CSS.escape(name)}"]`); selectTheme(name, PREVIEWS_BASE+first, tile); }
     }
 
+    async function fetchCurrentDoomTheme(){
+      const urls = [
+        '/my-theme-creator-status/',
+        '/my-theme-creator-status'
+      ];
+
+      for(const url of urls){
+        try{
+          const r = await fetch(url, {cache:'no-store'});
+          if(!r.ok) continue;
+          const text = await r.text();
+          const parsed = parseCurrentThemeStatus(text);
+          if(parsed) return parsed;
+        }catch(_){}
+      }
+
+      try{
+        return localStorage.getItem('doom_gallery_selected_theme') || '';
+      }catch(_){
+        return '';
+      }
+    }
+
+    function parseCurrentThemeStatus(text){
+      const raw = String(text || '').trim();
+      if(!raw) return '';
+
+      try{
+        const json = JSON.parse(raw);
+        const value =
+          json.doomTheme ||
+          json.doom_theme ||
+          json.theme ||
+          json.currentTheme ||
+          json.current_theme;
+        if(value) return cleanThemeName(value);
+      }catch(_){}
+
+      const matches = [
+        raw.match(/:doom-theme\\s+['"]?([A-Za-z0-9_-]+)/),
+        raw.match(/doom[-_ ]theme["'\\s:]+([A-Za-z0-9_-]+)/i),
+        raw.match(/current[-_ ]theme["'\\s:]+([A-Za-z0-9_-]+)/i)
+      ].filter(Boolean);
+
+      return matches.length ? cleanThemeName(matches[0][1]) : '';
+    }
+
+    function cleanThemeName(name){
+      return String(name || '')
+        .trim()
+        .replace(/^'+/, '')
+        .replace(/[)"',]+$/, '')
+        .replace(/-preview$/, '');
+    }
+
+    async function selectCurrentDoomThemeOnLoad(){
+      const current = await fetchCurrentDoomTheme();
+      if(!current) return;
+
+      const candidates = [
+        current,
+        current.replace(/^doom-/, 'doom-'),
+        current.replace(/-theme$/, '')
+      ].filter(Boolean);
+
+      for(const name of candidates){
+        const tile = $(`.theme-tile[data-theme="${CSS.escape(name)}"]`);
+        if(tile){
+          selectTheme(name, srcFor(name), tile);
+          setCaption(name + '  — current Doom theme');
+          return;
+        }
+      }
+    }
+
     function scanThemes(){
       fetch(PREVIEWS_BASE+'index.json',{cache:'no-cache'}).then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
-        .then(buildTiles)
-        .catch(()=> toast('index.json not found at '+PREVIEWS_BASE+' — try Load Folder or Add','⚠️'));
+        .then(files => {
+          buildTiles(files);
+          selectCurrentDoomThemeOnLoad();
+        })
+        .catch(()=> toast('index.json not found at '+PREVIEWS_BASE+' — try Load Folder or Create Theme','⚠️','error'));
     }
 
     function loadFromLocalFiles(files){
@@ -618,5 +783,146 @@
   function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(null,a),ms); } }
 })();
 </script>
+  <!-- Theme Creator v210 exported opener begin -->
+<script src="./theme-creator.js?v=247"></script>
+<script>
+(function themeCreatorExportedOpenerV210() {
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function diagnostic(report) {
+    let modal = document.querySelector(".tc-modal.tc-v210-diagnostic");
+
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.className = "tc-modal tc-v210-diagnostic";
+      document.body.appendChild(modal);
+    }
+
+    modal.hidden = false;
+    modal.style.position = "fixed";
+    modal.style.inset = "0";
+    modal.style.zIndex = "2147483647";
+    modal.style.display = "grid";
+    modal.style.placeItems = "center";
+    modal.style.background = "rgba(0,0,0,.64)";
+
+    modal.innerHTML = `
+      <div style="width:min(78rem,94vw);max-height:90vh;overflow:auto;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:#11111b;color:#cdd6f4;box-shadow:0 24px 80px rgba(0,0,0,.45);font:14px/1.45 system-ui,sans-serif;">
+        <header style="display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.12);background:#181825;">
+          <div>
+            <h2 style="margin:0;font-size:1.05rem;">Theme Creator v210 diagnostic</h2>
+            <p style="margin:.25rem 0 0;color:#a6adc8;">The full JS loaded, but opening still failed.</p>
+          </div>
+          <button type="button" data-tc-v210-close style="appearance:none;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:#313244;color:#cdd6f4;padding:.45rem .75rem;cursor:pointer;">Close</button>
+        </header>
+        <main style="padding:1rem 1.2rem;">
+          <pre style="white-space:pre-wrap;overflow:auto;max-height:64vh;padding:1rem;border-radius:12px;background:#181825;color:#f38ba8;">${escapeHtml(report)}</pre>
+        </main>
+      </div>
+    `;
+
+    const close = modal.querySelector("[data-tc-v210-close]");
+    if (close) {
+      close.addEventListener("click", () => {
+        modal.hidden = true;
+        modal.style.display = "none";
+      }, { once: true });
+    }
+  }
+
+  function requestedThemeName() {
+    const input = document.querySelector("#theme-add-input");
+    return input && input.value ? input.value : "";
+  }
+
+  function stateReport(extra) {
+    return JSON.stringify({
+      extra,
+      scriptVersion: window.themeCreatorScriptVersion || null,
+      exportState: typeof window.themeCreatorV210ExportState === "function"
+        ? window.themeCreatorV210ExportState()
+        : null,
+      functions: {
+        buildCreator: typeof window.buildCreator,
+        updatePreview: typeof window.updatePreview,
+        openThemeCreator: typeof window.openThemeCreator,
+        themeCreatorOpenThemeCreator: typeof window.themeCreatorOpenThemeCreator,
+        themeCreatorOpen: typeof window.themeCreatorOpen,
+        themeCreatorV210OpenThemeCreator: typeof window.themeCreatorV210OpenThemeCreator,
+      },
+      lastError: window.themeCreatorLastError || null,
+      modalCount: document.querySelectorAll(".tc-modal").length,
+      time: new Date().toISOString(),
+    }, null, 2);
+  }
+
+  function attemptOpen() {
+    const opener =
+      window.themeCreatorV210OpenThemeCreator ||
+      window.themeCreatorOpenThemeCreator ||
+      window.themeCreatorOpen ||
+      window.openThemeCreator;
+
+    if (typeof opener !== "function") {
+      diagnostic(stateReport("No exported Theme Creator opener exists after loading theme-creator.js?v=247."));
+      return true;
+    }
+
+    try {
+      const result = opener(requestedThemeName());
+
+      window.themeCreatorV210LastOpen = {
+        result,
+        lastError: window.themeCreatorLastError || null,
+        time: new Date().toISOString(),
+      };
+
+      if (result === false) {
+        diagnostic(stateReport("Exported opener returned false."));
+      }
+
+      return true;
+    } catch (error) {
+      window.themeCreatorLastError = error && (error.stack || error.message || String(error));
+      diagnostic(stateReport({
+        thrownName: error && error.name,
+        thrownMessage: error && error.message,
+        thrownStack: error && error.stack,
+      }));
+      return true;
+    }
+  }
+
+  document.addEventListener("click", function(event) {
+    const button = event.target && event.target.closest
+      ? event.target.closest("#theme-add-btn")
+      : null;
+
+    if (!button) return;
+
+    const text = String(button.textContent || "").trim();
+    if (!/^Create Theme$/i.test(text)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    attemptOpen();
+  }, true);
+
+  window.themeCreatorV210AttemptOpen = attemptOpen;
+  window.themeCreatorV210State = function themeCreatorV210State() {
+    return JSON.parse(stateReport("manual state"));
+  };
+})();
+</script>
+<!-- Theme Creator v210 exported opener end -->
 </body>
 </html>
